@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>机器学习智能学习平台</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&display=swap');
+  </style>
+  <link rel="stylesheet" href="styles/variables.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/components.css">
+  <link rel="stylesheet" href="styles/pages.css">
+</head>
+<body class="home-page">
+
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="index.html" class="navbar-logo">
+        <div class="navbar-logo-icon">S</div>
+        Scholar
+      </a>
+      <div class="navbar-nav">
+        <a href="index.html" class="navbar-link active">首页</a>
+        <a href="learning-path.html" class="navbar-link">学习中心</a>
+        <a href="resources.html" class="navbar-link">知识库</a>
+        <a href="exercises.html" class="navbar-link">练习</a>
+        <a href="report.html" class="navbar-link">学习报告</a>
+      </div>
+      <div class="navbar-user">
+        <div class="avatar" id="userAvatar">学</div>
+      </div>
+    </div>
+  </nav>
+
+  <section class="banner" id="banner">
+    <div class="banner-content">
+      <h1>用心学习<span class="accent">机器学习</span><br>每一步，都算数</h1>
+      <p class="banner-subtitle">因材施教 · 温暖陪伴 · AI 与你一同成长</p>
+      <a href="#" class="banner-btn" onclick="navigateTo('profile.html')">开始今天的学习之旅 →</a>
+    </div>
+  </section>
+
+  <div class="knowledge-thread container">
+    <svg viewBox="0 0 900 80" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="threadGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="var(--primary)"/>
+          <stop offset="60%" stop-color="var(--secondary)"/>
+          <stop offset="100%" stop-color="var(--accent-green)"/>
+        </linearGradient>
+      </defs>
+      <path class="thread-line" d="M30,50 C150,10 300,70 450,40 C600,10 750,60 870,35"/>
+      <circle class="thread-node start" cx="30" cy="50" r="6"/>
+      <circle class="thread-node" cx="150" cy="30" r="4"/>
+      <circle class="thread-node" cx="300" cy="60" r="4"/>
+      <circle class="thread-node" cx="450" cy="40" r="4"/>
+      <circle class="thread-node" cx="600" cy="25" r="4"/>
+      <circle class="thread-node" cx="750" cy="55" r="4"/>
+      <circle class="thread-node end" cx="870" cy="35" r="6"/>
+    </svg>
+  </div>
+
+  <section class="dashboard">
+    <div class="dashboard-grid">
+      <div class="dashboard-card motivational-card" data-reveal data-reveal-delay="0">
+        <p class="motivational-text" id="motivationalText">今天你又进步了 ✨</p>
+      </div>
+
+      <div class="dashboard-card" data-reveal data-reveal-delay="100">
+        <div class="dashboard-card-title">本周学习进度</div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-size:0.875rem;color:var(--text-secondary);">总进度</span>
+          <span style="font-size:0.875rem;font-weight:600;" id="weekProgress">65%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-bar-fill" id="progressFill" style="width:65%"></div>
+        </div>
+        <div style="display:flex;gap:24px;margin-top:12px;">
+          <div style="text-align:center;">
+            <div class="dashboard-card-value" id="knowledgeCount">23</div>
+            <div class="dashboard-card-title">已学知识点</div>
+          </div>
+          <div style="text-align:center;">
+            <div class="dashboard-card-value" id="exerciseCount">156</div>
+            <div class="dashboard-card-title">完成习题</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-card" data-reveal data-reveal-delay="200">
+        <div class="insight-cards">
+          <div class="insight-card">
+            <h4>你的进步亮点</h4>
+            <ul id="strengthList">
+              <li>数据分析</li>
+              <li>特征工程</li>
+            </ul>
+          </div>
+          <div class="insight-card weak">
+            <h4>知识薄弱不足</h4>
+            <ul id="weakList">
+              <li>深度学习优化</li>
+              <li>神经网络调参</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="features-section container">
+    <div class="section-header">
+      <h2>探索学习模块</h2>
+      <p>选择你想要学习的内容，开启个性化学习之旅</p>
+    </div>
+
+    <div class="features-grid">
+
+      <div class="card feature-card" data-reveal data-reveal-delay="0" onclick="navigateTo('learning-path.html')">
+        <div class="feature-card-icon">📚</div>
+        <h3 class="feature-card-title">机器学习知识学习</h3>
+        <p class="feature-card-desc">系统学习机器学习核心概念与算法</p>
+        <div class="feature-card-tags">
+          <span class="tag">监督学习</span>
+          <span class="tag">无监督学习</span>
+        </div>
+      </div>
+
+      <div class="card feature-card" data-reveal data-reveal-delay="80" onclick="navigateTo('learning-path.html')">
+        <div class="feature-card-icon">🧠</div>
+        <h3 class="feature-card-title">个性化学习路径</h3>
+        <p class="feature-card-desc">AI 智能规划专属于你的学习路线</p>
+        <div class="feature-card-tags">
+          <span class="tag tag-success">因材施教</span>
+          <span class="tag">动态调整</span>
+        </div>
+      </div>
+
+      <div class="card feature-card" data-reveal data-reveal-delay="160" onclick="navigateTo('exercises.html')">
+        <div class="feature-card-icon">📝</div>
+        <h3 class="feature-card-title">练习题题库</h3>
+        <p class="feature-card-desc">丰富的练习题巩固学习成果</p>
+        <div class="feature-card-tags">
+          <span class="tag">选择题</span>
+          <span class="tag">编程题</span>
+          <span class="tag">场景题</span>
+        </div>
+      </div>
+
+      <div class="card feature-card" data-reveal data-reveal-delay="240" onclick="navigateTo('resources.html')">
+        <div class="feature-card-icon">📄</div>
+        <h3 class="feature-card-title">学习资料文档</h3>
+        <p class="feature-card-desc">精心整理的机器学习知识库</p>
+        <div class="feature-card-tags">
+          <span class="tag">文档</span>
+          <span class="tag">思维导图</span>
+        </div>
+      </div>
+
+      <div class="card feature-card" data-reveal data-reveal-delay="320" onclick="navigateTo('resources.html')">
+        <div class="feature-card-icon">💻</div>
+        <h3 class="feature-card-title">代码实操案例</h3>
+        <p class="feature-card-desc">从零开始的代码实践教程</p>
+        <div class="feature-card-tags">
+          <span class="tag">Python</span>
+          <span class="tag">scikit-learn</span>
+          <span class="tag">PyTorch</span>
+        </div>
+      </div>
+
+      <div class="card feature-card" data-reveal data-reveal-delay="400" onclick="navigateTo('resources.html')">
+        <div class="feature-card-icon">🎥</div>
+        <h3 class="feature-card-title">多模态教学视频</h3>
+        <p class="feature-card-desc">视频讲解 + 图文并茂</p>
+        <div class="feature-card-tags">
+          <span class="tag">理论</span>
+          <span class="tag">实践</span>
+        </div>
+      </div>
+
+      <div class="card feature-card" data-reveal data-reveal-delay="480" onclick="navigateTo('report.html')">
+        <div class="feature-card-icon">📊</div>
+        <h3 class="feature-card-title">阶段学习报告</h3>
+        <p class="feature-card-desc">每个阶段的成长分析与反馈</p>
+        <div class="feature-card-tags">
+          <span class="tag">进步</span>
+          <span class="tag">薄弱</span>
+          <span class="tag">建议</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="recommend-section" style="background:var(--bg-elevated)">
+    <div class="recommend-container">
+      <h2>热门知识点</h2>
+      <div class="recommend-scroll">
+
+        <div class="recommend-item" data-reveal data-reveal-delay="0">
+          <div style="font-size:1.5rem;margin-bottom:8px;">🔢</div>
+          <h4 style="margin-bottom:8px;">线性代数基础</h4>
+          <p style="font-size:0.875rem;color:var(--text-secondary);">矩阵运算、向量空间、特征值分解</p>
+          <div style="margin-top:12px;">
+            <span class="badge badge-success">基础</span>
+          </div>
+        </div>
+
+        <div class="recommend-item" data-reveal data-reveal-delay="80">
+          <div style="font-size:1.5rem;margin-bottom:8px;">📈</div>
+          <h4 style="margin-bottom:8px;">监督学习算法</h4>
+          <p style="font-size:0.875rem;color:var(--text-secondary);">回归、分类、SVM、决策树</p>
+          <div style="margin-top:12px;">
+            <span class="badge">核心</span>
+          </div>
+        </div>
+
+        <div class="recommend-item" data-reveal data-reveal-delay="160">
+          <div style="font-size:1.5rem;margin-bottom:8px;">🧠</div>
+          <h4 style="margin-bottom:8px;">神经网络基础</h4>
+          <p style="font-size:0.875rem;color:var(--text-secondary);">感知机、反向传播、激活函数</p>
+          <div style="margin-top:12px;">
+            <span class="badge badge-warning">进阶</span>
+          </div>
+        </div>
+
+        <div class="recommend-item" data-reveal data-reveal-delay="240">
+          <div style="font-size:1.5rem;margin-bottom:8px;">🔧</div>
+          <h4 style="margin-bottom:8px;">模型评估与调参</h4>
+          <p style="font-size:0.875rem;color:var(--text-secondary);">交叉验证、网格搜索、正则化</p>
+          <div style="margin-top:12px;">
+            <span class="badge">重要</span>
+          </div>
+        </div>
+
+        <div class="recommend-item" data-reveal data-reveal-delay="320">
+          <div style="font-size:1.5rem;margin-bottom:8px;">📊</div>
+          <h4 style="margin-bottom:8px;">数据预处理</h4>
+          <p style="font-size:0.875rem;color:var(--text-secondary);">缺失值处理、特征缩放、编码</p>
+          <div style="margin-top:12px;">
+            <span class="badge badge-success">基础</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h4>关于我们</h4>
+          <p>机器学习个性化智能学习平台，专注于为每位学习者提供定制化的学习体验。</p>
+        </div>
+        <div class="footer-section">
+          <h4>快速链接</h4>
+          <p><a href="index.html">首页</a></p>
+          <p><a href="learning-path.html">学习中心</a></p>
+          <p><a href="report.html">学习报告</a></p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Scholar</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="scripts/localStorage.js"></script>
+  <script src="scripts/main.js"></script>
+  <script src="scripts/scrollReveal.js"></script>
+  <script>
+    // 初始化页面数据
+    document.addEventListener('DOMContentLoaded', () => {
+      initCommonPage();
+
+      const banner = document.getElementById('banner');
+      if (banner && window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+        banner.addEventListener('mousemove', (e) => {
+          const rect = banner.getBoundingClientRect();
+          const x = (e.clientX - rect.left) / rect.width - 0.5;
+          const y = (e.clientY - rect.top) / rect.height - 0.5;
+          const content = banner.querySelector('.banner-content');
+          if (content) {
+            content.style.transform = `translate(${x * 12}px, ${y * 12}px)`;
+          }
+        });
+        banner.addEventListener('mouseleave', () => {
+          const content = banner.querySelector('.banner-content');
+          if (content) {
+            content.style.transform = 'translate(0, 0)';
+            content.style.transition = 'transform 0.8s ease-out';
+          }
+        });
+      }
+
+      // 如果未注册，跳转到注册页
+      if (!Storage.isRegistered()) {
+        navigateTo('register.html');
+        return;
+      }
+
+      // 如果未完成画像，跳转到画像页
+      if (!Storage.isProfileCompleted()) {
+        navigateTo('profile.html');
+        return;
+      }
+
+      // 加载用户数据
+      const user = Storage.getUser();
+      const progress = Storage.getProgress();
+      const report = Storage.getReport();
+
+      // 更新用户头像
+      if (user && user.username) {
+        document.getElementById('userAvatar').textContent = user.username.charAt(0);
+      }
+
+      // 更新进度数据
+      document.getElementById('weekProgress').textContent = progress.weekProgress + '%';
+      document.getElementById('progressFill').style.width = progress.weekProgress + '%';
+      document.getElementById('knowledgeCount').textContent = progress.totalKnowledge;
+      document.getElementById('exerciseCount').textContent = progress.totalExercises;
+
+      animateNumber(document.getElementById('knowledgeCount'), progress.totalKnowledge, 1200);
+      animateNumber(document.getElementById('exerciseCount'), progress.totalExercises, 1200);
+
+      // 更新进步/薄弱列表
+      if (report.strengthPoints) {
+        document.getElementById('strengthList').innerHTML = report.strengthPoints
+          .map(p => `<li>${p}</li>`).join('');
+      }
+      if (report.weakPoints) {
+        document.getElementById('weakList').innerHTML = report.weakPoints
+          .map(p => `<li>${p}</li>`).join('');
+      }
+    });
+  </script>
+</body>
+</html>

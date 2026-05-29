@@ -1,0 +1,45 @@
+# Web框架
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+
+# LangGraph & LangChain
+langgraph==0.0.55
+langchain==0.1.0
+
+# 数据库 - PostgreSQL（生产） + SQLite（开发）
+sqlalchemy[asyncio]==2.0.23
+asyncpg==0.29.0
+aiosqlite==0.19.0
+alembic==1.13.0
+
+# Redis缓存与会话管理
+redis==5.0.1
+hiredis==2.2.3
+
+# HTTP客户端
+httpx==0.25.2
+
+# 认证与加密
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+
+# 配置管理
+python-dotenv==1.0.0
+pydantic==2.5.2
+pydantic-settings==2.1.0
+
+# 异步支持
+aiofiles==23.2.1
+
+# 讯飞星火官方SDK（自动处理认证）
+spark-ai-python>=0.4.5
+
+# 向量数据库
+pymilvus>=3.0.0
+
+# OSS对象存储
+minio>=7.2.7
+
+# 数值计算（向量用）
+numpy

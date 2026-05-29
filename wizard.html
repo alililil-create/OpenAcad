@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>学习画像构建向导 - ML 教育平台</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); min-height: 100vh; color: #e0e0e0; }
+
+  /* Progress Steps */
+  .progress-bar-wrap { position: sticky; top: 0; z-index: 100; background: rgba(15,12,41,0.92); backdrop-filter: blur(10px); padding: 18px 20px 12px; border-bottom: 1px solid rgba(120,100,255,0.18); }
+  .progress-steps { display: flex; justify-content: space-between; align-items: flex-start; max-width: 800px; margin: 0 auto; }
+  .progress-steps .step { display: flex; flex-direction: column; align-items: center; flex: 1; position: relative; cursor: default; }
+  .progress-steps .step .circle { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; border: 2.5px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.35); transition: all 0.35s; }
+  .progress-steps .step.active .circle { border-color: #a78bfa; background: linear-gradient(135deg, #7c3aed, #a78bfa); color: #fff; box-shadow: 0 0 18px rgba(124,58,237,0.45); }
+  .progress-steps .step.done .circle { border-color: #34d399; background: #34d399; color: #fff; }
+  .progress-steps .step .label { font-size: 10px; margin-top: 5px; color: rgba(255,255,255,0.35); text-align: center; max-width: 70px; line-height: 1.3; transition: color 0.35s; }
+  .progress-steps .step.active .label { color: #c4b5fd; }
+  .progress-steps .step.done .label { color: #6ee7b7; }
+  .progress-steps .step::after { content: ''; position: absolute; top: 18px; left: calc(50% + 22px); width: calc(100% - 44px); height: 2px; background: rgba(255,255,255,0.12); transition: background 0.35s; }
+  .progress-steps .step:last-child::after { display: none; }
+  .progress-steps .step.done::after { background: rgba(52,211,153,0.4); }
+
+  /* Container */
+  .wizard-container { max-width: 800px; margin: 0 auto; padding: 28px 20px 50px; }
+
+  /* Stage Card */
+  .stage-card { background: rgba(255,255,255,0.06); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.1); border-radius: 18px; padding: 36px 32px; box-shadow: 0 8px 32px rgba(0,0,0,0.25); animation: fadeSlideIn 0.45s ease; }
+  @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+  .stage-card h2 { font-size: 24px; font-weight: 700; background: linear-gradient(135deg, #c4b5fd, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
+  .stage-card h3 { font-size: 17px; color: #c4b5fd; margin-bottom: 18px; font-weight: 500; }
+  .stage-card p { line-height: 1.75; color: #b0b0c8; margin-bottom: 16px; }
+
+  /* Buttons */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 12px 28px; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; border: none; transition: all 0.25s; font-family: inherit; }
+  .btn-primary { background: linear-gradient(135deg, #7c3aed, #a78bfa); color: #fff; box-shadow: 0 4px 16px rgba(124,58,237,0.35); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(124,58,237,0.5); }
+  .btn-secondary { background: rgba(255,255,255,0.08); color: #c4b5fd; border: 1px solid rgba(167,139,250,0.3); }
+  .btn-secondary:hover { background: rgba(255,255,255,0.14); }
+  .btn-sm { padding: 7px 16px; font-size: 13px; border-radius: 7px; }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+  /* Stage 0 Welcome */
+  .welcome-icon { font-size: 56px; text-align: center; margin-bottom: 16px; }
+  .info-box { background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.25); border-radius: 12px; padding: 16px 20px; margin: 18px 0; }
+
+  /* Stage 1 Upload */
+  .upload-zone { border: 2px dashed rgba(167,139,250,0.35); border-radius: 16px; padding: 50px 20px; text-align: center; cursor: pointer; transition: all 0.3s; background: rgba(255,255,255,0.03); }
+  .upload-zone:hover, .upload-zone.dragover { border-color: #a78bfa; background: rgba(124,58,237,0.08); }
+  .upload-zone .upload-icon { font-size: 44px; margin-bottom: 10px; }
+  .upload-zone .upload-hint { color: #8888aa; font-size: 13px; margin-top: 6px; }
+  .extracted-info { background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.25); border-radius: 12px; padding: 16px 20px; margin-top: 18px; display: none; }
+  .extracted-info h4 { color: #6ee7b7; margin-bottom: 8px; font-size: 14px; }
+  .extracted-info pre { white-space: pre-wrap; font-size: 13px; color: #b0b0c8; line-height: 1.6; }
+
+  /* Stage 2 Subject */
+  .subject-card { background: rgba(167,139,250,0.08); border: 2px solid #a78bfa; border-radius: 14px; padding: 20px 24px; display: flex; align-items: center; gap: 16px; }
+  .subject-card .check { font-size: 24px; color: #a78bfa; }
+  .subject-info { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; }
+  .subject-info .info-chip { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 12px 16px; text-align: center; }
+  .subject-info .info-chip .num { font-size: 28px; font-weight: 800; color: #c4b5fd; }
+  .subject-info .info-chip .txt { font-size: 12px; color: #8888aa; margin-top: 2px; }
+
+  /* Stage 3 Quiz */
+  .quiz-progress-bar { height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin-bottom: 20px; overflow: hidden; }
+  .quiz-progress-bar .fill { height: 100%; background: linear-gradient(90deg, #7c3aed, #a78bfa); border-radius: 3px; transition: width 0.4s; }
+  .quiz-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-size: 13px; color: #8888aa; }
+  .quiz-meta .chapter-tag { background: rgba(124,58,237,0.2); color: #c4b5fd; padding: 3px 10px; border-radius: 6px; font-weight: 600; }
+  .question-card { background: rgba(255,255,255,0.04); border-radius: 14px; padding: 24px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 16px; }
+  .question-card .q-text { font-size: 17px; line-height: 1.7; margin-bottom: 18px; color: #e0e0e0; }
+  .options-list { display: flex; flex-direction: column; gap: 10px; }
+  .option-btn { display: block; width: 100%; text-align: left; padding: 13px 18px; border-radius: 10px; background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.12); color: #d0d0e0; font-size: 14px; cursor: pointer; transition: all 0.2s; font-family: inherit; line-height: 1.5; }
+  .option-btn:hover:not(.correct):not(.incorrect):not(.dont-know) { border-color: rgba(167,139,250,0.5); background: rgba(124,58,237,0.1); }
+  .option-btn.correct { border-color: #34d399; background: rgba(52,211,153,0.15); color: #6ee7b7; }
+  .option-btn.incorrect { border-color: #f87171; background: rgba(248,113,113,0.12); color: #fca5a5; }
+  .option-btn.dont-know { border-color: rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #8888aa; }
+  .explanation-box { margin-top: 14px; padding: 14px 18px; border-radius: 10px; font-size: 14px; line-height: 1.6; display: none; }
+  .explanation-box.correct-exp { background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.2); color: #6ee7b7; }
+  .explanation-box.incorrect-exp { background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.2); color: #fca5a5; }
+  .dont-know-btn { display: block; margin: 12px auto 0; padding: 10px 24px; border-radius: 8px; background: transparent; border: 1px solid rgba(255,255,255,0.15); color: #8888aa; font-size: 13px; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+  .dont-know-btn:hover { border-color: rgba(255,255,255,0.3); color: #aaa; }
+  .skip-notice { background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.25); border-radius: 10px; padding: 12px 16px; margin-top: 14px; color: #fbbf24; font-size: 13px; display: none; }
+
+  /* Stage 4 Generation */
+  .loading-spinner { display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 50px 20px; }
+  .spinner { width: 52px; height: 52px; border: 4px solid rgba(167,139,250,0.2); border-top-color: #a78bfa; border-radius: 50%; animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { color: #c4b5fd; font-size: 15px; }
+  .loading-sub { color: #8888aa; font-size: 13px; }
+  .gen-steps { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+  .gen-step { display: flex; align-items: center; gap: 10px; font-size: 14px; color: #8888aa; }
+  .gen-step.done { color: #6ee7b7; }
+  .gen-step .step-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.15); }
+  .gen-step.done .step-dot { background: #34d399; }
+
+  /* Stage 5 Profile */
+  .profile-chart { width: 100%; max-width: 400px; margin: 0 auto 24px; display: block; }
+  .overall-score-bar { height: 10px; background: rgba(255,255,255,0.1); border-radius: 5px; overflow: hidden; margin: 10px 0 20px; }
+  .overall-score-bar .fill-bar { height: 100%; border-radius: 5px; background: linear-gradient(90deg, #7c3aed, #a78bfa, #34d399); transition: width 0.6s; }
+  .overall-label { display: flex; justify-content: space-between; font-size: 13px; color: #8888aa; margin-bottom: 4px; }
+  .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 18px; }
+  .weak-points-list, .strong-points-list { background: rgba(255,255,255,0.04); border-radius: 12px; padding: 16px 18px; }
+  .weak-points-list h4 { color: #fca5a5; margin-bottom: 10px; font-size: 14px; }
+  .strong-points-list h4 { color: #6ee7b7; margin-bottom: 10px; font-size: 14px; }
+  .weak-points-list ul, .strong-points-list ul { list-style: none; }
+  .weak-points-list li, .strong-points-list li { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
+  .adj-btns { display: flex; gap: 4px; }
+  .adj-btns button { width: 24px; height: 24px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color: #ccc; cursor: pointer; font-size: 14px; line-height: 1; transition: all 0.2s; }
+  .adj-btns button:hover { background: rgba(124,58,237,0.2); border-color: #a78bfa; }
+  .score-val { font-weight: 700; color: #c4b5fd; min-width: 28px; text-align: center; }
+
+  /* Stage 6 Final */
+  .path-card { background: rgba(255,255,255,0.04); border-radius: 14px; padding: 20px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 12px; }
+  .path-card h4 { color: #c4b5fd; margin-bottom: 8px; font-size: 15px; }
+  .path-card .path-desc { font-size: 13px; color: #b0b0c8; line-height: 1.6; }
+  .path-card .path-level { display: inline-block; padding: 2px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; margin-left: 8px; }
+  .path-level.beginner { background: rgba(52,211,153,0.15); color: #6ee7b7; }
+  .path-level.intermediate { background: rgba(251,191,36,0.15); color: #fbbf24; }
+  .path-level.advanced { background: rgba(248,113,113,0.15); color: #fca5a5; }
+  .done-icon { text-align: center; font-size: 60px; margin-bottom: 10px; }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .wizard-container { padding: 16px 12px 40px; }
+    .stage-card { padding: 24px 18px; }
+    .profile-grid { grid-template-columns: 1fr; }
+    .subject-info { grid-template-columns: 1fr 1fr; }
+    .progress-steps .step .label { font-size: 8px; max-width: 50px; }
+    .progress-steps .step .circle { width: 28px; height: 28px; font-size: 11px; }
+    .progress-steps .step::after { top: 14px; left: calc(50% + 18px); width: calc(100% - 36px); }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-bar-wrap">
+  <div class="progress-steps" id="progressSteps">
+    <div class="step" data-stage="0"><div class="circle">1</div><div class="label">欢迎</div></div>
+    <div class="step" data-stage="1"><div class="circle">2</div><div class="label">上传资料</div></div>
+    <div class="step" data-stage="2"><div class="circle">3</div><div class="label">选择学科</div></div>
+    <div class="step" data-stage="3"><div class="circle">4</div><div class="label">能力测评</div></div>
+    <div class="step" data-stage="4"><div class="circle">5</div><div class="label">生成画像</div></div>
+    <div class="step" data-stage="5"><div class="circle">6</div><div class="label">画像展示</div></div>
+    <div class="step" data-stage="6"><div class="circle">7</div><div class="label">学习路径</div></div>
+  </div>
+</div>
+
+<div class="wizard-container" id="wizardContainer"></div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ====== STATE ====== */
+  const BASE_URL = () => localStorage.getItem('api_base_url') || 'http://127.0.0.1:8000';
+  const USER_ID = () => {
+    try {
+      const user = JSON.parse(localStorage.getItem('ml_user') || 'null');
+      return user?.user_id || null;
+    } catch(e) { return null; }
+  };
+
+  let currentStage = 0;
+  let uploadedFile = null;
+  let uploadedFileInfo = null;
+  let selectedSubject = 'machine_learning';
+  let quizQuestions = [];
+  let quizAnswers = [];
+  let currentQuestionIndex = 0;
+  let chapterCorrectCounts = {};
+  let chapterRequiredCorrect = {};
+  let chapterSkipped = {};
+  let activeChapter = null;
+  let capabilityMatrix = null;
+  let profileAdjustments = {};
+  let weakPointsData = [];
+
+  /* ====== DOM REF ====== */
+  const container = document.getElementById('wizardContainer');
+  const progressSteps = document.getElementById('progressSteps');
+
+  /* ====== RENDER ====== */
+  function updateProgress() {
+    const steps = progressSteps.querySelectorAll('.step');
+    steps.forEach(s => { s.classList.remove('active','done'); });
+    for (let i = 0; i < steps.length; i++) {
+      if (i < currentStage) steps[i].classList.add('done');
+      if (i === currentStage) steps[i].classList.add('active');
+    }
+  }
+
+  function renderStage() {
+    updateProgress();
+    switch (currentStage) {
+      case 0: renderStage0(); break;
+      case 1: renderStage1(); break;
+      case 2: renderStage2(); break;
+      case 3: renderStage3(); break;
+      case 4: renderStage4(); break;
+      case 5: renderStage5(); break;
+      case 6: renderStage6(); break;
+    }
+  }
+
+  /* ====== STAGE 0: Welcome ====== */
+  function renderStage0() {
+    container.innerHTML = `
+      <div class="stage-card">
+        <div class="welcome-icon">🧠</div>
+        <h2>欢迎来到学习画像构建</h2>
+        <p>为了给你推荐最合适的学习内容，需要你花 <strong style="color:#c4b5fd;">5-8 分钟</strong> 完成画像构建。</p>
+        <div class="info-box">
+          <p style="margin:0;font-size:14px;">📋 <strong>流程说明：</strong></p>
+          <p style="margin:6px 0 0;font-size:13px;color:#b0b0c8;">上传资料 → 选择学科 → 能力测评 → 生成画像 → 查看画像 → 获取学习路径</p>
+        </div>
+        <div class="info-box" style="margin-top:12px;">
+          <p style="margin:0;font-size:14px;">💡 <strong>温馨提示：</strong></p>
+          <p style="margin:6px 0 0;font-size:13px;color:#b0b0c8;">测评环节共 15 道题，系统会根据你的答题情况自适应调整，不用担心，尽力作答即可。</p>
+        </div>
+        <div style="text-align:center;margin-top:24px;">
+          <button class="btn btn-primary" onclick="window._wizard.goStage(1)">开始构建画像 →</button>
+        </div>
+      </div>`;
+  }
+
+  /* ====== STAGE 1: Document Upload ====== */
+  function handleFile(file) {
+    if (!file) return;
+    const allowed = ['.txt','.pdf','.docx','.md'];
+    const ext = '.' + file.name.split('.').pop().toLowerCase();
+    if (!allowed.includes(ext)) {
+      alert('仅支持 .txt / .pdf / .docx / .md 格式文件');
+      return;
+    }
+    if (file.size > 20 * 1024 * 1024) {
+      alert('文件大小不能超过 20MB');
+      return;
+    }
+    uploadedFile = file;
+    uploadedFileInfo = { name: file.name, size: (file.size / 1024).toFixed(1) + ' KB', type: ext };
+    renderStage1();
+  }
+
+  function renderStage1() {
+    container.innerHTML = `
+      <div class="stage-card">
+        <h2>📄 上传学习资料</h2>
+        <p>上传你的简历、成绩单或相关学习记录（.txt / .pdf / .docx / .md），系统将自动提取关键信息。</p>
+        <div class="upload-zone" id="uploadZone">
+          <div class="upload-icon">📁</div>
+          <div style="font-size:15px;color:#c4b5fd;">拖拽文件到此处，或点击选择文件</div>
+          <div class="upload-hint">支持 .txt / .pdf / .docx / .md，最大 20MB</div>
+          <input type="file" id="fileInput" accept=".txt,.pdf,.docx,.md" style="display:none;">
+        </div>
+        <div class="extracted-info" id="extractedInfo">
+          <h4>✅ 已提取信息</h4>
+          <div id="extractedContent"></div>
+        </div>
+        <div style="display:flex;gap:12px;justify-content:center;margin-top:20px;">
+          <button class="btn btn-secondary" onclick="window._wizard.goStage(0)">← 上一步</button>
+          <button class="btn btn-primary" id="btnNext1" ${uploadedFile ? '' : 'disabled'} onclick="window._wizard.goStage(2)">下一步 →</button>
+        </div>
+      </div>`;
+
+    const zone = document.getElementById('uploadZone');
+    const input = document.getElementById('fileInput');
+    if (zone && input) {
+      zone.addEventListener('click', () => input.click());
+      zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+      zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+      zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('dragover'); handleFile(e.dataTransfer.files[0]); });
+      input.addEventListener('change', e => handleFile(e.target.files[0]));
+    }
+
+    if (uploadedFileInfo) {
+      const info = document.getElementById('extractedInfo');
+      const content = document.getElementById('extractedContent');
+      if (info && content) {
+        info.style.display = 'block';
+        content.innerHTML = `<pre>文件名: ${uploadedFileInfo.name}\n大小: ${uploadedFileInfo.size}\n类型: ${uploadedFileInfo.type}\n\n文件已就绪，系统将在后续步骤中提取关键信息。</pre>`;
+      }
+    }
+  }
+
+  /* ====== STAGE 2: Select Subject ====== */
+  function renderStage2() {
+    container.innerHTML = `
+      <div class="stage-card">
+        <h2>📚 选择学习学科</h2>
+        <p>请选择你想要学习的方向：</p>
+        <div class="subject-card">
+          <div class="check">✅</div>
+          <div>
+            <div style="font-size:17px;font-weight:700;color:#e0e0e0;">机器学习</div>
+            <div style="font-size:13px;color:#8888aa;">Machine Learning</div>
+          </div>
+        </div>
+        <div class="subject-info">
+          <div class="info-chip"><div class="num">7</div><div class="txt">章节数量</div></div>
+          <div class="info-chip"><div class="num">28</div><div class="txt">知识点数量</div></div>
+        </div>
+        <p style="margin-top:14px;font-size:13px;color:#8888aa;">涵盖：机器学习概述、线性回归、逻辑回归、决策树、支持向量机、神经网络、集成学习</p>
+        <div style="display:flex;gap:12px;justify-content:center;margin-top:20px;">
+          <button class="btn btn-secondary" onclick="window._wizard.goStage(1)">← 上一步</button>
+          <button class="btn btn-primary" onclick="window._wizard.startQuiz()">开始测评 →</button>
+        </div>
+      </div>`;
+  }
+
+  /* ====== STAGE 3: Quiz ====== */
+  const QUIZ_DATA = [
+    // Chapter 1: 机器学习概述 (q0-q1)
+    { id: 'q0', chapter: '机器学习概述', chapterIdx: 0, question: '以下哪项最准确地描述了"机器学习"？', options: ['A. 计算机通过明确的规则编程来执行任务', 'B. 计算机从数据中自动学习模式和规律', 'C. 计算机模拟人类大脑的所有功能', 'D. 计算机执行预先定义的逻辑推理'], correct: 1, explanation: '机器学习的核心是从数据中自动学习规律，而无需显式编程。' },
+    { id: 'q1', chapter: '机器学习概述', chapterIdx: 0, question: '下列哪个不属于机器学习的主要类型？', options: ['A. 监督学习', 'B. 无监督学习', 'C. 强化学习', 'D. 演绎学习'], correct: 3, explanation: '机器学习的三种主要类型是监督学习、无监督学习和强化学习。"演绎学习"不是标准分类。' },
+    // Chapter 2: 线性回归 (q2-q3)
+    { id: 'q2', chapter: '线性回归', chapterIdx: 1, question: '在线性回归中，最常用的损失函数是？', options: ['A. 交叉熵损失', 'B. 均方误差 (MSE)', 'C. Hinge Loss', 'D. 对数损失'], correct: 1, explanation: '线性回归通常使用均方误差 (MSE) 作为损失函数，衡量预测值与真实值的平方差。' },
+    { id: 'q3', chapter: '线性回归', chapterIdx: 1, question: '过拟合（Overfitting）的典型表现是？', options: ['A. 训练误差和测试误差都很大', 'B. 训练误差小但测试误差大', 'C. 训练误差和测试误差都很小', 'D. 训练误差大但测试误差小'], correct: 1, explanation: '过拟合时模型在训练集上表现很好（误差小），但在测试集上泛化能力差（误差大）。' },
+    // Chapter 3: 逻辑回归 (q4-q5)
+    { id: 'q4', chapter: '逻辑回归', chapterIdx: 2, question: '逻辑回归主要用于解决什么问题？', options: ['A. 回归预测连续值', 'B. 分类问题（尤其是二分类）', 'C. 聚类分析', 'D. 降维'], correct: 1, explanation: '尽管名字叫"回归"，逻辑回归主要用于分类任务，尤其是二分类。' },
+    { id: 'q5', chapter: '逻辑回归', chapterIdx: 2, question: '逻辑回归中常用的激活函数是？', options: ['A. ReLU', 'B. Tanh', 'C. Sigmoid', 'D. Softmax'], correct: 2, explanation: '逻辑回归使用 Sigmoid 函数将线性输出映射到 (0,1) 区间，表示概率。' },
+    // Chapter 4: 决策树 (q6-q7)
+    { id: 'q6', chapter: '决策树', chapterIdx: 3, question: '决策树选择分裂节点时，常用的指标不包括？', options: ['A. 信息增益', 'B. 基尼指数', 'C. 均方误差', 'D. 信息增益率'], correct: 2, explanation: '信息增益、基尼指数和信息增益率是决策树分类的常用指标。MSE 主要用于回归。' },
+    { id: 'q7', chapter: '决策树', chapterIdx: 3, question: '防止决策树过拟合的常用方法是？', options: ['A. 增加树的深度', 'B. 剪枝 (Pruning)', 'C. 增加训练数据噪声', 'D. 使用更多特征'], correct: 1, explanation: '剪枝是防止决策树过拟合的主要方法，包括预剪枝和后剪枝。' },
+    // Chapter 5: 支持向量机 (q8-q9)
+    { id: 'q8', chapter: '支持向量机', chapterIdx: 4, question: 'SVM 中的"支持向量"指的是？', options: ['A. 所有训练样本', 'B. 距离决策边界最近的样本点', 'C. 被正确分类的样本', 'D. 噪声数据'], correct: 1, explanation: '支持向量是距离超平面最近的那些样本点，它们决定了分类边界的位置。' },
+    { id: 'q9', chapter: '支持向量机', chapterIdx: 4, question: 'SVM 中的核函数 (Kernel) 主要作用是？', options: ['A. 加速计算', 'B. 将数据映射到高维空间使其线性可分', 'C. 减少过拟合', 'D. 选择特征'], correct: 1, explanation: '核函数将低维数据映射到高维空间，使得在原空间非线性可分的数据在高维空间中变得线性可分。' },
+    // Chapter 6: 神经网络 (q10-q11)
+    { id: 'q10', chapter: '神经网络', chapterIdx: 5, question: '下列哪个不是常用的激活函数？', options: ['A. ReLU', 'B. Sigmoid', 'C. Linear', 'D. 信息增益函数'], correct: 3, explanation: '信息增益函数是决策树中使用的概念，不是激活函数。常用激活函数包括 ReLU、Sigmoid、Tanh 等。' },
+    { id: 'q11', chapter: '神经网络', chapterIdx: 5, question: '反向传播算法 (Backpropagation) 的主要目的是？', options: ['A. 初始化网络权重', 'B. 计算损失函数对各层权重的梯度', 'C. 增加网络层数', 'D. 选择最优激活函数'], correct: 1, explanation: '反向传播通过链式法则计算损失函数关于各层权重的梯度，用于梯度下降更新参数。' },
+    // Chapter 7: 集成学习 (q12-q14)
+    { id: 'q12', chapter: '集成学习', chapterIdx: 6, question: '随机森林 (Random Forest) 属于哪种集成方法？', options: ['A. Boosting', 'B. Bagging', 'C. Stacking', 'D. 以上都不是'], correct: 1, explanation: '随机森林使用 Bagging 策略，通过 Bootstrap 采样训练多棵决策树并投票。' },
+    { id: 'q13', chapter: '集成学习', chapterIdx: 6, question: '关于 Boosting 和 Bagging，以下哪项正确？', options: ['A. Boosting 模型并行训练，Bagging 串行训练', 'B. Boosting 串行训练，Bagging 并行训练', 'C. 两者都是并行训练', 'D. 两者都是串行训练'], correct: 1, explanation: 'Boosting（如 AdaBoost、GBDT）是串行的，每轮根据前一轮误差调整；Bagging（如随机森林）是并行的。' },
+    { id: 'q14', chapter: '集成学习', chapterIdx: 6, question: 'XGBoost 相比传统 GBDT 的主要优势是？', options: ['A. 更简单的模型结构', 'B. 引入正则化项和二阶梯度信息', 'C. 只能用于分类', 'D. 不需要调参'], correct: 1, explanation: 'XGBoost 引入了正则化项防止过拟合，并使用二阶泰勒展开逼近损失函数，提高了精度和效率。' }
+  ];
+
+  function startQuiz() {
+    quizQuestions = [...QUIZ_DATA];
+    quizAnswers = [];
+    currentQuestionIndex = 0;
+    chapterCorrectCounts = {};
+    chapterRequiredCorrect = {};
+    chapterSkipped = {};
+    const chapters = ['机器学习概述','线性回归','逻辑回归','决策树','支持向量机','神经网络','集成学习'];
+    chapters.forEach((ch, i) => {
+      const chQs = quizQuestions.filter(q => q.chapterIdx === i);
+      chapterRequiredCorrect[ch] = Math.min(2, chQs.length);
+      chapterCorrectCounts[ch] = 0;
+      chapterSkipped[ch] = false;
+    });
+    activeChapter = null;
+    currentStage = 3;
+    renderStage3Question();
+  }
+
+  function getCurrentValidQuestions() {
+    return quizQuestions.filter(q => {
+      if (activeChapter === null) return q.chapterIdx === quizQuestions[currentQuestionIndex]?.chapterIdx;
+      return q.chapter === activeChapter;
+    });
+  }
+
+  function getActiveChapterQuestions() {
+    const ch = quizQuestions[currentQuestionIndex]?.chapter;
+    if (!ch) return [];
+    return quizQuestions.filter(q => q.chapter === ch);
+  }
+
+  function findNextQuestionIndex() {
+    let idx = currentQuestionIndex + 1;
+    while (idx < quizQuestions.length) {
+      const q = quizQuestions[idx];
+      if (!chapterSkipped[q.chapter]) return idx;
+      idx++;
+    }
+    return -1;
+  }
+
+  function handleAnswer(questionId, selectedOption) {
+    const q = quizQuestions.find(qq => qq.id === questionId);
+    if (!q) return;
+    const isCorrect = (selectedOption === q.correct);
+    quizAnswers.push({ question_id: q.id, selected_option: selectedOption, is_correct: isCorrect });
+    if (isCorrect) {
+      chapterCorrectCounts[q.chapter] = (chapterCorrectCounts[q.chapter] || 0) + 1;
+    }
+
+    const chQs = quizQuestions.filter(qq => qq.chapter === q.chapter);
+    const needed = chapterRequiredCorrect[q.chapter] || 2;
+
+    if (chapterCorrectCounts[q.chapter] >= needed) {
+      chapterSkipped[q.chapter] = true;
+    }
+
+    renderStage3QuestionWithAnswer(q, isCorrect);
+  }
+
+  function renderStage3Question() {
+    if (currentQuestionIndex >= quizQuestions.length) {
+      finishQuiz();
+      return;
+    }
+    const q = quizQuestions[currentQuestionIndex];
+    if (chapterSkipped[q.chapter]) {
+      const next = findNextQuestionIndex();
+      if (next >= 0) { currentQuestionIndex = next; renderStage3Question(); }
+      else { finishQuiz(); }
+      return;
+    }
+    activeChapter = q.chapter;
+
+    const chQs = getActiveChapterQuestions();
+    const answeredInCh = quizAnswers.filter(a => {
+      const qq = quizQuestions.find(qqq => qqq.id === a.question_id);
+      return qq && qq.chapter === q.chapter;
+    }).length;
+    const chTotal = chQs.length;
+    const totalQs = quizQuestions.filter(qq => !chapterSkipped[qq.chapter]).length;
+    const totalAnswered = quizAnswers.length;
+    const progressPct = totalQs > 0 ? (totalAnswered / totalQs * 100) : 0;
+    const needed = chapterRequiredCorrect[q.chapter] || 2;
+    const chCorrect = chapterCorrectCounts[q.chapter] || 0;
+
+    container.innerHTML = `
+      <div class="stage-card">
+        <h2>📝 能力测评</h2>
+        <div class="quiz-progress-bar"><div class="fill" style="width:${progressPct}%;"></div></div>
+        <div class="quiz-meta">
+          <span class="chapter-tag">${q.chapter}</span>
+          <span>第 ${totalAnswered + 1} / ${totalQs} 题 | 本章正确 ${chCorrect}/${needed}（达标后自动跳过）</span>
+        </div>
+        <div class="question-card" id="questionCard">
+          <div class="q-text">${q.question}</div>
+          <div class="options-list" id="optionsList">
+            ${q.options.map((opt, i) => `<button class="option-btn" data-idx="${i}" onclick="window._wizard.handleAnswer('${q.id}', ${i})">${opt}</button>`).join('')}
+          </div>
+          <div class="explanation-box" id="explanationBox"></div>
+          <button class="dont-know-btn" id="dontKnowBtn" onclick="window._wizard.handleDontKnow('${q.id}')">🤷 不知道</button>
+          <div class="skip-notice" id="skipNotice"></div>
+        </div>
+        <div style="text-align:center;margin-top:16px;">
+          <button class="btn btn-secondary btn-sm" id="btnNextQ" style="display:none;" onclick="window._wizard.nextQuestion()">下一题 →</button>
+        </div>
+      </div>`;
+  }
+
+  function renderStage3QuestionWithAnswer(q, isCorrect) {
+    const opts = document.querySelectorAll('.option-btn');
+    const expBox = document.getElementById('explanationBox');
+    const btnNext = document.getElementById('btnNextQ');
+    const dontKnowBtn = document.getElementById('dontKnowBtn');
+    const skipNotice = document.getElementById('skipNotice');
+
+    opts.forEach(btn => {
+      btn.disabled = true;
+      const idx = parseInt(btn.dataset.idx);
+      if (idx === q.correct) btn.classList.add('correct');
+      if (idx !== q.correct && btn.classList.contains('option-btn')) {
+        if (idx === (quizAnswers[quizAnswers.length - 1]?.selected_option) && !isCorrect) {
+          btn.classList.add('incorrect');
+        }
+      }
+    });
+
+    if (dontKnowBtn) dontKnowBtn.style.display = 'none';
+    if (expBox) {
+      expBox.style.display = 'block';
+      expBox.className = 'explanation-box ' + (isCorrect ? 'correct-exp' : 'incorrect-exp');
+      expBox.textContent = (isCorrect ? '✅ 正确！' : '❌ 不正确。') + ' ' + q.explanation;
+    }
+
+    if (chapterSkipped[q.chapter] && skipNotice) {
+      skipNotice.style.display = 'block';
+      skipNotice.textContent = `🎉 本章已达正确数量要求（${chapterCorrectCounts[q.chapter]} / ${chapterRequiredCorrect[q.chapter]}），剩下题目将自动跳过！`;
+    }
+
+    if (btnNext) btnNext.style.display = 'inline-flex';
+  }
+
+  function handleDontKnow(questionId) {
+    const q = quizQuestions.find(qq => qq.id === questionId);
+    if (!q) return;
+    quizAnswers.push({ question_id: q.id, selected_option: -1, is_correct: false });
+    renderStage3QuestionWithAnswer(q, false);
+  }
+
+  function nextQuestion() {
+    let next = findNextQuestionIndex();
+    if (next < 0) {
+      finishQuiz();
+      return;
+    }
+    currentQuestionIndex = next;
+    renderStage3Question();
+  }
+
+  function finishQuiz() {
+    currentStage = 4;
+    renderStage4();
+  }
+
+  /* ====== STAGE 4: Profile Generation ====== */
+  function renderStage4() {
+    container.innerHTML = `
+      <div class="stage-card">
+        <h2>🔄 正在生成学习画像</h2>
+        <div class="loading-spinner">
+          <div class="spinner"></div>
+          <div class="loading-text">系统正在分析你的答题数据...</div>
+          <div class="loading-sub">预计需要 10-15 秒</div>
+          <div class="gen-steps" id="genSteps">
+            <div class="gen-step" id="gs0"><span class="step-dot"></span> 分析答题情况</div>
+            <div class="gen-step" id="gs1"><span class="step-dot"></span> 评估各章节掌握度</div>
+            <div class="gen-step" id="gs2"><span class="step-dot"></span> 生成能力矩阵</div>
+            <div class="gen-step" id="gs3"><span class="step-dot"></span> 识别强项与薄弱点</div>
+            <div class="gen-step" id="gs4"><span class="step-dot"></span> 计算综合评分</div>
+          </div>
+        </div>
+      </div>`;
+
+    const steps = [
+      { el: 'gs0', delay: 800 },
+      { el: 'gs1', delay: 1800 },
+      { el: 'gs2', delay: 2800 },
+      { el: 'gs3', delay: 3800 },
+      { el: 'gs4', delay: 4800 }
+    ];
+
+    steps.forEach(({ el, delay }) => {
+      setTimeout(() => {
+        const elem = document.getElementById(el);
+        if (elem) elem.classList.add('done');
+      }, delay);
+    });
+
+    setTimeout(() => {
+      generateProfile();
+    }, 5500);
+  }
+
+  function generateProfile() {
+    // Compute capability matrix from quiz answers
+    const chapters = ['机器学习概述','线性回归','逻辑回归','决策树','支持向量机','神经网络','集成学习'];
+    capabilityMatrix = {};
+    chapters.forEach(ch => {
+      const chQs = quizQuestions.filter(q => q.chapter === ch);
+      const chAnswers = quizAnswers.filter(a => {
+        const q = quizQuestions.find(qq => qq.id === a.question_id);
+        return q && q.chapter === ch;
+      });
+      const correct = chAnswers.filter(a => a.is_correct).length;
+      const total = chQs.length;
+      const score = total > 0 ? Math.round((correct / total) * 100) : 50;
+      capabilityMatrix[ch] = Math.min(100, Math.max(20, score));
+    });
+
+    profileAdjustments = {};
+    chapters.forEach(ch => { profileAdjustments[ch] = 0; });
+
+    currentStage = 5;
+    renderStage5();
+  }
+
+  /* ====== STAGE 5: Profile Display ====== */
+  function renderStage5() {
+    const chapters = ['机器学习概述','线性回归','逻辑回归','决策树','支持向量机','神经网络','集成学习'];
+    const scores = chapters.map(ch => capabilityMatrix[ch] || 50);
+    const overall = Math.round(scores.reduce((a,b) => a + b, 0) / scores.length);
+    const sorted = chapters.map(ch => ({ name: ch, score: capabilityMatrix[ch] || 50 })).sort((a,b) => b.score - a.score);
+    const strongPoints = sorted.slice(0, 3);
+    const weakPoints = sorted.slice(-3).reverse();
+
+    container.innerHTML = `
+      <div class="stage-card">
+        <h2>📊 学习能力画像</h2>
+        <p>基于你的测评结果生成的各章节能力分布：</p>
+        <div class="profile-chart">
+          <canvas id="radarCanvas" width="400" height="400"></canvas>
+        </div>
+        <div class="overall-label"><span>综合评分</span><span style="color:#c4b5fd;font-weight:700;">${overall} / 100</span></div>
+        <div class="overall-score-bar"><div class="fill-bar" style="width:${overall}%;"></div></div>
+        <div class="profile-grid">
+          <div class="weak-points-list">
+            <h4>⚠️ 薄弱环节</h4>
+            <ul id="weakList"></ul>
+          </div>
+          <div class="strong-points-list">
+            <h4>⭐ 优势领域</h4>
+            <ul id="strongList"></ul>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;justify-content:center;margin-top:20px;">
+          <button class="btn btn-secondary" onclick="window._wizard.goStage(3)">← 重新测评</button>
+          <button class="btn btn-primary" onclick="window._wizard.confirmProfile()">确认画像 →</button>
+        </div>
+      </div>`;
+
+    setTimeout(() => drawRadarChart(scores, chapters), 100);
+    setTimeout(() => {
+      renderWeakStrongList('weakList', weakPoints, true);
+      renderWeakStrongList('strongList', strongPoints, false);
+    }, 150);
+  }
+
+  function renderWeakStrongList(listId, items, isWeak) {
+    const list = document.getElementById(listId);
+    if (!list) return;
+    list.innerHTML = items.map((item, idx) => {
+      const adj = profileAdjustments[item.name] || 0;
+      return `<li>
+        <span>${item.name}</span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span class="score-val">${Math.min(100, Math.max(1, item.score + adj))}</span>
+          <div class="adj-btns">
+            <button onclick="window._wizard.adjustProfile('${item.name}', -1)">−</button>
+            <button onclick="window._wizard.adjustProfile('${item.name}', 1)">+</button>
+          </div>
+        </div>
+      </li>`;
+    }).join('');
+  }
+
+  function adjustProfile(chapterName, delta) {
+    if (!profileAdjustments[chapterName]) profileAdjustments[chapterName] = 0;
+    profileAdjustments[chapterName] += delta;
+    const newVal = (capabilityMatrix[chapterName] || 50) + profileAdjustments[chapterName];
+    if (newVal < 1 || newVal > 100) {
+      profileAdjustments[chapterName] -= delta;
+      return;
+    }
+    renderStage5();
+  }
+
+  function drawRadarChart(scores, labels) {
+    const canvas = document.getElementById('radarCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    const cx = w / 2, cy = h / 2;
+    const radius = 140;
+    const n = labels.length;
+
+    ctx.clearRect(0, 0, w, h);
+
+    // Background grid
+    for (let r = 1; r <= 5; r++) {
+      ctx.beginPath();
+      for (let i = 0; i < n; i++) {
+        const angle = (Math.PI * 2 / n) * i - Math.PI / 2;
+        const x = cx + (radius / 5) * r * Math.cos(angle);
+        const y = cy + (radius / 5) * r * Math.sin(angle);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      ctx.stroke();
+    }
+
+    // Axis lines
+    for (let i = 0; i < n; i++) {
+      const angle = (Math.PI * 2 / n) * i - Math.PI / 2;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + radius * Math.cos(angle), cy + radius * Math.sin(angle));
+      ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+      ctx.stroke();
+    }
+
+    // Data polygon
+    ctx.beginPath();
+    for (let i = 0; i < n; i++) {
+      const angle = (Math.PI * 2 / n) * i - Math.PI / 2;
+      const val = scores[i] / 100;
+      const x = cx + radius * val * Math.cos(angle);
+      const y = cy + radius * val * Math.sin(angle);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(124,58,237,0.2)';
+    ctx.fill();
+    ctx.strokeStyle = '#a78bfa';
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+
+    // Data points
+    for (let i = 0; i < n; i++) {
+      const angle = (Math.PI * 2 / n) * i - Math.PI / 2;
+      const val = scores[i] / 100;
+      const x = cx + radius * val * Math.cos(angle);
+      const y = cy + radius * val * Math.sin(angle);
+      ctx.beginPath();
+      ctx.arc(x, y, 4, 0, Math.PI * 2);
+      ctx.fillStyle = '#c4b5fd';
+      ctx.fill();
+    }
+
+    // Labels
+    ctx.font = 'bold 12px "PingFang SC","Microsoft YaHei",sans-serif';
+    ctx.fillStyle = '#c4b5fd';
+    ctx.textAlign = 'center';
+    for (let i = 0; i < n; i++) {
+      const angle = (Math.PI * 2 / n) * i - Math.PI / 2;
+      const labelR = radius + 32;
+      const x = cx + labelR * Math.cos(angle);
+      const y = cy + labelR * Math.sin(angle);
+      // Short labels
+      const short = labels[i].length > 4 ? labels[i].substring(0, 3) + '..' : labels[i];
+      ctx.fillText(short, x, y + 5);
+    }
+  }
+
+  function confirmProfile() {
+    const chapters = ['机器学习概述','线性回归','逻辑回归','决策树','支持向量机','神经网络','集成学习'];
+    weakPointsData = chapters
+      .map(ch => ({ chapter: ch, score: (capabilityMatrix[ch] || 50) + (profileAdjustments[ch] || 0) }))
+      .filter(item => item.score < 60)
+      .sort((a, b) => a.score - b.score);
+    currentStage = 6;
+    renderStage6();
+  }
+
+  /* ====== STAGE 6: Final ====== */
+  function renderStage6() {
+    const pathItems = generateLearningPath();
+    container.innerHTML = `
+      <div class="stage-card">
+        <div class="done-icon">🎓</div>
+        <h2>你的专属学习路径</h2>
+        <p>基于你的薄弱环节，系统为你推荐以下学习路径：</p>
+        <div id="pathList"></div>
+        <div style="display:flex;gap:12px;justify-content:center;margin-top:24px;">
+          <button class="btn btn-secondary" onclick="window._wizard.goStage(5)">← 返回画像</button>
+          <button class="btn btn-primary" onclick="window._wizard.finishWizard()">完成，开始学习！</button>
+        </div>
+      </div>`;
+
+    const pathList = document.getElementById('pathList');
+    if (pathList) {
+      pathList.innerHTML = pathItems.map(p => `
+        <div class="path-card">
+          <h4>${p.order}. ${p.chapter} <span class="path-level ${p.level}">${p.levelLabel}</span></h4>
+          <div class="path-desc">${p.description}</div>
+        </div>`).join('');
+    }
+  }
+
+  function generateLearningPath() {
+    const chapters = ['机器学习概述','线性回归','逻辑回归','决策树','支持向量机','神经网络','集成学习'];
+    const all = chapters.map(ch => ({
+      chapter: ch,
+      score: (capabilityMatrix[ch] || 50) + (profileAdjustments[ch] || 0)
+    })).sort((a, b) => a.score - b.score);
+
+    const descriptions = {
+      '机器学习概述': '回顾机器学习的基本概念、类型和应用场景，构建完整知识框架。',
+      '线性回归': '深入理解线性模型原理、梯度下降优化和正则化方法。',
+      '逻辑回归': '掌握分类问题的建模方法、Sigmoid 函数和决策边界。',
+      '决策树': '学习树模型的分裂策略、剪枝技术和特征重要性分析。',
+      '支持向量机': '理解最大间隔分类、核技巧和软间隔 SVM 的原理。',
+      '神经网络': '从感知机到深度网络，掌握前向传播和反向传播机制。',
+      '集成学习': '学习 Bagging、Boosting 和 Stacking 等集成策略及实践。'
+    };
+
+    return all.map((item, idx) => {
+      let level, levelLabel;
+      if (item.score < 40) { level = 'beginner'; levelLabel = '入门'; }
+      else if (item.score < 70) { level = 'intermediate'; levelLabel = '进阶'; }
+      else { level = 'advanced'; levelLabel = '高级'; }
+      return {
+        order: idx + 1,
+        chapter: item.chapter,
+        score: item.score,
+        level: level,
+        levelLabel: levelLabel,
+        description: (idx < 3 && item.score < 70) ? '⭐ 重点学习：' + descriptions[item.chapter] : descriptions[item.chapter]
+      };
+    });
+  }
+
+  async function finishWizard() {
+    // 调用后端 API 保存画像到数据库
+    const userId = USER_ID();
+    if (userId && capabilityMatrix) {
+      try {
+        const resp = await apiCall('POST', `/api/wizard/save-computed-profile/${userId}`, {
+          capability_matrix: capabilityMatrix,
+          quiz_answers: quizAnswers
+        });
+        if (resp && resp.success) {
+          console.log('[Wizard] 画像已保存到数据库:', resp.data);
+        }
+      } catch(e) {
+        console.warn('[Wizard] 画像保存失败:', e.message);
+      }
+    }
+
+    container.innerHTML = `
+      <div class="stage-card" style="text-align:center;">
+        <div class="done-icon">✨</div>
+        <h2>画像构建完成！</h2>
+        <p>你的学习画像已保存，即将跳转到学习页面...</p>
+        <p style="font-size:13px;color:#8888aa;">如果页面未自动跳转，请点击下方按钮。</p>
+        <button class="btn btn-primary" style="margin-top:16px;" onclick="window.location.href='index.html'">前往学习首页</button>
+      </div>`;
+    currentStage = 7;
+    updateProgress();
+    setTimeout(() => {
+      if (currentStage === 7) {
+        window.location.href = 'index.html';
+      }
+    }, 3000);
+  }
+
+  /* ====== NAVIGATION ====== */
+  function goStage(stage) {
+    currentStage = stage;
+    renderStage();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ====== API (stub — real API calls prepared) ====== */
+  async function apiCall(method, path, body = null) {
+    const url = BASE_URL() + path;
+    const opts = {
+      method,
+      headers: body instanceof FormData ? {} : { 'Content-Type': 'application/json' },
+      body: body instanceof FormData ? body : (body ? JSON.stringify(body) : undefined)
+    };
+    try {
+      const resp = await fetch(url, opts);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      return await resp.json();
+    } catch (err) {
+      console.warn('API call failed:', err.message, '- using local fallback');
+      return null;
+    }
+  }
+
+  /* ====== EXPORT ====== */
+  window._wizard = {
+    goStage,
+    startQuiz,
+    handleAnswer,
+    handleDontKnow,
+    nextQuestion,
+    adjustProfile,
+    confirmProfile,
+    finishWizard
+  };
+
+  /* ====== INIT ====== */
+  renderStage();
+
+})();
+</script>
+
+</body>
+</html>

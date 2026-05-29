@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI画像收集 - 机器学习个性化智能学习平台</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/variables.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/components.css">
+  <link rel="stylesheet" href="styles/pages.css">
+
+  <!-- Agent监控面板样式 -->
+  <style>
+    .agent-monitor {
+      position: fixed;
+      right: 20px;
+      top: 100px;
+      width: 280px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+      padding: 20px;
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+
+    .agent-monitor h3 {
+      font-size: 16px;
+      margin-bottom: 16px;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .agent-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .agent-card {
+      background: #f8f9fa;
+      border: 2px solid #e9ecef;
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .agent-card .agent-icon {
+      font-size: 24px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      border-radius: 10px;
+    }
+
+    .agent-card .agent-info {
+      flex: 1;
+    }
+
+    .agent-card .agent-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .agent-card .status {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      display: inline-block;
+      margin-top: 4px;
+    }
+
+    .status.idle { background: #e9ecef; color: #6c757d; }
+    .status.working {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      animation: pulse 1.5s infinite;
+    }
+    .status.completed { background: #00b894; color: white; }
+    .status.error { background: #e74c3c; color: white; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.05); }
+    }
+
+    .workflow-flow {
+      text-align: center;
+      font-size: 12px;
+      color: #666;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #eee;
+    }
+
+    .workflow-step {
+      display: inline-block;
+      padding: 4px 10px;
+      margin: 2px;
+      border-radius: 6px;
+      background: #f0f0f0;
+    }
+
+    .workflow-step.active {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+    }
+
+    @media (max-width: 768px) {
+      .agent-monitor {
+        position: static;
+        width: 100%;
+        margin: 20px 0;
+      }
+    }
+  </style>
+</head>
+<body class="profile-page">
+  <!-- 导航栏 -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="index.html" class="navbar-logo">
+        <div class="navbar-logo-icon">🤖</div>
+        <span>ML智能学习</span>
+      </a>
+      <div class="navbar-nav">
+        <a href="index.html" class="navbar-link">首页</a>
+        <a href="learning-path.html" class="navbar-link">学习中心</a>
+        <a href="resources.html" class="navbar-link">知识库</a>
+        <a href="exercises.html" class="navbar-link">练习</a>
+        <a href="report.html" class="navbar-link">学习报告</a>
+        <a href="profile-center.html" class="navbar-link">👤 个人中心</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 主内容区 -->
+  <div style="display: flex; max-width: 1400px; margin: 0 auto; padding: 20px; gap: 20px;">
+    <!-- 左侧：对话区域 -->
+    <div style="flex: 1;">
+      <div class="profile-container">
+        <div class="profile-header">
+          <h1>🎯 AI智能画像构建</h1>
+          <p>基于你已有的学习画像，7个专业AI Agent协同工作，为你生成个性化学习资源</p>
+          <div style="margin-top: 12px; padding: 12px; background: rgba(102, 126, 234, 0.1); border-radius: 8px; font-size: 14px;">
+            💡 系统将自动读取你的学习画像，无需手动输入，点击下方按钮即可启动分析
+          </div>
+        </div>
+
+        <!-- 进度指示 -->
+        <div class="profile-progress">
+          <div class="profile-progress-bar">
+            <div class="progress-bar">
+              <div class="progress-bar-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+          </div>
+          <span class="profile-progress-text" id="progressText">等待启动...</span>
+        </div>
+
+        <!-- 启动按钮 -->
+        <div id="startSection" style="text-align: center; margin-top: 20px;">
+          <button onclick="triggerProfileAnalysis()"
+                  class="btn btn-primary"
+                  style="padding: 16px 40px; border-radius: 14px; font-size: 17px; font-weight: 700;">
+            🚀 开始智能分析
+          </button>
+          <p style="margin-top: 12px; font-size: 13px; color: var(--text-secondary);">
+            系统将依次调用：意图识别 → 画像Agent → 文档Agent → 题库Agent → 导图Agent → 代码Agent → 路径Agent
+          </p>
+        </div>
+
+        <!-- AI分析结果区域 -->
+        <div class="chat-container" id="chatContainer" style="min-height: 400px;">
+          <!-- 结果将动态插入 -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 右侧：Agent监控面板 -->
+    <div class="agent-monitor" id="agentMonitorPanel">
+      <h3>🤖 多智能体协作状态</h3>
+
+      <div class="agent-grid">
+        <div class="agent-card" id="card-build_profile">
+          <div class="agent-icon">👤</div>
+          <div class="agent-info">
+            <div class="agent-name">画像Agent</div>
+            <div class="status idle">待命中</div>
+          </div>
+        </div>
+
+        <div class="agent-card" id="card-analyze_intent">
+          <div class="agent-icon">🎯</div>
+          <div class="agent-info">
+            <div class="agent-name">意图识别</div>
+            <div class="status idle">待命中</div>
+          </div>
+        </div>
+
+        <div class="agent-card" id="card-generate_doc">
+          <div class="agent-icon">📝</div>
+          <div class="agent-info">
+            <div class="agent-name">文档Agent</div>
+            <div class="status idle">待命中</div>
+          </div>
+        </div>
+
+        <div class="agent-card" id="card-generate_questions">
+          <div class="agent-icon">❓</div>
+          <div class="agent-info">
+            <div class="agent-name">题库Agent</div>
+            <div class="status idle">待命中</div>
+          </div>
+        </div>
+
+        <div class="agent-card" id="card-generate_mindmap">
+          <div class="agent-icon">🗺️</div>
+          <div class="agent-info">
+            <div class="agent-name">导图Agent</div>
+            <div class="status idle">待命中</div>
+          </div>
+        </div>
+
+        <div class="agent-card" id="card-generate_code">
+          <div class="agent-icon">💻</div>
+          <div class="agent-info">
+            <div class="agent-name">代码Agent</div>
+            <div class="status idle">待命中</div>
+          </div>
+        </div>
+
+        <div class="agent-card" id="card-plan_path">
+          <div class="agent-icon">🛤️</div>
+          <div class="agent-info">
+            <div class="agent-name">路径Agent</div>
+            <div class="status idle">待命中</div>
+          </div>
+        </div>
+
+        <div class="agent-card" id="card-final_summary">
+          <div class="agent-icon">✅</div>
+          <div class="agent-info">
+            <div class="agent-name">总结节点</div>
+            <div class="status idle">待命中</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 执行流程 -->
+      <div class="workflow-flow">
+        <span class="workflow-step active" id="step-1">① 输入</span> →
+        <span class="workflow-step" id="step-2">② 分析</span> →
+        <span class="workflow-step" id="step-3">③ 生成</span> →
+        <span class="workflow-step" id="step-4">④ 规划</span> →
+        <span class="workflow-step" id="step-5">⑤ 完成</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 脚本 -->
+  <script src="scripts/localStorage.js"></script>
+  <script src="scripts/main.js"></script>
+  <script src="scripts/api.js"></script>
+  <script src="scripts/profile.js"></script>
+</body>
+</html>

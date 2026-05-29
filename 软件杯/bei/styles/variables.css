@@ -1,0 +1,72 @@
+/* CSS变量定义 - 统一管理颜色、尺寸、动画 */
+:root {
+  /* 主色调 - 科技蓝紫渐变 */
+  --primary: #6366F1;
+  --primary-dark: #4F46E5;
+  --primary-light: #818CF8;
+  --secondary: #8B5CF6;
+  --secondary-dark: #7C3AED;
+
+  /* 强调色 */
+  --accent-success: #10B981;
+  --accent-success-light: #34D399;
+  --accent-warning: #F59E0B;
+  --accent-warning-light: #FBBF24;
+  --accent-danger: #EF4444;
+
+  /* 背景色 */
+  --bg-main: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-dark: #1E293B;
+
+  /* 文字色 */
+  --text-primary: #1E293B;
+  --text-secondary: #64748B;
+  --text-light: #94A3B8;
+  --text-white: #FFFFFF;
+
+  /* 阴影 */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
+  --shadow-primary: 0 4px 20px rgba(99, 102, 241, 0.3);
+
+  /* 圆角 */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* 间距 */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+
+  /* 过渡 */
+  --transition-fast: 0.15s ease;
+  --transition: 0.3s ease;
+  --transition-slow: 0.5s ease;
+
+  /* 字体 */
+  --font-sans: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-display: 'Poppins', 'Noto Sans SC', sans-serif;
+
+  /* 导航栏高度 */
+  --navbar-height: 72px;
+
+  /* 最大内容宽度 */
+  --max-width: 1200px;
+}
+
+/* 暗色主题变量 (预留) */
+[data-theme="dark"] {
+  --bg-main: #0F172A;
+  --bg-card: #1E293B;
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+}

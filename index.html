@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>机器学习个性化智能学习平台</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/variables.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/components.css">
+  <link rel="stylesheet" href="styles/pages.css">
+</head>
+<body class="home-page">
+  <!-- 导航栏 -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="index.html" class="navbar-logo">
+        <div class="navbar-logo-icon">🤖</div>
+        <span>ML智能学习</span>
+      </a>
+      <div class="navbar-nav">
+        <a href="index.html" class="navbar-link active">首页</a>
+        <a href="learning-path.html" class="navbar-link">学习中心</a>
+        <a href="resources.html" class="navbar-link">知识库</a>
+        <a href="exercises.html" class="navbar-link">练习</a>
+        <a href="report.html" class="navbar-link">学习报告</a>
+        <a href="profile-center.html" class="navbar-link">👤 个人中心</a>
+        <a href="profile-detail.html" class="navbar-link" id="navProfile" style="display:none;">🎯 我的画像</a>
+      </div>
+      <div class="navbar-user">
+        <div class="avatar" id="userAvatar">学</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Banner区 -->
+  <section class="banner">
+    <div class="banner-content">
+      <h1>机器学习个性化智能学习平台</h1>
+      <p class="banner-subtitle">因材施教 · AI定制专属学习路径</p>
+      
+      <!-- 🎯 新增：AI功能入口 -->
+      <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 24px;">
+        <a href="profile.html" class="banner-btn" style="
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          padding: 18px 36px;
+          font-size: 1.1rem;
+          font-weight: 700;
+          box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+          animation: pulse-glow 2s infinite;
+        ">
+          🤖 体验AI智能画像 (7个Agent协作)
+        </a>
+        <a href="learning-path.html" class="banner-btn">
+          📚 开始今天的学习之旅
+        </a>
+      </div>
+      
+      <!-- 功能亮点提示 -->
+      <div style="margin-top: 32px; display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+        <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 12px 20px; border-radius: 12px; font-size: 0.9rem;">
+          ✨ 7章28维度能力矩阵
+        </div>
+        <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 12px 20px; border-radius: 12px; font-size: 0.9rem;">
+          🎯 6大类精准学生画像
+        </div>
+        <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 12px 20px; border-radius: 12px; font-size: 0.9rem;">
+          📝 15题智能诊断测评
+        </div>
+      </div>
+    </div>
+    
+    <!-- 添加脉冲动画样式 -->
+    <style>
+      @keyframes pulse-glow {
+        0%, 100% { 
+          box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+          transform: scale(1);
+        }
+        50% { 
+          box-shadow: 0 12px 40px rgba(118, 75, 162, 0.6);
+          transform: scale(1.02);
+        }
+      }
+    </style>
+  </section>
+
+  <!-- 学习数据看板 -->
+  <section class="dashboard">
+    <div class="dashboard-grid" id="dashboardGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+
+      <!-- 🎯 我的学习画像（核心新增） -->
+      <div class="dashboard-card profile-summary-card" id="profileSummaryCard" style="display:none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: -30px; right: -30px; width: 120px; height: 120px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
+        <div style="position: absolute; bottom: -20px; left: -20px; width: 80px; height: 80px; background: rgba(255,255,255,0.08); border-radius: 50%;"></div>
+        <div class="dashboard-card-title" style="color: rgba(255,255,255,0.9); position: relative; display: flex; align-items: center; justify-content: space-between;">
+          <span>🎯 我的学习画像</span>
+          <span style="font-size: 0.7rem; background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 20px;" id="profileVersion">v1</span>
+        </div>
+
+        <!-- 总分区 -->
+        <div style="display: flex; align-items: center; gap: 20px; margin: 16px 0; position: relative;">
+          <div style="text-align: center; flex-shrink: 0;">
+            <div style="font-size: 2.8rem; font-weight: 700; line-height: 1;" id="overallScore">--</div>
+            <div style="font-size: 0.75rem; opacity: 0.7; margin-top: 4px;">综合评分</div>
+          </div>
+          <div style="flex: 1; min-width: 0;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.7rem; opacity: 0.7;">
+              <span>置信度</span><span id="confidenceScore">--</span>
+            </div>
+            <div style="background: rgba(255,255,255,0.2); border-radius: 10px; height: 6px; margin: 6px 0 10px;">
+              <div id="confidenceBar" style="width: 0%; height: 100%; background: #4ade80; border-radius: 10px; transition: width 0.6s;"></div>
+            </div>
+            <!-- 章节小条 -->
+            <div id="chapterBars" style="display: flex; flex-direction: column; gap: 3px;"></div>
+          </div>
+        </div>
+
+        <!-- 弱项提醒 -->
+        <div id="profileWeakAlert" style="position: relative; background: rgba(255,255,255,0.15); border-radius: 10px; padding: 10px 14px; font-size: 0.78rem; line-height: 1.5; display: none;">
+          <span style="opacity: 0.8;">⚠️ 薄弱知识点提醒：</span>
+          <span id="profileWeakText" style="font-weight: 600;"></span>
+        </div>
+
+        <a href="profile-detail.html" style="display: block; margin-top: 12px; position: relative; text-align: center; padding: 8px; background: rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 0.8rem; font-weight: 600; text-decoration: none; transition: background 0.2s;">
+          查看完整画像 →
+        </a>
+      </div>
+
+      <!-- 进度数据 -->
+      <div class="dashboard-card">
+        <div class="dashboard-card-title">
+          <span>📊</span> 本周学习进度
+        </div>
+        <div style="margin-top: 16px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span style="font-size: 0.875rem; color: var(--text-secondary);">总进度</span>
+            <span style="font-size: 0.875rem; font-weight: 600; color: var(--primary);" id="weekProgress">65%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-bar-fill" id="progressFill" style="width: 65%"></div>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px;">
+          <div style="text-align: center;">
+            <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary);" id="knowledgeCount">23</div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary);">已学知识点</div>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-success);" id="exerciseCount">156</div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary);">完成习题</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 进步与薄弱 -->
+      <div class="dashboard-card">
+        <div class="insight-cards">
+          <div class="insight-card">
+            <h4 style="color: var(--accent-success);">💪 强项知识点</h4>
+            <ul id="strengthList">
+              <li style="color: var(--text-secondary);">加载中...</li>
+            </ul>
+          </div>
+          <div class="insight-card weak">
+            <h4 style="color: var(--text-secondary);">📚 待加强</h4>
+            <ul id="weakList">
+              <li style="color: var(--text-secondary);">加载中...</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 功能卡片区 -->
+  <section class="features-section">
+    <div class="section-header">
+      <h2>探索学习模块</h2>
+      <p>选择你想要学习的内容，开启个性化学习之旅</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="card feature-card" onclick="navigateTo('learning-path.html')">
+        <div class="feature-card-icon">📚</div>
+        <h3 class="feature-card-title">机器学习知识学习</h3>
+        <p class="feature-card-desc">从基础概念到高级算法，系统化学习机器学习核心知识</p>
+        <div class="feature-card-tags">
+          <span class="tag">Python</span>
+          <span class="tag">算法</span>
+          <span class="tag">实战</span>
+        </div>
+      </div>
+
+      <div class="card feature-card" onclick="navigateTo('learning-path.html')">
+        <div class="feature-card-icon">🧠</div>
+        <h3 class="feature-card-title">个性化学习路径</h3>
+        <p class="feature-card-desc">AI根据你的画像量身定制学习路线，效率翻倍</p>
+        <div class="feature-card-tags">
+          <span class="tag tag-success">AI定制</span>
+          <span class="tag">个性化</span>
+        </div>
+      </div>
+
+      <div class="card feature-card" onclick="navigateTo('exercises.html')">
+        <div class="feature-card-icon">📝</div>
+        <h3 class="feature-card-title">练习题题库</h3>
+        <p class="feature-card-desc">精选海量习题，检验学习成果，巩固知识点</p>
+        <div class="feature-card-tags">
+          <span class="tag">选择题</span>
+          <span class="tag">填空题</span>
+          <span class="tag">实战题</span>
+        </div>
+      </div>
+
+      <div class="card feature-card" onclick="navigateTo('resources.html')">
+        <div class="feature-card-icon">📄</div>
+        <h3 class="feature-card-title">学习资料文档</h3>
+        <p class="feature-card-desc">整理好的知识点文档和思维导图，随时查阅复习</p>
+        <div class="feature-card-tags">
+          <span class="tag">文档</span>
+          <span class="tag">思维导图</span>
+        </div>
+      </div>
+
+      <div class="card feature-card" onclick="navigateTo('resources.html')">
+        <div class="feature-card-icon">💻</div>
+        <h3 class="feature-card-title">代码实操案例</h3>
+        <p class="feature-card-desc">边学边练，在实践中掌握代码实现技能</p>
+        <div class="feature-card-tags">
+          <span class="tag">Jupyter</span>
+          <span class="tag">代码</span>
+          <span class="tag">实操</span>
+        </div>
+      </div>
+
+      <div class="card feature-card" onclick="navigateTo('resources.html')">
+        <div class="feature-card-icon">🎥</div>
+        <h3 class="feature-card-title">多模态教学视频</h3>
+        <p class="feature-card-desc">视频+图文+互动，全方位提升学习体验</p>
+        <div class="feature-card-tags">
+          <span class="tag">视频</span>
+          <span class="tag tag-success">高清</span>
+        </div>
+      </div>
+
+      <div class="card feature-card" onclick="navigateTo('report.html')">
+        <div class="feature-card-icon">📊</div>
+        <h3 class="feature-card-title">阶段学习报告</h3>
+        <p class="feature-card-desc">定期生成学习报告，清晰看到自己的进步与成长</p>
+        <div class="feature-card-tags">
+          <span class="tag">报告</span>
+          <span class="tag tag-success">可视化</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 推荐资源区 -->
+  <section class="recommend-section">
+    <div class="recommend-container">
+      <div class="section-header" style="text-align: left;">
+        <h2>热门知识点</h2>
+        <p>推荐你接下来学习的内容</p>
+      </div>
+      <div class="recommend-scroll">
+        <div class="recommend-item">
+          <div style="font-size: 1.5rem; margin-bottom: 8px;">🔢</div>
+          <h4 style="margin-bottom: 8px;">线性代数基础</h4>
+          <p style="font-size: 0.875rem; color: var(--text-secondary);">矩阵运算、向量空间、特征值分解</p>
+          <div style="margin-top: 12px;">
+            <span class="badge badge-success">基础</span>
+          </div>
+        </div>
+        <div class="recommend-item">
+          <div style="font-size: 1.5rem; margin-bottom: 8px;">📈</div>
+          <h4 style="margin-bottom: 8px;">监督学习算法</h4>
+          <p style="font-size: 0.875rem; color: var(--text-secondary);">回归、分类、SVM、决策树</p>
+          <div style="margin-top: 12px;">
+            <span class="badge">核心</span>
+          </div>
+        </div>
+        <div class="recommend-item">
+          <div style="font-size: 1.5rem; margin-bottom: 8px;">🧠</div>
+          <h4 style="margin-bottom: 8px;">神经网络基础</h4>
+          <p style="font-size: 0.875rem; color: var(--text-secondary);">感知机、反向传播、激活函数</p>
+          <div style="margin-top: 12px;">
+            <span class="badge badge-warning">进阶</span>
+          </div>
+        </div>
+        <div class="recommend-item">
+          <div style="font-size: 1.5rem; margin-bottom: 8px;">🔧</div>
+          <h4 style="margin-bottom: 8px;">模型评估与调参</h4>
+          <p style="font-size: 0.875rem; color: var(--text-secondary);">交叉验证、网格搜索、正则化</p>
+          <div style="margin-top: 12px;">
+            <span class="badge">重要</span>
+          </div>
+        </div>
+        <div class="recommend-item">
+          <div style="font-size: 1.5rem; margin-bottom: 8px;">📊</div>
+          <h4 style="margin-bottom: 8px;">数据预处理</h4>
+          <p style="font-size: 0.875rem; color: var(--text-secondary);">缺失值处理、特征缩放、编码</p>
+          <div style="margin-top: 12px;">
+            <span class="badge badge-success">基础</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 页脚 -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h4>关于我们</h4>
+          <p>机器学习个性化智能学习平台，专注于为每位学习者提供定制化的学习体验。</p>
+        </div>
+        <div class="footer-section">
+          <h4>快速链接</h4>
+          <p><a href="index.html">首页</a></p>
+          <p><a href="learning-path.html">学习中心</a></p>
+          <p><a href="report.html">学习报告</a></p>
+        </div>
+        <div class="footer-section">
+          <h4>大赛信息</h4>
+          <p>第十五届中国软件杯</p>
+          <p>大学生软件设计大赛</p>
+          <p>A3赛题</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 ML智能学习平台 - 第十五届中国软件杯参赛作品</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 脚本 -->
+  <script src="scripts/localStorage.js"></script>
+  <script src="scripts/main.js"></script>
+  <script>
+    // ===== 中文章节名映射 =====
+    const CHAPTER_NAMES = {
+      'math_foundation': '数学基础', 'programming': '编程基础',
+      'supervised_learning': '监督学习', 'unsupervised_learning': '无监督学习',
+      'neural_networks': '神经网络', 'model_evaluation': '模型评估',
+      'advanced_interest': '进阶方向'
+    };
+    const CHAPTER_COLORS = ['#f59e0b','#3b82f6','#10b981','#6366f1','#ef4444','#8b5cf6','#ec4899'];
+
+    // 获取 API 基数地址
+    function getApiBase() {
+      return localStorage.getItem('ml_api_base') || '';
+    }
+
+    // ===== 加载画像数据 =====
+    async function loadProfileData() {
+      let userId = null;
+      try {
+        const user = JSON.parse(localStorage.getItem('ml_user') || '{}');
+        userId = user.user_id;
+      } catch(e) {}
+
+      // 尝试从 localStorage 读取缓存的画像
+      let profileData = null;
+      try {
+        const cached = JSON.parse(localStorage.getItem('ml_profile_cache') || 'null');
+        if (cached && cached.capability_matrix) {
+          profileData = cached;
+        }
+      } catch(e) {}
+
+      // 如果有 userId，从 API 获取最新画像
+      if (userId) {
+        try {
+          const resp = await fetch(`${getApiBase()}/api/wizard/full-profile/${userId}`);
+          const json = await resp.json();
+          if (json.success && json.data) {
+            profileData = json.data;
+            // 缓存到 localStorage
+            localStorage.setItem('ml_profile_cache', JSON.stringify(profileData));
+          }
+        } catch(e) {
+          console.log('[Profile] API 获取失败，使用缓存数据');
+        }
+      }
+
+      return profileData;
+    }
+
+    // ===== 渲染画像摘要卡 =====
+    function renderProfileSummary(data) {
+      if (!data || !data.capability_matrix) {
+        // 显示引导卡
+        const card = document.getElementById('profileSummaryCard');
+        if (card) {
+          card.style.display = 'block';
+          card.style.background = 'linear-gradient(135deg, #64748b, #475569)';
+          card.querySelector('.dashboard-card-title span:first-child').textContent = '🎯 学习画像';
+          document.getElementById('overallScore').textContent = '--';
+          document.getElementById('confidenceScore').textContent = '未生成';
+          document.getElementById('confidenceBar').style.width = '0%';
+          document.getElementById('chapterBars').innerHTML = '<div style="font-size:0.75rem;opacity:0.7;padding:6px 0;">前往 <a href="wizard.html" style="color:#fbbf24;">画像向导</a> 构建画像</div>';
+          document.getElementById('profileWeakAlert').style.display = 'none';
+          document.getElementById('profileVersion').textContent = '';
+          return;
+        }
+        return;
+      }
+
+      const card = document.getElementById('profileSummaryCard');
+      if (!card) return;
+
+      // 显示卡片
+      card.style.display = 'block';
+      card.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+
+      // 显示导航栏入口
+      const navProfile = document.getElementById('navProfile');
+      if (navProfile) navProfile.style.display = '';
+
+      // 综合评分
+      const overall = data.overall_score || 0;
+      const overallEl = document.getElementById('overallScore');
+      if (overallEl) overallEl.textContent = overall;
+
+      // 置信度
+      const confidence = data.confidence_score || 0;
+      document.getElementById('confidenceScore').textContent = Math.round(confidence * 100) + '%';
+      document.getElementById('confidenceBar').style.width = Math.round(confidence * 100) + '%';
+
+      // 版本号
+      document.getElementById('profileVersion').textContent = 'v' + (data.profile_version || 1);
+
+      // 章节条
+      const chapterSummary = data.chapter_summary || {};
+      const capMatrix = data.capability_matrix || {};
+      const barsHtml = Object.entries(capMatrix).map(([chId, kps], i) => {
+        if (typeof kps !== 'object') return '';
+        const scores = Object.values(kps).map(v => typeof v === 'object' ? (v.score || 0) : 0);
+        const avg = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1) : 0;
+        const pct = Math.round(avg / 5 * 100);
+        const color = CHAPTER_COLORS[i % CHAPTER_COLORS.length];
+        return `<div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:0.65rem;opacity:0.8;width:48px;text-align:right;flex-shrink:0;">${CHAPTER_NAMES[chId]||chId}</span>
+          <div style="flex:1;background:rgba(255,255,255,0.2);border-radius:4px;height:8px;">
+            <div style="width:${pct}%;height:100%;background:${color};border-radius:4px;transition:width 0.8s;"></div>
+          </div>
+          <span style="font-size:0.65rem;font-weight:600;width:22px;">${avg}</span>
+        </div>`;
+      }).join('');
+      document.getElementById('chapterBars').innerHTML = barsHtml;
+
+      // 弱项提醒
+      let weakKps = [];
+      Object.entries(capMatrix).forEach(([chId, kps]) => {
+        if (typeof kps !== 'object') return;
+        Object.entries(kps).forEach(([kpName, kpData]) => {
+          const score = typeof kpData === 'object' ? (kpData.score || 0) : kpData;
+          if (score <= 2.5) weakKps.push({ chapter: chId, name: kpName, score });
+        });
+      });
+      weakKps.sort((a,b) => a.score - b.score);
+
+      const weakAlert = document.getElementById('profileWeakAlert');
+      const weakText = document.getElementById('profileWeakText');
+      if (weakKps.length > 0) {
+        weakAlert.style.display = 'block';
+        const top3 = weakKps.slice(0, 3).map(k => 
+          `${CHAPTER_NAMES[k.chapter]||k.chapter}·${k.name}(${k.score})`
+        ).join('、');
+        weakText.textContent = top3 + (weakKps.length > 3 ? ` 等${weakKps.length}项` : '');
+      } else if (weakKps.length === 0 && overall > 0) {
+        weakAlert.style.display = 'block';
+        weakText.textContent = '暂无薄弱项，继续保持！👍';
+      } else {
+        weakAlert.style.display = 'none';
+      }
+    }
+
+    // ===== 渲染强弱项列表 =====
+    function renderInsights(data) {
+      if (!data || !data.capability_matrix) return;
+
+      const capMatrix = data.capability_matrix;
+      const strongList = [];
+      const weakList = [];
+
+      Object.entries(capMatrix).forEach(([chId, kps]) => {
+        if (typeof kps !== 'object') return;
+        Object.entries(kps).forEach(([kpName, kpData]) => {
+          const score = typeof kpData === 'object' ? (kpData.score || 0) : kpData;
+          if (score >= 3.5) {
+            strongList.push({ name: kpName, chapter: CHAPTER_NAMES[chId] || chId, score });
+          }
+          if (score <= 2.5) {
+            weakList.push({ name: kpName, chapter: CHAPTER_NAMES[chId] || chId, score });
+          }
+        });
+      });
+
+      strongList.sort((a,b) => b.score - a.score);
+      weakList.sort((a,b) => a.score - b.score);
+
+      const strengthEl = document.getElementById('strengthList');
+      const weakEl = document.getElementById('weakList');
+
+      if (strengthEl) {
+        if (strongList.length > 0) {
+          strengthEl.innerHTML = strongList.slice(0, 5).map(s =>
+            `<li><span style="color:var(--text-primary);">${s.chapter}·${s.name}</span> <span style="color:#10b981;font-weight:600;">${s.score}</span></li>`
+          ).join('');
+        } else {
+          strengthEl.innerHTML = '<li style="color:var(--text-secondary);">暂无数据</li>';
+        }
+      }
+
+      if (weakEl) {
+        if (weakList.length > 0) {
+          weakEl.innerHTML = weakList.slice(0, 5).map(w =>
+            `<li><span style="color:var(--text-primary);">${w.chapter}·${w.name}</span> <span style="color:#ef4444;font-weight:600;">${w.score}</span></li>`
+          ).join('');
+        } else {
+          weakEl.innerHTML = '<li style="color:var(--text-secondary);">暂无薄弱项</li>';
+        }
+      }
+    }
+
+    // ===== 初始化 =====
+    document.addEventListener('DOMContentLoaded', async () => {
+      initCommonPage();
+
+      // 尝试加载画像数据
+      const profileData = await loadProfileData();
+      renderProfileSummary(profileData);
+      renderInsights(profileData);
+
+      // 加载用户信息
+      try {
+        const user = JSON.parse(localStorage.getItem('ml_user') || '{}');
+        if (user && user.username) {
+          document.getElementById('userAvatar').textContent = user.username.charAt(0);
+        }
+      } catch(e) {}
+
+      // 加载学习进度（保持原有逻辑）
+      try {
+        const progress = Storage.getProgress();
+        if (progress) {
+          document.getElementById('weekProgress').textContent = progress.weekProgress + '%';
+          document.getElementById('progressFill').style.width = progress.weekProgress + '%';
+          const knowCount = profileData && profileData.capability_matrix ?
+            Object.values(profileData.capability_matrix).reduce((sum,kps) =>
+              sum + Object.keys(kps||{}).length, 0
+            ) : (progress.totalKnowledge || 23);
+          document.getElementById('knowledgeCount').textContent = knowCount;
+          document.getElementById('exerciseCount').textContent = progress.totalExercises || 156;
+        }
+      } catch(e) {
+        console.log("使用默认数据显示");
+      }
+    });
+  </script>
+</body>
+</html>
