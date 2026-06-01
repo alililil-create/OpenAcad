@@ -56,6 +56,16 @@ class Settings(BaseSettings):
     MINIO_SECURE: bool = False
     MINIO_ENABLED: bool = True
 
+    # Seedance 视频生成配置（豆包/火山引擎）
+    SEEDANCE_API_KEY: str = ""
+    SEEDANCE_BASE_URL: str = "https://ark.cn-beijing.volces.com"
+    SEEDANCE_MODEL: str = "doubao-seedance-1-5-pro-251215"
+    SEEDANCE_ENABLED: bool = False
+
+    # OpenMAIC 视频生成配置（AI交互式教学动画）
+    OPENMAIC_BASE_URL: str = "http://localhost:3001"
+    OPENMAIC_ENABLED: bool = True
+
     # JWT认证配置
     SECRET_KEY: str = "your-secret-key-change-in-production"
     ALGORITHM: str = "HS256"

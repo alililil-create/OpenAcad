@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI画像构建 - 机器学习个性化智能学习平台</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/variables.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/components.css">
+  <link rel="stylesheet" href="styles/pages.css">
+
+  <style>
+    * { box-sizing: border-box; }
+
+    .pipeline-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px 20px 0;
+    }
+
+    /* ===== Agent 流水线（横向） ===== */
+    .agent-pipeline {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      padding: 20px 16px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+      overflow-x: auto;
+      margin-bottom: 24px;
+    }
+
+    .pipeline-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      min-width: 72px;
+      flex-shrink: 0;
+      cursor: default;
+      transition: all 0.4s;
+    }
+
+    .pipeline-icon {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: #F1F5F9;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      border: 3px solid #E2E8F0;
+      transition: all 0.4s;
+      position: relative;
+    }
+
+    .pipeline-node.working .pipeline-icon {
+      background: #667eea;
+      border-color: #667eea;
+      animation: nodeGlow 1.2s infinite;
+      box-shadow: 0 0 0 8px rgba(102,126,234,0.18);
+    }
+
+    .pipeline-node.completed .pipeline-icon {
+      background: #10B981;
+      border-color: #10B981;
+      opacity: 1;
+    }
+
+    .pipeline-node.completed .pipeline-icon::after {
+      content: '✓';
+      position: absolute;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .pipeline-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #94A3B8;
+      text-align: center;
+      line-height: 1.3;
+      transition: color 0.3s;
+    }
+
+    .pipeline-node.working .pipeline-label { color: #667eea; }
+    .pipeline-node.completed .pipeline-label { color: #10B981; }
+
+    .pipeline-connector {
+      width: 28px;
+      height: 3px;
+      background: #E2E8F0;
+      border-radius: 2px;
+      flex-shrink: 0;
+      transition: background 0.5s;
+    }
+    .pipeline-connector.done { background: #10B981; }
+
+    @keyframes nodeGlow {
+      0%, 100% { box-shadow: 0 0 0 4px rgba(102,126,234,0.12); }
+      50% { box-shadow: 0 0 0 14px rgba(102,126,234,0.06); transform: scale(1.05); }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    /* ===== 主布局 ===== */
+    .main-layout {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px 40px;
+      display: flex;
+      gap: 24px;
+    }
+
+    .chat-column {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .resource-column {
+      width: 340px;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 1100px) {
+      .main-layout { flex-direction: column; }
+      .resource-column { width: 100%; }
+    }
+
+    /* ===== 状态栏 ===== */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+      margin-bottom: 20px;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #475569;
+    }
+
+    .status-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #94A3B8;
+    }
+    .status-dot.running {
+      background: #667eea;
+      animation: pulse 1s infinite;
+    }
+    .status-dot.done { background: #10B981; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .start-btn {
+      padding: 14px 36px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(102,126,234,0.35);
+      transition: all 0.3s;
+    }
+    .start-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(102,126,234,0.45);
+    }
+    .start-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ===== 进度条 ===== */
+    .modern-progress {
+      height: 6px;
+      background: #E2E8F0;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .modern-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea, #10B981);
+      border-radius: 3px;
+      transition: width 0.6s;
+      width: 0%;
+    }
+
+    /* ===== 聊天气泡 ===== */
+    .chat-wrapper {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+      min-height: 500px;
+      max-height: 70vh;
+      overflow-y: auto;
+      padding: 24px;
+    }
+
+    .chat-message.ai {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .chat-avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+      color: #fff;
+    }
+
+    .chat-bubble {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 14px;
+      padding: 14px 18px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: #334155;
+      max-width: 100%;
+    }
+
+    .chat-bubble p { margin: 6px 0; }
+
+    /* ===== 资源产出卡片 ===== */
+    .resource-output-card {
+      background: #fff;
+      border: 2px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      transition: all 0.3s;
+    }
+
+    .resource-output-card.done {
+      border-color: #10B981;
+      background: #F0FDF4;
+    }
+
+    .resource-output-card .card-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #475569;
+    }
+
+    .resource-output-card .card-icon {
+      font-size: 20px;
+    }
+
+    .resource-output-card .card-badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: #E2E8F0;
+      color: #64748B;
+      margin-left: auto;
+    }
+
+    .resource-output-card.done .card-badge {
+      background: #D1FAE5;
+      color: #065F46;
+    }
+
+    /* ===== 引导消息 ===== */
+    .welcome-card {
+      background: linear-gradient(135deg, #667eea08, #764ba208);
+      border: 1px dashed #C4B5FD;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .welcome-card h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+      color: #667eea;
+    }
+
+    .welcome-card p {
+      margin: 4px 0;
+      font-size: 13px;
+      color: #64748B;
+      line-height: 1.6;
+    }
+
+    /* ===== 隐藏的 status（兼容旧JS） ===== */
+    .hidden-status { position: absolute; opacity: 0; pointer-events: none; }
+    #agentMonitorPanel { display: none; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="index.html" class="navbar-logo">
+        <div class="navbar-logo-icon">🤖</div>
+        <span>ML智能学习</span>
+      </a>
+      <div class="navbar-nav">
+        <a href="index.html" class="navbar-link">首页</a>
+        <a href="learning-path.html" class="navbar-link">学习中心</a>
+        <a href="resources.html" class="navbar-link">知识库</a>
+        <a href="exercises.html" class="navbar-link">练习</a>
+        <a href="report.html" class="navbar-link">学习报告</a>
+        <a href="profile-center.html" class="navbar-link">👤 个人中心</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== Agent 流水线 ===== -->
+  <div class="pipeline-container">
+    <div class="agent-pipeline" id="agentPipeline">
+      <div class="pipeline-node" id="node-analyze_intent">
+        <div class="pipeline-icon">🎯</div>
+        <div class="pipeline-label">意图识别</div>
+      </div>
+      <div class="pipeline-connector"></div>
+      <div class="pipeline-node" id="node-build_profile">
+        <div class="pipeline-icon">👤</div>
+        <div class="pipeline-label">画像Agent</div>
+      </div>
+      <div class="pipeline-connector"></div>
+      <div class="pipeline-node" id="node-generate_doc">
+        <div class="pipeline-icon">📝</div>
+        <div class="pipeline-label">文档Agent</div>
+      </div>
+      <div class="pipeline-connector"></div>
+      <div class="pipeline-node" id="node-generate_questions">
+        <div class="pipeline-icon">❓</div>
+        <div class="pipeline-label">题库Agent</div>
+      </div>
+      <div class="pipeline-connector"></div>
+      <div class="pipeline-node" id="node-generate_mindmap">
+        <div class="pipeline-icon">🗺️</div>
+        <div class="pipeline-label">导图Agent</div>
+      </div>
+      <div class="pipeline-connector"></div>
+      <div class="pipeline-node" id="node-generate_code">
+        <div class="pipeline-icon">💻</div>
+        <div class="pipeline-label">代码Agent</div>
+      </div>
+      <div class="pipeline-connector"></div>
+      <div class="pipeline-node" id="node-plan_path">
+        <div class="pipeline-icon">🛤️</div>
+        <div class="pipeline-label">路径Agent</div>
+      </div>
+      <div class="pipeline-connector"></div>
+      <div class="pipeline-node" id="node-generate_video">
+        <div class="pipeline-icon">🎥</div>
+        <div class="pipeline-label">视频Agent</div>
+      </div>
+      <div class="pipeline-connector"></div>
+      <div class="pipeline-node" id="node-final_summary">
+        <div class="pipeline-icon">✅</div>
+        <div class="pipeline-label">总结节点</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 主内容 ===== -->
+  <div class="main-layout">
+    <div class="chat-column">
+      <!-- 状态栏 -->
+      <div class="status-bar">
+        <div class="status-indicator">
+          <div class="status-dot" id="statusDot"></div>
+          <span id="statusText">等待启动</span>
+        </div>
+        <div id="startSection">
+          <button class="start-btn" onclick="triggerProfileAnalysis()">🚀 开始智能分析</button>
+        </div>
+      </div>
+
+      <!-- 进度条 -->
+      <div class="modern-progress">
+        <div class="modern-progress-fill" id="progressFill"></div>
+      </div>
+      <div style="text-align:center;margin-bottom:16px;">
+        <span style="font-size:12px;color:#94A3B8;" id="progressText">准备就绪</span>
+      </div>
+
+      <!-- 对话区 -->
+      <div class="chat-wrapper" id="chatContainer"></div>
+    </div>
+
+    <!-- 资源产出面板 -->
+    <div class="resource-column" id="resourcePanel">
+      <div style="background:#fff;border-radius:16px;box-shadow:0 2px 16px rgba(0,0,0,0.06);padding:20px;">
+        <h3 style="margin:0 0 16px;font-size:15px;color:#1E293B;">📦 资源产出</h3>
+        <div style="display:flex;flex-direction:column;gap:10px;" id="resourceCards">
+          <div class="resource-output-card" id="rcard-profile"><div class="card-row"><span class="card-icon">👤</span>学生画像<span class="card-badge">等待</span></div></div>
+          <div class="resource-output-card" id="rcard-document"><div class="card-row"><span class="card-icon">📄</span>教学文档<span class="card-badge">等待</span></div></div>
+          <div class="resource-output-card" id="rcard-questions"><div class="card-row"><span class="card-icon">✏️</span>练习题<span class="card-badge">等待</span></div></div>
+          <div class="resource-output-card" id="rcard-mindmap"><div class="card-row"><span class="card-icon">🗺️</span>思维导图<span class="card-badge">等待</span></div></div>
+          <div class="resource-output-card" id="rcard-code"><div class="card-row"><span class="card-icon">💻</span>代码案例<span class="card-badge">等待</span></div></div>
+          <div class="resource-output-card" id="rcard-path"><div class="card-row"><span class="card-icon">🛤️</span>学习路径<span class="card-badge">等待</span></div></div>
+          <div class="resource-output-card" id="rcard-video"><div class="card-row"><span class="card-icon">🎥</span>教学视频<span class="card-badge">等待</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 隐藏面板（兼容旧JS） -->
+  <div class="hidden-status">
+    <div class="agent-card" id="card-analyze_intent"><div class="status idle">待命中</div></div>
+    <div class="agent-card" id="card-build_profile"><div class="status idle">待命中</div></div>
+    <div class="agent-card" id="card-generate_doc"><div class="status idle">待命中</div></div>
+    <div class="agent-card" id="card-generate_questions"><div class="status idle">待命中</div></div>
+    <div class="agent-card" id="card-generate_mindmap"><div class="status idle">待命中</div></div>
+    <div class="agent-card" id="card-generate_code"><div class="status idle">待命中</div></div>
+    <div class="agent-card" id="card-plan_path"><div class="status idle">待命中</div></div>
+    <div class="agent-card" id="card-generate_video"><div class="status idle">待命中</div></div>
+    <div class="agent-card" id="card-final_summary"><div class="status idle">待命中</div></div>
+    <span class="workflow-step" id="step-1"></span>
+    <span class="workflow-step" id="step-2"></span>
+    <span class="workflow-step" id="step-3"></span>
+    <span class="workflow-step" id="step-4"></span>
+    <span class="workflow-step" id="step-5"></span>
+  </div>
+
+  <script src="scripts/localStorage.js"></script>
+  <script src="scripts/main.js"></script>
+  <script src="scripts/api.js"></script>
+  <script src="scripts/profile.js"></script>
+  <script>
+    (function() {
+      var origUpdateAgentStatus = window.updateAgentStatusUI;
+      window.updateAgentStatusUI = function(agentName, status) {
+        if (origUpdateAgentStatus) origUpdateAgentStatus(agentName, status);
+        var node = document.getElementById('node-' + agentName);
+        if (!node) return;
+        node.classList.remove('working', 'completed');
+        if (status === 'working') node.classList.add('working');
+        if (status === 'completed') node.classList.add('completed');
+        if (status === 'completed') {
+          var prev = node.previousElementSibling;
+          if (prev && prev.classList.contains('pipeline-connector')) prev.classList.add('done');
+        }
+      };
+
+      var origReset = window.resetAllAgentStatus;
+      window.resetAllAgentStatus = function() {
+        if (origReset) origReset();
+        document.querySelectorAll('.pipeline-node').forEach(function(n) {
+          n.classList.remove('working', 'completed');
+        });
+        document.querySelectorAll('.pipeline-connector').forEach(function(c) {
+          c.classList.remove('done');
+        });
+        document.getElementById('statusDot').classList.remove('running', 'done');
+        document.getElementById('statusText').textContent = '等待启动';
+        document.querySelectorAll('.resource-output-card').forEach(function(c) {
+          c.classList.remove('done');
+          c.querySelector('.card-badge').textContent = '等待';
+        });
+      };
+
+      var origProgress = window.updateProgress;
+      window.updateProgress = function(percent, text) {
+        if (origProgress) origProgress(percent, text);
+        document.getElementById('progressFill').style.width = percent + '%';
+        if (percent > 0 && percent < 100) {
+          document.getElementById('statusDot').classList.add('running');
+          document.getElementById('statusDot').classList.remove('done');
+          document.getElementById('statusText').textContent = '分析中...';
+        }
+        if (percent >= 100) {
+          document.getElementById('statusDot').classList.remove('running');
+          document.getElementById('statusDot').classList.add('done');
+          document.getElementById('statusText').textContent = '分析完成';
+        }
+      };
+
+      var origAgentContent = window.appendToAIAnalysis;
+      var rcardMap = {
+        'profile': 'rcard-profile', 'document': 'rcard-document',
+        'questions': 'rcard-questions', 'mindmap': 'rcard-mindmap',
+        'code_examples': 'rcard-code', 'video': 'rcard-video'
+      };
+      window.appendToAIAnalysis = function(text) {
+        if (origAgentContent) origAgentContent(text);
+        var el = document.getElementById('chatContainer');
+        if (el) el.scrollTop = el.scrollHeight;
+      };
+
+      var origComplete = window.updateAgentStatusUI;
+      Object.defineProperty(window, 'updateAgentStatusUI', {
+        get: function() { return updateAgentPipeline; },
+        set: function(v) { }
+      });
+
+      function updateAgentPipeline(agentName, status) {
+        if (origComplete) try { origComplete(agentName, status); } catch(e) {}
+        if (status === 'completed') {
+          var resourceLabels = {
+            'build_profile': 'profile', 'generate_doc': 'document',
+            'generate_questions': 'questions', 'generate_mindmap': 'mindmap',
+            'generate_code': 'code_examples', 'generate_video': 'video',
+            'plan_path': 'path'
+          };
+          var rkey = resourceLabels[agentName];
+          var rcid = rkey ? (rcardMap[rkey] || ('rcard-' + rkey)) : null;
+          var rcard = rcid ? document.getElementById(rcid) : null;
+          if (rcard) {
+            rcard.classList.add('done');
+            rcard.querySelector('.card-badge').textContent = '已生成';
+          }
+        }
+        var node = document.getElementById('node-' + agentName);
+        if (!node) return;
+        node.classList.remove('working', 'completed');
+        if (status === 'working') node.classList.add('working');
+        if (status === 'completed') {
+          node.classList.add('completed');
+          var prev = node.previousElementSibling;
+          if (prev && prev.classList.contains('pipeline-connector')) prev.classList.add('done');
+        }
+      }
+
+      window.addEventListener('DOMContentLoaded', function() {
+        window.updateAgentStatusUI = updateAgentPipeline;
+      });
+    })();
+  </script>
+</body>
+</html>

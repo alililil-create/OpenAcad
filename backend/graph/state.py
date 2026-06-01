@@ -138,6 +138,16 @@ class LearningPathStep(TypedDict):
     status: str                   # not_started/in_progress/completed
 
 
+class VideoResult(TypedDict):
+    """教学视频生成结果"""
+    url: str
+    duration: int
+    ratio: str
+    resolution: str
+    object_name: str
+    stored_in_oss: bool
+
+
 class AgentState(TypedDict):
     """
     LangGraph 共享状态 - 7 个 Agent 在此读写
@@ -163,6 +173,8 @@ class AgentState(TypedDict):
     questions: Optional[List[QuestionItem]]
     code_examples: Optional[List[CodeExample]]
     reading_materials: Optional[List[Dict]]
+    video_result: Optional[VideoResult]
+    video_skipped: bool
 
     # === 规划与输出层 ===
     learning_path: Optional[List[LearningPathStep]]

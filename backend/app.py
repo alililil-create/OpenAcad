@@ -25,6 +25,8 @@ from graph.workflow import execute_workflow
 from services.cache_service import CacheService
 from services.vector_service import init_milvus, close_milvus, insert_resource, search_resources, rebuild_vocabulary
 from services.oss_service import init_minio, close_minio, upload_file, upload_text, get_file, get_presigned_url
+from services.video_service import generate_video, test_connectivity, generate_video_script, generate_lecture_script
+from services.video_provider import get_provider, get_all_providers
 from routers.wizard import router as wizard_router
 
 logging.basicConfig(level=logging.INFO)
@@ -648,6 +650,19 @@ async def chat_stream(request: ChatRequest):
                                         'preview': str(val)[:200]
                                     }, ensure_ascii=False)}\n\n"
 
+                            if node_output.get("video_result"):
+                                v = node_output["video_result"]
+                                dur = v.get("duration", 0)
+                                res = v.get("resolution", "720p")
+                                vu = v.get("url", "")
+                                yield "data: " + json.dumps({
+                                    "type": "agent_content",
+                                    "agent": node_name,
+                                    "resource_type": "video",
+                                    "preview": "教学视频已生成 ({}s, {})".format(dur, res),
+                                    "video_url": vu,
+                                }, ensure_ascii=False) + "\n\n"
+
                         yield f"data: {json.dumps({
                             'type': 'agent_complete',
                             'agent': node_name,
@@ -768,7 +783,8 @@ async def _save_resources(db: AsyncSession, user_id: int, session_id: str, outpu
         "questions": ("questions", "topic"),
         "mindmap": ("mindmap", "title"),
         "code_examples": ("code_examples", "title"),
-        "learning_path": ("learning_path", "title")
+        "learning_path": ("learning_path", "title"),
+        "video_result": ("video", "object_name"),
     }
 
     saved_resources = []
@@ -958,6 +974,18 @@ async def analyze_profile_pipeline(user_id: int):
                             val = node_output.get(key)
                             if val:
                                 yield f"data: {json.dumps({'type': 'agent_content', 'agent': node_name, 'resource_type': key, 'preview': str(val)[:200]}, ensure_ascii=False)}\n\n"
+                        if node_output.get("video_result"):
+                            v = node_output["video_result"]
+                            dur = v.get("duration", 0)
+                            res = v.get("resolution", "720p")
+                            vu = v.get("url", "")
+                            yield "data: " + json.dumps({
+                                "type": "agent_content",
+                                "agent": node_name,
+                                "resource_type": "video",
+                                "preview": "教学视频已生成 ({}s, {})".format(dur, res),
+                                "video_url": vu,
+                            }, ensure_ascii=False) + "\n\n"
 
                     yield f"data: {json.dumps({'type': 'agent_complete', 'agent': node_name, 'status': 'success'}, ensure_ascii=False)}\n\n"
                     await asyncio.sleep(0.1)
@@ -988,6 +1016,242 @@ async def analyze_profile_pipeline(user_id: int):
             "Access-Control-Allow-Origin": "*"
         }
     )
+
+
+# ===== 视频生成 API（独立入口）=====
+
+class VideoGenerateRequest(BaseModel):
+    topic: str
+    duration: int = 5
+    ratio: str = "16:9"
+    resolution: str = "720p"
+    mode: str = "quick"
+    user_id: Optional[int] = None
+
+
+@app.post("/api/video/generate")
+async def api_video_generate(req: VideoGenerateRequest):
+    """独立视频生成入口 —— 有画像→个性化 / 无画像→默认，SSE 流式返回"""
+    async def event_generator():
+        try:
+            from services.llm_service import get_llm_service
+
+            profile = None
+            mode = "default"
+
+            if req.user_id and db_conn._async_session_factory:
+                async with db_conn._async_session_factory() as db:
+                    profile = await _load_existing_profile(db, req.user_id)
+
+            if req.mode == "lecture":
+                yield f"data: {json.dumps({'type': 'status', 'message': '📖 完整课件模式：正在生成多章节教学脚本...', 'mode': 'lecture'}, ensure_ascii=False)}\n\n"
+                video_data = await generate_lecture_script(req.topic, profile)
+                yield f"data: {json.dumps({'type': 'done', 'video_url': '', 'script': video_data.get('script', ''), 'resolution': 'text', 'mode': 'lecture', 'is_fallback': True, 'is_lecture': True}, ensure_ascii=False)}\n\n"
+                return
+
+            llm = await get_llm_service()
+
+            if profile and profile.get("confidence_score", 0) > 0.3:
+                mode = "personalized"
+                grade = profile.get("grade_level", "大学生")
+                major = profile.get("major", "计算机")
+                skill = profile.get("skill_matrix", {})
+                cognitive = profile.get("cognitive_profile", {})
+
+                weak_parts = []
+                for cat, skills in skill.items():
+                    if isinstance(skills, dict):
+                        for name, score in skills.items():
+                            if isinstance(score, (int, float)) and score <= 2.5:
+                                weak_parts.append(name)
+                weak_hint = ("，重点讲解: " + "、".join(weak_parts[:3])) if weak_parts else ""
+
+                prof_conf = int(profile.get("confidence_score", 0) * 100)
+                prof_label = "{} {} 画像置信度 {}%".format(major, grade, prof_conf)
+                yield "data: " + json.dumps({
+                    "type": "status",
+                    "message": "画像模式：{}{}，正在生成个性化视频场景...".format(major, grade),
+                    "mode": "personalized",
+                    "profile_summary": prof_label,
+                }, ensure_ascii=False) + "\n\n"
+
+                scene_result = await llm.chat([{
+                    "role": "user",
+                    "content": f"为机器学习教学视频生成英文画面描述。教学主题: {req.topic}{weak_hint}。学生: {major}专业{grade}。要求: 60-150英文单词，风格: educational animation, clean modern, suitable for {major} students。只输出英文。"
+                }])
+            else:
+                yield f"data: {json.dumps({'type': 'status', 'message': '📋 默认模式：正在生成通用视频场景...', 'mode': 'default'}, ensure_ascii=False)}\n\n"
+
+                scene_result = await llm.chat([{
+                    "role": "user",
+                    "content": f"为机器学习教学视频生成英文画面描述。教学主题: {req.topic}。要求: 60-150英文单词，风格: educational animation, clean and modern。只输出英文。"
+                }])
+
+            scene_prompt = scene_result.get("content", req.topic).strip()
+            if len(scene_prompt) < 10:
+                scene_prompt = f"A modern educational animation explaining {req.topic}, with clean diagrams and university lecture style."
+
+            video_data = None
+            is_fallback = False
+
+            if settings.SEEDANCE_ENABLED:
+                yield f"data: {json.dumps({'type': 'status', 'message': f'正在调用Seedance生成视频...', 'mode': mode}, ensure_ascii=False)}\n\n"
+                try:
+                    video_data = await generate_video(
+                        prompt=scene_prompt,
+                        user_id=req.user_id or 0,
+                        duration=req.duration,
+                        ratio=req.ratio,
+                        resolution=req.resolution,
+                    )
+                except Exception as seedance_err:
+                    logger.warning(f"[VideoGenerate] Seedance失败，降级LLM: {seedance_err}")
+                    is_fallback = True
+
+            if video_data is None:
+                yield f"data: {json.dumps({'type': 'status', 'message': 'Seedance不可用，降级为LLM生成视频脚本...', 'mode': mode}, ensure_ascii=False)}\n\n"
+                video_data = await generate_video_script(req.topic)
+                is_fallback = True
+
+            title = f"教学视频 - {req.topic[:50]}"
+            if req.user_id and db_conn._async_session_factory:
+                try:
+                    content = {
+                        "url": video_data.get("url", ""),
+                        "duration": video_data.get("duration", 0),
+                        "ratio": video_data.get("ratio", "16:9"),
+                        "resolution": video_data.get("resolution", "720p"),
+                        "object_name": video_data.get("object_name", ""),
+                        "stored_in_oss": video_data.get("stored_in_oss", False),
+                        "scene_prompt": scene_prompt,
+                        "is_fallback": is_fallback,
+                    }
+                    if video_data.get("script"):
+                        content["script"] = video_data["script"]
+                    if video_data.get("is_lecture"):
+                        content["is_lecture"] = True
+                    async with db_conn._async_session_factory() as db:
+                        resource = LearningResource(
+                            user_id=req.user_id,
+                            resource_type="video",
+                            title=title,
+                            content=content,
+                            topic=req.topic,
+                        )
+                        db.add(resource)
+                        await db.commit()
+                        logger.info(f"[VideoGenerate] 视频已保存到数据库 resource_id={resource.id}")
+                except Exception as db_err:
+                    logger.warning(f"[VideoGenerate] 数据库保存失败（不影响视频生成）: {db_err}")
+
+            if is_fallback:
+                yield f"data: {json.dumps({'type': 'done', 'video_url': '', 'script': video_data.get('script', ''), 'resolution': 'text', 'mode': mode, 'is_fallback': True, 'scene_prompt': scene_prompt}, ensure_ascii=False)}\n\n"
+            else:
+                yield f"data: {json.dumps({'type': 'done', 'video_url': video_data.get('url', ''), 'duration': video_data.get('duration', 5), 'resolution': video_data.get('resolution', '720p'), 'ratio': video_data.get('ratio', '16:9'), 'stored_in_oss': video_data.get('stored_in_oss', False), 'scene_prompt': scene_prompt, 'mode': mode, 'is_fallback': False}, ensure_ascii=False)}\n\n"
+
+        except Exception as e:
+            logger.error(f"[VideoGenerate] 错误: {str(e)}", exc_info=True)
+            try:
+                fallback = await generate_video_script(req.topic)
+                yield f"data: {json.dumps({'type': 'done', 'video_url': '', 'script': fallback.get('script', ''), 'resolution': 'text', 'mode': 'default', 'is_fallback': True}, ensure_ascii=False)}\n\n"
+            except Exception as fallback_err:
+                yield f"data: {json.dumps({'type': 'error', 'message': str(e)}, ensure_ascii=False)}\n\n"
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+            "Access-Control-Allow-Origin": "*"
+        }
+    )
+
+
+@app.get("/api/video/providers")
+async def api_video_providers():
+    """返回视频 Provider 列表及配置"""
+    providers = get_all_providers()
+    result = []
+    for pid, p in providers.items():
+        result.append({
+            "id": pid,
+            "name": p["name"],
+            "requiresApiKey": p["requiresApiKey"],
+            "defaultBaseUrl": p.get("defaultBaseUrl", ""),
+            "models": p.get("models", []),
+            "supportedDurations": p.get("supportedDurations", [5]),
+            "supportedResolutions": p.get("supportedResolutions", ["720p"]),
+            "supportedAspectRatios": p.get("supportedAspectRatios", ["16:9"]),
+            "enabled": pid == "seedance",
+        })
+    return {"success": True, "providers": result}
+
+
+@app.post("/api/video/verify")
+async def api_video_verify(req: dict):
+    """测试视频 Provider 连通性"""
+    provider_id = req.get("provider_id", "seedance")
+    api_key = req.get("api_key", "")
+    base_url = req.get("base_url", "")
+
+    if not api_key:
+        return {"success": False, "message": "请提供 API Key"}
+
+    ok, msg = await test_connectivity()
+
+    return {"success": ok, "message": msg}
+
+
+@app.get("/api/video/list/{user_id}")
+async def api_video_list(user_id: int, db: AsyncSession = Depends(get_db)):
+    """获取用户的视频历史列表"""
+    result = await db.execute(
+        select(LearningResource)
+        .where(
+            LearningResource.user_id == user_id,
+            LearningResource.resource_type == "video"
+        )
+        .order_by(LearningResource.created_at.desc())
+        .limit(50)
+    )
+    videos = result.scalars().all()
+
+    return {
+        "success": True,
+        "data": [
+            {
+                "id": v.id,
+                "title": v.title,
+                "topic": v.topic,
+                "content": v.content,
+                "created_at": str(v.created_at) if v.created_at else None,
+            }
+            for v in videos
+        ]
+    }
+
+
+@app.delete("/api/video/{resource_id}")
+async def api_video_delete(resource_id: int, db: AsyncSession = Depends(get_db)):
+    """删除视频记录"""
+    result = await db.execute(
+        select(LearningResource).where(LearningResource.id == resource_id)
+    )
+    resource = result.scalar_one_or_none()
+
+    if not resource:
+        raise HTTPException(status_code=404, detail="视频记录不存在")
+
+    if resource.resource_type != "video":
+        raise HTTPException(status_code=400, detail="该资源不是视频类型")
+
+    await db.delete(resource)
+    await db.commit()
+
+    logger.info(f"[VideoDelete] 视频记录已删除 resource_id={resource_id}")
+    return {"success": True, "message": "视频记录已删除"}
 
 
 @app.post("/api/search")

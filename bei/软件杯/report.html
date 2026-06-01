@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>学习报告 - Scholar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/variables.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/components.css">
+  <link rel="stylesheet" href="styles/pages.css">
+</head>
+<body class="report-page">
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="index.html" class="navbar-logo">
+        <div class="navbar-logo-icon">S</div>
+        Scholar
+      </a>
+      <div class="navbar-nav">
+        <a href="index.html" class="navbar-link">首页</a>
+        <a href="learning-path.html" class="navbar-link">学习中心</a>
+        <a href="resources.html" class="navbar-link">知识库</a>
+        <a href="exercises.html" class="navbar-link">练习</a>
+        <a href="report.html" class="navbar-link active">学习报告</a>
+      </div>
+      <div class="navbar-user">
+        <div class="avatar" id="userAvatar">学</div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="report-container">
+    <div class="report-header">
+      <h1>阶段学习报告</h1>
+      <p class="report-date" id="reportDate"></p>
+    </div>
+
+    <div class="knowledge-thread knowledge-thread-mini container">
+      <svg viewBox="0 0 900 40" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="threadGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="var(--primary)"/>
+            <stop offset="50%" stop-color="var(--secondary)"/>
+            <stop offset="100%" stop-color="var(--accent-green)"/>
+          </linearGradient>
+        </defs>
+        <path class="thread-line" d="M30,20 C200,5 400,30 600,20 C750,12 820,28 870,20"/>
+      </svg>
+    </div>
+
+    <div class="report-overview">
+      <div class="overview-card" data-reveal data-reveal-delay="0">
+        <div class="overview-icon">⏱</div>
+        <div class="overview-value" id="totalHours">24</div>
+        <div class="overview-label">学习时长（小时）</div>
+      </div>
+      <div class="overview-card" data-reveal data-reveal-delay="100">
+        <div class="overview-icon">✅</div>
+        <div class="overview-value" id="completionRate">78%</div>
+        <div class="overview-label">课程完成率</div>
+      </div>
+      <div class="overview-card" data-reveal data-reveal-delay="200">
+        <div class="overview-icon">⭐</div>
+        <div class="overview-value" id="avgScore">85</div>
+        <div class="overview-label">平均得分</div>
+      </div>
+    </div>
+
+    <div class="report-section">
+      <h3><span class="icon">�</span> 进步亮点</h3>
+      <ul class="strength-list" id="strengthList"></ul>
+    </div>
+
+    <div class="report-section">
+      <h3><span class="icon">🎯</span> 薄弱不足</h3>
+      <ul class="weakness-list" id="weaknessList"></ul>
+    </div>
+
+    <div class="report-section">
+      <h3><span class="icon">�</span> 学习画像变化</h3>
+      <div class="profile-comparison">
+        <div class="comparison-column">
+          <h4>学习前</h4>
+          <div class="comparison-item"><span>数学基础</span><span id="beforeMath">-</span></div>
+          <div class="comparison-item"><span>编程能力</span><span id="beforeProg">-</span></div>
+          <div class="comparison-item"><span>算法基础</span><span id="beforeAlgo">-</span></div>
+          <div class="comparison-item"><span>项目经验</span><span id="beforeExp">-</span></div>
+        </div>
+        <div class="comparison-column">
+          <h4>当前</h4>
+          <div class="comparison-item"><span>数学基础</span><span id="afterMath">-</span></div>
+          <div class="comparison-item"><span>编程能力</span><span id="afterProg">-</span></div>
+          <div class="comparison-item"><span>算法基础</span><span id="afterAlgo">-</span></div>
+          <div class="comparison-item"><span>项目经验</span><span id="afterExp">-</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="report-section">
+      <h3><span class="icon">💡</span> 下一步建议</h3>
+      <ul class="strength-list" id="recommendList"></ul>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p>&copy; 2026 Scholar</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="scripts/localStorage.js"></script>
+  <script src="scripts/main.js"></script>
+  <script src="scripts/scrollReveal.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initCommonPage();
+
+      if (!requireAuth()) return;
+
+      const user = Storage.getUser();
+      const report = Storage.getReport();
+      const progress = Storage.getProgress();
+
+      if (user && user.username) {
+        document.getElementById('userAvatar').textContent = user.username.charAt(0);
+      }
+
+      document.getElementById('reportDate').textContent = `生成于 ${formatDate(Date.now())}`;
+
+      document.getElementById('completionRate').textContent = progress.weekProgress + '%';
+
+      if (report.strengthPoints) {
+        document.getElementById('strengthList').innerHTML = report.strengthPoints.map(p => `
+          <li>
+            <span style="font-size: 1.25rem; margin-right: 8px;">✓</span>
+            <div>
+              <strong>${p}</strong>
+            </div>
+          </li>
+        `).join('');
+      }
+
+      if (report.weakPoints) {
+        document.getElementById('weaknessList').innerHTML = report.weakPoints.map(p => `
+          <li>
+            <span style="font-size: 1.25rem; margin-right: 8px;">⚠</span>
+            <div>
+              <strong>${p}</strong>
+            </div>
+          </li>
+        `).join('');
+      }
+    });
+  </script>
+</body>
+</html>

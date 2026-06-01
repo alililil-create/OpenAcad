@@ -21,6 +21,7 @@ BUCKETS = {
     "code_screenshots": "代码截图",
     "exports": "学习报告导出",
     "uploads": "用户上传文件",
+    "videos": "教学视频",
 }
 
 
