@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI画像收集 - 机器学习智能学习平台</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&display=swap');
+  </style>
+  <link rel="stylesheet" href="styles/variables.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/components.css">
+  <link rel="stylesheet" href="styles/pages.css">
+</head>
+<body class="profile-page">
+
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="index.html" class="navbar-logo">
+        <div class="navbar-logo-icon">S</div>
+        Scholar
+      </a>
+    </div>
+  </nav>
+
+  <main class="profile-container">
+    <div class="profile-header">
+      <h1>学习画像收集</h1>
+      <p>回答几个问题，AI 为你定制专属学习路径</p>
+    </div>
+
+    <div class="knowledge-thread knowledge-thread-mini container">
+      <svg viewBox="0 0 900 40" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="threadGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="var(--primary)"/>
+            <stop offset="50%" stop-color="var(--secondary)"/>
+            <stop offset="100%" stop-color="var(--accent-green)"/>
+          </linearGradient>
+        </defs>
+        <path class="thread-line" d="M30,20 C200,5 400,30 600,20 C750,12 820,28 870,20"/>
+      </svg>
+    </div>
+
+    <div class="profile-progress">
+      <div class="profile-progress-bar">
+        <div class="progress-bar">
+          <div class="progress-bar-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+      </div>
+      <span class="profile-progress-text" id="progressText">0 / 8</span>
+    </div>
+
+    <div class="chat-container" id="chatContainer">
+    </div>
+
+    <div style="text-align:center;margin-top:24px;">
+      <button class="btn btn-ghost btn-sm" onclick="resetProfile()">重置画像</button>
+    </div>
+  </main>
+
+  <script src="scripts/localStorage.js"></script>
+  <script src="scripts/main.js"></script>
+  <script src="scripts/scrollReveal.js"></script>
+  <script src="scripts/profile.js"></script>
+  <script>
+    function resetProfile() {
+      if (confirm('确定要重置画像吗？所有学习数据将被清除。')) {
+        Storage.clearAll();
+        showToast('画像已重置，请重新注册', 'success');
+        setTimeout(() => { window.location.href = 'register.html'; }, 1200);
+      }
+    }
+  </script>
+</body>
+</html>

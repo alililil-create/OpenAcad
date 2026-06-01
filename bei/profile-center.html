@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>个人中心 - 机器学习个性化智能学习平台</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/variables.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/components.css">
+  <link rel="stylesheet" href="styles/pages.css">
+  <style>
+    .profile-center-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+    .profile-center-header {
+      margin-bottom: 32px;
+    }
+    .profile-center-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .profile-center-header p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    .profile-center-card {
+      background: var(--bg-card, #fff);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .profile-center-card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .info-row {
+      display: flex;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-color, #f0f0f0);
+    }
+    .info-row:last-child {
+      border-bottom: none;
+    }
+    .info-label {
+      width: 100px;
+      flex-shrink: 0;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+    .info-value {
+      flex: 1;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    .logout-btn {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      background: #ef4444;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 8px;
+    }
+    .logout-btn:hover {
+      background: #dc2626;
+    }
+    .logout-btn:active {
+      transform: scale(0.98);
+    }
+    .avatar-large {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 0 auto 16px;
+    }
+    .user-name-display {
+      text-align: center;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .user-id-display {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+    .profile-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .profile-stat-item {
+      text-align: center;
+      padding: 16px 12px;
+      background: var(--bg-secondary, #f8f9fc);
+      border-radius: 12px;
+    }
+    .profile-stat-value {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--primary, #667eea);
+    }
+    .profile-stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+    .no-profile-hint {
+      text-align: center;
+      padding: 32px 0;
+      color: var(--text-secondary);
+    }
+    .no-profile-hint a {
+      color: var(--primary, #667eea);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .no-login-hint {
+      text-align: center;
+      padding: 48px 0;
+    }
+    .no-login-hint p {
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      font-size: 1rem;
+    }
+    .no-login-hint a {
+      display: inline-block;
+      padding: 12px 32px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border-radius: 10px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform 0.2s;
+    }
+    .no-login-hint a:hover {
+      transform: scale(1.05);
+    }
+    .logout-modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .logout-modal-overlay.show {
+      display: flex;
+    }
+    .logout-modal {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+    }
+    .logout-modal h3 {
+      font-size: 1.2rem;
+      margin-bottom: 12px;
+      color: var(--text-primary);
+    }
+    .logout-modal p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+    .logout-modal-btns {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+    .modal-btn {
+      padding: 10px 28px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: background 0.2s;
+    }
+    .modal-btn-cancel {
+      background: var(--bg-secondary, #f0f0f0);
+      color: var(--text-primary);
+    }
+    .modal-btn-cancel:hover {
+      background: #e0e0e0;
+    }
+    .modal-btn-confirm {
+      background: #ef4444;
+      color: white;
+    }
+    .modal-btn-confirm:hover {
+      background: #dc2626;
+    }
+  </style>
+</head>
+<body class="profile-center-page">
+  <!-- 导航栏 -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="index.html" class="navbar-logo">
+        <div class="navbar-logo-icon">🤖</div>
+        <span>ML智能学习</span>
+      </a>
+      <div class="navbar-nav">
+        <a href="index.html" class="navbar-link">首页</a>
+        <a href="learning-path.html" class="navbar-link">学习中心</a>
+        <a href="resources.html" class="navbar-link">知识库</a>
+        <a href="exercises.html" class="navbar-link">练习</a>
+        <a href="report.html" class="navbar-link">学习报告</a>
+        <a href="profile-center.html" class="navbar-link active">👤 个人中心</a>
+      </div>
+      <div class="navbar-user">
+        <div class="avatar" id="userAvatar">学</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 主内容 -->
+  <div class="profile-center-container">
+    <div class="profile-center-header">
+      <h1>个人中心</h1>
+      <p>管理你的账号信息、查看学习画像</p>
+    </div>
+
+    <!-- 未登录状态 -->
+    <div id="noLoginSection" style="display:none;">
+      <div class="profile-center-card">
+        <div class="no-login-hint">
+          <p>👋 你还没有登录，请先登录或注册账号</p>
+          <a href="register.html">去登录 / 注册</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 已登录状态 -->
+    <div id="loggedInSection" style="display:none;">
+
+      <!-- 用户基本信息 -->
+      <div class="profile-center-card">
+        <div class="profile-center-card-title">👤 账号信息</div>
+        <div class="avatar-large" id="largeAvatar">学</div>
+        <div class="user-name-display" id="displayUsername">--</div>
+        <div class="user-id-display" id="displayUserId">ID: --</div>
+        <div class="info-row">
+          <span class="info-label">注册时间</span>
+          <span class="info-value" id="displayRegTime">--</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">登录方式</span>
+          <span class="info-value" id="displayAuthType">JWT Token</span>
+        </div>
+      </div>
+
+      <!-- 学习画像摘要 -->
+      <div class="profile-center-card" id="profileSummaryCard">
+        <div class="profile-center-card-title">🎯 学习画像摘要</div>
+        <div id="profileContent">
+          <div class="no-profile-hint">
+            <p>还没有学习画像</p>
+            <a href="wizard.html">👉 前往画像向导构建画像</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 快速入口 -->
+      <div class="profile-center-card">
+        <div class="profile-center-card-title">🔗 快速入口</div>
+        <div class="info-row" style="cursor:pointer;" onclick="navigateTo('profile-detail.html')">
+          <span class="info-label" style="flex:1;">📊 查看详细画像</span>
+          <span style="color:var(--text-secondary);">→</span>
+        </div>
+        <div class="info-row" style="cursor:pointer;" onclick="navigateTo('wizard.html')">
+          <span class="info-label" style="flex:1;">🤖 更新学习画像</span>
+          <span style="color:var(--text-secondary);">→</span>
+        </div>
+        <div class="info-row" style="cursor:pointer;" onclick="navigateTo('report.html')">
+          <span class="info-label" style="flex:1;">📝 查看学习报告</span>
+          <span style="color:var(--text-secondary);">→</span>
+        </div>
+        <div class="info-row" style="cursor:pointer;" onclick="navigateTo('learning-path.html')">
+          <span class="info-label" style="flex:1;">📚 进入学习中心</span>
+          <span style="color:var(--text-secondary);">→</span>
+        </div>
+      </div>
+
+      <!-- 退出登录 -->
+      <div class="profile-center-card">
+        <div class="profile-center-card-title" style="color:#ef4444;">⚠️ 危险操作</div>
+        <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:16px;">
+          退出登录后，你需要重新登录才能使用平台。你的学习数据会被安全保存。
+        </p>
+        <button class="logout-btn" onclick="showLogoutModal()">退出登录</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 退出确认弹窗 -->
+  <div class="logout-modal-overlay" id="logoutModal">
+    <div class="logout-modal">
+      <h3>确认退出登录</h3>
+      <p>退出后需要重新登录才能使用平台，确定要退出吗？</p>
+      <div class="logout-modal-btns">
+        <button class="modal-btn modal-btn-cancel" onclick="hideLogoutModal()">取消</button>
+        <button class="modal-btn modal-btn-confirm" onclick="doLogout()">确定退出</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 页脚 -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h4>关于我们</h4>
+          <p>机器学习个性化智能学习平台，专注于为每位学习者提供定制化的学习体验。</p>
+        </div>
+        <div class="footer-section">
+          <h4>快速链接</h4>
+          <p><a href="index.html">首页</a></p>
+          <p><a href="learning-path.html">学习中心</a></p>
+          <p><a href="report.html">学习报告</a></p>
+        </div>
+        <div class="footer-section">
+          <h4>大赛信息</h4>
+          <p>第十五届中国软件杯</p>
+          <p>大学生软件设计大赛</p>
+          <p>A3赛题</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 ML智能学习平台 - 第十五届中国软件杯参赛作品</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 脚本 -->
+  <script src="scripts/localStorage.js"></script>
+  <script src="scripts/main.js"></script>
+  <script>
+    // ===== 获取 API 基数地址 =====
+    function getApiBase() {
+      return localStorage.getItem('ml_api_base') || '';
+    }
+
+    // ===== 登出弹窗 =====
+    function showLogoutModal() {
+      document.getElementById('logoutModal').classList.add('show');
+    }
+    function hideLogoutModal() {
+      document.getElementById('logoutModal').classList.remove('show');
+    }
+
+    // ===== 执行退出登录 =====
+    function doLogout() {
+      // 清除所有 localStorage 数据
+      localStorage.clear();
+      // 跳转到登录/注册页面
+      window.location.href = 'register.html';
+    }
+
+    // ===== 格式化时间 =====
+    function formatDateTime(timestamp) {
+      if (!timestamp) return '--';
+      const d = new Date(timestamp);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      const hour = String(d.getHours()).padStart(2, '0');
+      const min = String(d.getMinutes()).padStart(2, '0');
+      return `${year}-${month}-${day} ${hour}:${min}`;
+    }
+
+    // ===== 加载用户信息 =====
+    function loadUserInfo() {
+      let user = null;
+      try {
+        user = JSON.parse(localStorage.getItem('ml_user') || 'null');
+      } catch(e) { user = null; }
+
+      if (!user || !user.user_id) {
+        // 未登录
+        document.getElementById('noLoginSection').style.display = 'block';
+        document.getElementById('loggedInSection').style.display = 'none';
+        return null;
+      }
+
+      // 已登录
+      document.getElementById('noLoginSection').style.display = 'none';
+      document.getElementById('loggedInSection').style.display = 'block';
+
+      const username = user.username || '用户';
+      const firstChar = username.charAt(0);
+
+      document.getElementById('largeAvatar').textContent = firstChar;
+      document.getElementById('displayUsername').textContent = username;
+      document.getElementById('displayUserId').textContent = 'ID: ' + (user.user_id || '--');
+
+      // 注册时间 - 优先从 localStorage ml_user 中读取，否则从 API 获取
+      const registeredAt = user.registered_at || user.registeredAt || null;
+      document.getElementById('displayRegTime').textContent = formatDateTime(registeredAt);
+
+      // 更新导航栏头像
+      const navAvatar = document.getElementById('userAvatar');
+      if (navAvatar) navAvatar.textContent = firstChar;
+
+      return user;
+    }
+
+    // ===== 加载画像摘要 =====
+    async function loadProfileSummary(userId) {
+      const profileContent = document.getElementById('profileContent');
+      if (!userId) {
+        profileContent.innerHTML = '<div class="no-profile-hint"><p>请先登录后查看画像</p></div>';
+        return;
+      }
+
+      // 先从缓存加载
+      let profileData = null;
+      try {
+        const cached = JSON.parse(localStorage.getItem('ml_profile_cache') || 'null');
+        if (cached && cached.capability_matrix) profileData = cached;
+      } catch(e) {}
+
+      // 从 API 获取最新数据
+      try {
+        const resp = await fetch(`${getApiBase()}/api/wizard/full-profile/${userId}`);
+        const json = await resp.json();
+        if (json.success && json.data) {
+          profileData = json.data;
+          localStorage.setItem('ml_profile_cache', JSON.stringify(profileData));
+        }
+      } catch(e) {
+        console.log('[Profile] API 获取失败，使用缓存');
+      }
+
+      if (!profileData || !profileData.capability_matrix) {
+        profileContent.innerHTML = '<div class="no-profile-hint"><p>还没有学习画像</p><a href="wizard.html">👉 前往画像向导构建画像</a></div>';
+        return;
+      }
+
+      const overall = profileData.overall_score || 0;
+      const confidence = profileData.confidence_score || 0;
+      const version = profileData.profile_version || 1;
+
+      // 统计知识点数
+      const capMatrix = profileData.capability_matrix || {};
+      let totalKps = 0;
+      let avgScoreSum = 0;
+      let chapterEntries = 0;
+
+      Object.values(capMatrix).forEach(kps => {
+        if (typeof kps !== 'object') return;
+        const entries = Object.entries(kps);
+        totalKps += entries.length;
+        const chapterAvg = entries.reduce((sum, [,v]) =>
+          sum + (typeof v === 'object' ? (v.score || 0) : v), 0
+        );
+        if (entries.length > 0) {
+          avgScoreSum += chapterAvg / entries.length;
+          chapterEntries++;
+        }
+      });
+
+      const overallAvg = chapterEntries > 0 ? (avgScoreSum / chapterEntries).toFixed(1) : '--';
+
+      profileContent.innerHTML = `
+        <div class="profile-stat-grid">
+          <div class="profile-stat-item">
+            <div class="profile-stat-value">${overall}</div>
+            <div class="profile-stat-label">综合评分</div>
+          </div>
+          <div class="profile-stat-item">
+            <div class="profile-stat-value">${Math.round(confidence * 100)}%</div>
+            <div class="profile-stat-label">置信度</div>
+          </div>
+          <div class="profile-stat-item">
+            <div class="profile-stat-value">${totalKps}</div>
+            <div class="profile-stat-label">已评估知识点</div>
+          </div>
+          <div class="profile-stat-item">
+            <div class="profile-stat-value">${overallAvg}</div>
+            <div class="profile-stat-label">平均得分</div>
+          </div>
+        </div>
+        <div style="margin-top:16px;text-align:center;">
+          <span style="font-size:0.75rem;color:var(--text-secondary);">画像版本: v${version}</span>
+          <span style="margin-left:16px;font-size:0.75rem;color:var(--text-secondary);">
+            更新时间: ${formatDateTime(profileData.updated_at || profileData.created_at)}
+          </span>
+        </div>
+      `;
+    }
+
+    // ===== 初始化 =====
+    document.addEventListener('DOMContentLoaded', async () => {
+      initCommonPage();
+      const user = loadUserInfo();
+      if (user) {
+        await loadProfileSummary(user.user_id);
+      }
+    });
+  </script>
+</body>
+</html>

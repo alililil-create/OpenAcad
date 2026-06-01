@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>学习画像详情 - 机器学习个性化智能学习平台</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/variables.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/components.css">
+  <link rel="stylesheet" href="styles/pages.css">
+
+  <style>
+    /* ==================== 页面布局 ==================== */
+    .profile-detail-page {
+      min-height: 100vh;
+      background: linear-gradient(180deg, #E0E7FF 0%, #F8FAFC 30%);
+    }
+
+    .profile-container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: calc(var(--navbar-height) + var(--space-xl)) var(--space-lg) var(--space-3xl);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-lg);
+      width: 100%;
+    }
+
+    /* ==================== 头部总评分 ==================== */
+    .profile-header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl);
+      color: var(--text-white);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-xl);
+      flex-wrap: wrap;
+      box-shadow: var(--shadow-primary);
+      animation: fadeInUp var(--transition) ease-out;
+    }
+
+    .profile-header-info h1 {
+      font-size: 1.75rem;
+      color: var(--text-white);
+      margin-bottom: var(--space-xs);
+    }
+
+    .profile-header-info p {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.9375rem;
+      margin-bottom: 0;
+    }
+
+    .profile-header-score {
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .profile-header-score .score-value {
+      font-size: 4rem;
+      font-weight: 800;
+      font-family: var(--font-display);
+      line-height: 1;
+    }
+
+    .profile-header-score .score-label {
+      font-size: 0.875rem;
+      color: rgba(255, 255, 255, 0.75);
+      margin-top: var(--space-xs);
+    }
+
+    .profile-header-score .score-bar-wrap {
+      width: 160px;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: var(--radius-full);
+      margin-top: var(--space-sm);
+      overflow: hidden;
+    }
+
+    .profile-header-score .score-bar-fill {
+      height: 100%;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: var(--radius-full);
+      transition: width 0.8s ease;
+    }
+
+    /* ==================== 通用区块卡片 ==================== */
+    .section-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      box-shadow: var(--shadow-sm);
+      animation: fadeInUp var(--transition) ease-out;
+    }
+
+    .section-card h2 {
+      font-size: 1.25rem;
+      margin-bottom: var(--space-lg);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      color: var(--text-primary);
+    }
+
+    .section-card h2 .section-icon {
+      font-size: 1.5rem;
+    }
+
+    /* ==================== 信息卡片网格 ==================== */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: var(--space-md);
+    }
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+      padding: var(--space-md);
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.04), rgba(139, 92, 246, 0.04));
+      border-radius: var(--radius-md);
+      border-left: 3px solid var(--primary);
+    }
+
+    .info-item .info-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .info-item .info-value {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* ==================== 列表样式 ==================== */
+    .list-stack {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .list-stack li {
+      padding: var(--space-sm) var(--space-md);
+      background: #F8FAFC;
+      border-radius: var(--radius-sm);
+      font-size: 0.9375rem;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .list-stack li::before {
+      content: '▸';
+      color: var(--primary);
+      font-weight: bold;
+    }
+
+    .self-assessment-text {
+      padding: var(--space-md);
+      background: #F8FAFC;
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      font-size: 0.9375rem;
+      line-height: 1.6;
+      border-left: 3px solid var(--secondary);
+    }
+
+    /* ==================== 雷达图容器 ==================== */
+    .radar-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-md) 0;
+    }
+
+    .radar-container canvas {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* ==================== 热力图网格 ==================== */
+    .heatmap-grid {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-lg);
+    }
+
+    .heatmap-chapter {
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .heatmap-chapter-header {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.08));
+      padding: var(--space-sm) var(--space-md);
+      font-weight: 600;
+      font-size: 0.9375rem;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .heatmap-chapter-header .chapter-avg {
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .heatmap-chapter-body {
+      display: flex;
+      flex-wrap: wrap;
+      padding: var(--space-sm);
+      gap: var(--space-sm);
+    }
+
+    .kp-cell {
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #fff;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      position: relative;
+      user-select: none;
+      min-width: 100px;
+      text-align: center;
+    }
+
+    .kp-cell:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .kp-cell.level-high {
+      background: linear-gradient(135deg, #10B981, #34D399);
+    }
+
+    .kp-cell.level-mid {
+      background: linear-gradient(135deg, #F59E0B, #FBBF24);
+      color: #1E293B;
+    }
+
+    .kp-cell.level-low {
+      background: linear-gradient(135deg, #EF4444, #F87171);
+    }
+
+    .kp-cell .kp-score {
+      display: block;
+      font-size: 0.6875rem;
+      opacity: 0.85;
+      margin-top: 2px;
+    }
+
+    .kp-cell .kp-adjust {
+      display: none;
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      font-size: 14px;
+      line-height: 22px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .kp-cell:hover .kp-adjust {
+      display: block;
+    }
+
+    .kp-cell .kp-adjust.down {
+      top: auto;
+      bottom: -8px;
+      right: -8px;
+      background: var(--accent-danger);
+    }
+
+    /* ==================== 强弱项卡片 ==================== */
+    .points-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-lg);
+    }
+
+    .strong-point-card,
+    .weak-point-card {
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+    }
+
+    .strong-point-card {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.06), rgba(52, 211, 153, 0.06));
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .weak-point-card {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.06), rgba(248, 113, 113, 0.06));
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .strong-point-card h3,
+    .weak-point-card h3 {
+      font-size: 1rem;
+      margin-bottom: var(--space-md);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .strong-point-card .point-list,
+    .weak-point-card .point-list {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .point-list li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-sm);
+      font-size: 0.9375rem;
+      font-weight: 500;
+    }
+
+    .strong-point-card .point-list li {
+      background: rgba(16, 185, 129, 0.1);
+      border-left: 3px solid var(--accent-success);
+      color: var(--text-primary);
+    }
+
+    .weak-point-card .point-list li {
+      background: rgba(239, 68, 68, 0.1);
+      border-left: 3px solid var(--accent-danger);
+      color: var(--text-primary);
+    }
+
+    .point-list li .point-score {
+      font-weight: 700;
+      font-family: var(--font-display);
+      font-size: 0.9375rem;
+    }
+
+    .strong-point-card .point-list li .point-score {
+      color: var(--accent-success);
+    }
+
+    .weak-point-card .point-list li .point-score {
+      color: var(--accent-danger);
+    }
+
+    /* ==================== 文档信息 ==================== */
+    .document-card {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      padding: var(--space-lg);
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
+      border-radius: var(--radius-md);
+      border: 1px dashed var(--primary-light);
+    }
+
+    .document-card .doc-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .document-card .doc-info {
+      flex: 1;
+    }
+
+    .document-card .doc-name {
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: var(--space-xs);
+    }
+
+    .document-card .doc-meta {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+    }
+
+    .document-card .doc-action {
+      padding: var(--space-sm) var(--space-lg);
+      background: var(--primary);
+      color: #fff;
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .document-card .doc-action:hover {
+      background: var(--primary-dark);
+    }
+
+    /* ==================== 加载与错误状态 ==================== */
+    .loading-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-3xl);
+      color: var(--text-secondary);
+      gap: var(--space-md);
+    }
+
+    .loading-spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid #E2E8F0;
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .error-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-3xl);
+      color: var(--accent-danger);
+      gap: var(--space-md);
+      text-align: center;
+    }
+
+    .error-state .error-icon {
+      font-size: 3rem;
+    }
+
+    .no-data-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-3xl);
+      color: var(--text-secondary);
+      gap: var(--space-md);
+      text-align: center;
+    }
+
+    /* ==================== 操作按钮区 ==================== */
+    .action-bar {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-md);
+      padding-top: var(--space-md);
+    }
+
+    .action-bar .btn {
+      min-width: 160px;
+    }
+
+    /* ==================== Toast提示 ==================== */
+    .toast {
+      position: fixed;
+      top: calc(var(--navbar-height) + var(--space-lg));
+      left: 50%;
+      transform: translateX(-50%);
+      padding: var(--space-md) var(--space-xl);
+      border-radius: var(--radius-full);
+      font-weight: 500;
+      font-size: 0.9375rem;
+      color: #fff;
+      z-index: 2000;
+      animation: toastIn 0.3s ease-out, toastOut 0.3s ease-out 2s forwards;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .toast.success {
+      background: linear-gradient(135deg, #10B981, #059669);
+    }
+
+    .toast.error {
+      background: linear-gradient(135deg, #EF4444, #DC2626);
+    }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    @keyframes toastOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+
+    /* ==================== 响应式 ==================== */
+    @media (max-width: 768px) {
+      .profile-header {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .profile-header-score .score-value {
+        font-size: 3rem;
+      }
+
+      .points-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .kp-cell {
+        min-width: 80px;
+        font-size: 0.8125rem;
+      }
+
+      .action-bar {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body class="profile-detail-page">
+
+  <!-- 导航栏 -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="index.html" class="navbar-logo">
+        <div class="navbar-logo-icon">🤖</div>
+        <span>ML智能学习</span>
+      </a>
+      <div class="navbar-nav">
+        <a href="index.html" class="navbar-link">首页</a>
+        <a href="learning-path.html" class="navbar-link">学习中心</a>
+        <a href="resources.html" class="navbar-link">知识库</a>
+        <a href="exercises.html" class="navbar-link">练习</a>
+        <a href="report.html" class="navbar-link">学习报告</a>
+        <a href="profile-center.html" class="navbar-link">👤 个人中心</a>
+        <a href="profile-detail.html" class="navbar-link active">画像详情</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 主内容区 -->
+  <div class="profile-container" id="mainContainer">
+    <!-- 动态渲染 -->
+  </div>
+
+  <!-- Toast容器 -->
+  <div id="toastContainer"></div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // ==================== 工具函数 ====================
+      function getUserId() {
+        try {
+          const raw = localStorage.getItem('ml_user');
+          if (!raw) return null;
+          const user = JSON.parse(raw);
+          return user.user_id || user.id || null;
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function getApiBaseUrl() {
+        try {
+          const stored = localStorage.getItem('ml_api_base_url');
+          if (stored) return stored;
+        } catch (e) { /* ignore */ }
+        return 'http://127.0.0.1:8000';
+      }
+
+      async function fetchFullProfile(userId) {
+        const baseUrl = getApiBaseUrl();
+        const resp = await fetch(`${baseUrl}/api/wizard/full-profile/${userId}`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        if (!resp.ok) {
+          const text = await resp.text().catch(() => '');
+          throw new Error(`请求失败 (${resp.status}): ${text || resp.statusText}`);
+        }
+        const data = await resp.json();
+        return data.data || data;
+      }
+
+      async function confirmProfile(userId, capabilityMatrix) {
+        const baseUrl = getApiBaseUrl();
+        const resp = await fetch(`${baseUrl}/api/wizard/confirm-profile/${userId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ capability_matrix: capabilityMatrix })
+        });
+        if (!resp.ok) {
+          const text = await resp.text().catch(() => '');
+          throw new Error(`提交失败 (${resp.status}): ${text || resp.statusText}`);
+        }
+        return resp.json();
+      }
+
+      function showToast(message, type) {
+        var container = document.getElementById('toastContainer');
+        var toast = document.createElement('div');
+        toast.className = 'toast ' + (type || 'success');
+        toast.textContent = message;
+        container.appendChild(toast);
+        setTimeout(function () {
+          if (toast.parentNode) toast.parentNode.removeChild(toast);
+        }, 2500);
+      }
+
+      function formatDate(dateStr) {
+        if (!dateStr) return '未知';
+        try {
+          var d = new Date(dateStr);
+          if (isNaN(d.getTime())) return dateStr;
+          return d.getFullYear() + '-' +
+            String(d.getMonth() + 1).padStart(2, '0') + '-' +
+            String(d.getDate()).padStart(2, '0') + ' ' +
+            String(d.getHours()).padStart(2, '0') + ':' +
+            String(d.getMinutes()).padStart(2, '0');
+        } catch (e) {
+          return dateStr;
+        }
+      }
+
+      // ==================== 雷达图绘制 ====================
+      function drawRadarChart(canvas, chapters) {
+        if (!canvas || !chapters || chapters.length === 0) return;
+
+        var ctx = canvas.getContext('2d');
+        var dpr = window.devicePixelRatio || 1;
+
+        var displayWidth = Math.min(520, canvas.parentElement.clientWidth - 32);
+        var displayHeight = displayWidth;
+        canvas.style.width = displayWidth + 'px';
+        canvas.style.height = displayHeight + 'px';
+        canvas.width = displayWidth * dpr;
+        canvas.height = displayHeight * dpr;
+        ctx.scale(dpr, dpr);
+
+        var w = displayWidth;
+        var h = displayHeight;
+        var cx = w / 2;
+        var cy = h / 2;
+        var maxRadius = Math.min(w, h) / 2 - 60;
+        var n = chapters.length;
+        var angleStep = (2 * Math.PI) / n;
+        var levels = 5;
+
+        ctx.clearRect(0, 0, w, h);
+
+        // Draw background polygon grid
+        for (var level = 1; level <= levels; level++) {
+          ctx.beginPath();
+          var r = (maxRadius / levels) * level;
+          for (var i = 0; i < n; i++) {
+            var angle = angleStep * i - Math.PI / 2;
+            var x = cx + r * Math.cos(angle);
+            var y = cy + r * Math.sin(angle);
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.closePath();
+          ctx.strokeStyle = 'rgba(99, 102, 241, 0.15)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          ctx.fillStyle = level % 2 === 0 ? 'rgba(99, 102, 241, 0.03)' : 'transparent';
+          ctx.fill();
+        }
+
+        // Draw axes
+        for (var i = 0; i < n; i++) {
+          var angle = angleStep * i - Math.PI / 2;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.lineTo(cx + maxRadius * Math.cos(angle), cy + maxRadius * Math.sin(angle));
+          ctx.strokeStyle = 'rgba(99, 102, 241, 0.2)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+
+        // Draw data polygon
+        ctx.beginPath();
+        for (var i = 0; i < n; i++) {
+          var score = chapters[i].avg_score || 0;
+          score = Math.max(0.2, Math.min(5, score));
+          var r = (maxRadius / levels) * score;
+          var angle = angleStep * i - Math.PI / 2;
+          var x = cx + r * Math.cos(angle);
+          var y = cy + r * Math.sin(angle);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(99, 102, 241, 0.2)';
+        ctx.fill();
+        ctx.strokeStyle = '#6366F1';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+
+        // Draw data points
+        for (var i = 0; i < n; i++) {
+          var score = chapters[i].avg_score || 0;
+          score = Math.max(0.2, Math.min(5, score));
+          var r = (maxRadius / levels) * score;
+          var angle = angleStep * i - Math.PI / 2;
+          var x = cx + r * Math.cos(angle);
+          var y = cy + r * Math.sin(angle);
+
+          ctx.beginPath();
+          ctx.arc(x, y, 5, 0, 2 * Math.PI);
+          ctx.fillStyle = '#4F46E5';
+          ctx.fill();
+          ctx.strokeStyle = '#fff';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        }
+
+        // Draw labels
+        ctx.fillStyle = '#1E293B';
+        ctx.font = '600 13px "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        for (var i = 0; i < n; i++) {
+          var angle = angleStep * i - Math.PI / 2;
+          var labelR = maxRadius + 28;
+          var lx = cx + labelR * Math.cos(angle);
+          var ly = cy + labelR * Math.sin(angle);
+          ctx.fillText(chapters[i].chapter_name, lx, ly);
+        }
+
+        // Draw score labels on each axis
+        for (var level = 1; level <= levels; level++) {
+          var r = (maxRadius / levels) * level;
+          var angle = angleStep * 0 - Math.PI / 2;
+          var sx = cx + r * Math.cos(angle) - 22;
+          var sy = cy + r * Math.sin(angle);
+          ctx.fillStyle = '#94A3B8';
+          ctx.font = '10px "Poppins", sans-serif';
+          ctx.textAlign = 'right';
+          ctx.fillText(level, sx, sy);
+        }
+      }
+
+      // ==================== 渲染函数 ====================
+      function renderBasicInfo(basicInfo) {
+        if (!basicInfo) return '';
+        var items = [
+          { label: '专业', value: basicInfo.major || '未填写' },
+          { label: '年级', value: basicInfo.grade || '未填写' },
+          { label: '学校', value: basicInfo.school || '未填写' },
+          { label: '常用语言', value: basicInfo.preferred_language || '未填写' }
+        ];
+        var html = '<div class="info-grid">';
+        for (var i = 0; i < items.length; i++) {
+          html += '<div class="info-item">' +
+            '<span class="info-label">' + items[i].label + '</span>' +
+            '<span class="info-value">' + items[i].value + '</span>' +
+            '</div>';
+        }
+        html += '</div>';
+        return html;
+      }
+
+      function renderLearningGoals(goals) {
+        if (!goals) return '';
+        var items = [
+          { label: '目标岗位', value: goals.target_role || '未填写' },
+          { label: '目标期限', value: goals.deadline || '未填写' },
+          { label: '每周学时', value: goals.weekly_hours ? goals.weekly_hours + ' 小时' : '未填写' },
+          { label: '学习动机', value: goals.motivation || '未填写' }
+        ];
+        var html = '<div class="info-grid">';
+        for (var i = 0; i < items.length; i++) {
+          html += '<div class="info-item">' +
+            '<span class="info-label">' + items[i].label + '</span>' +
+            '<span class="info-value">' + items[i].value + '</span>' +
+            '</div>';
+        }
+        html += '</div>';
+        return html;
+      }
+
+      function renderPriorExperience(exp) {
+        if (!exp) return '';
+        var html = '';
+
+        if (exp.courses_taken && exp.courses_taken.length > 0) {
+          html += '<h4 style="margin-bottom:8px;color:var(--text-secondary);">📚 已修课程</h4>';
+          html += '<ul class="list-stack">';
+          for (var i = 0; i < exp.courses_taken.length; i++) {
+            html += '<li>' + exp.courses_taken[i] + '</li>';
+          }
+          html += '</ul>';
+        }
+
+        if (exp.projects && exp.projects.length > 0) {
+          html += '<h4 style="margin-top:16px;margin-bottom:8px;color:var(--text-secondary);">💻 项目经验</h4>';
+          html += '<ul class="list-stack">';
+          for (var i = 0; i < exp.projects.length; i++) {
+            html += '<li>' + exp.projects[i] + '</li>';
+          }
+          html += '</ul>';
+        }
+
+        if (exp.self_assessment) {
+          html += '<h4 style="margin-top:16px;margin-bottom:8px;color:var(--text-secondary);">✍️ 自我评估</h4>';
+          html += '<div class="self-assessment-text">' + exp.self_assessment + '</div>';
+        }
+
+        if (!html) {
+          html = '<p style="color:var(--text-secondary);">暂无数据</p>';
+        }
+
+        return html;
+      }
+
+      function getScoreLevel(score) {
+        if (score >= 4) return 'level-high';
+        if (score >= 2.5) return 'level-mid';
+        return 'level-low';
+      }
+
+      function buildCapabilityMatrixData(chapters) {
+        var matrix = [];
+        for (var i = 0; i < chapters.length; i++) {
+          var chapter = chapters[i];
+          var kps = chapter.knowledge_points || [];
+          var total = 0;
+          for (var j = 0; j < kps.length; j++) {
+            total += kps[j].score || 0;
+          }
+          var avg = kps.length > 0 ? total / kps.length : 0;
+          matrix.push({
+            chapter_name: chapter.chapter_name,
+            avg_score: avg,
+            knowledge_points: kps.map(function (kp) {
+              return { name: kp.name, score: kp.score || 0 };
+            })
+          });
+        }
+        return matrix;
+      }
+
+      function getAllKnowledgePoints(chapters) {
+        var all = [];
+        for (var i = 0; i < chapters.length; i++) {
+          var kps = chapters[i].knowledge_points || [];
+          for (var j = 0; j < kps.length; j++) {
+            all.push({
+              name: kps[j].name,
+              score: kps[j].score || 0,
+              chapter_name: chapters[i].chapter_name,
+              chapter_idx: i,
+              kp_idx: j
+            });
+          }
+        }
+        return all;
+      }
+
+      function renderHeatmap(chapters, matrix) {
+        var html = '<div class="heatmap-grid">';
+        for (var i = 0; i < chapters.length; i++) {
+          var chapter = chapters[i];
+          var mat = matrix[i];
+          var kps = chapter.knowledge_points || [];
+          html += '<div class="heatmap-chapter">' +
+            '<div class="heatmap-chapter-header">' +
+            '<span>' + chapter.chapter_name + '</span>' +
+            '<span class="chapter-avg">均分: ' + (mat ? mat.avg_score.toFixed(1) : '0.0') + '</span>' +
+            '</div>' +
+            '<div class="heatmap-chapter-body">';
+
+          for (var j = 0; j < kps.length; j++) {
+            var kp = kps[j];
+            var level = getScoreLevel(kp.score || 0);
+            html += '<div class="kp-cell ' + level + '" data-chapter="' + i + '" data-kp="' + j + '" title="点击调整评分">' +
+              kp.name +
+              '<span class="kp-score">' + (kp.score || 0).toFixed(1) + ' 分</span>' +
+              '<span class="kp-adjust" data-dir="up">+</span>' +
+              '<span class="kp-adjust down" data-dir="down">−</span>' +
+              '</div>';
+          }
+
+          html += '</div></div>';
+        }
+        html += '</div>';
+        return html;
+      }
+
+      function renderPointsList(points, type) {
+        if (!points || points.length === 0) {
+          return '<ul class="point-list"><li style="justify-content:center;opacity:0.6;">暂无数据</li></ul>';
+        }
+        var sorted = points.slice().sort(function (a, b) { return b.score - a.score; });
+        var html = '<ul class="point-list">';
+        for (var i = 0; i < sorted.length; i++) {
+          html += '<li><span>' + sorted[i].chapter_name + ' · ' + sorted[i].name + '</span>' +
+            '<span class="point-score">' + sorted[i].score.toFixed(1) + '</span></li>';
+        }
+        html += '</ul>';
+        return html;
+      }
+
+      function renderDocumentInfo(docInfo) {
+        if (!docInfo) {
+          return '<p style="color:var(--text-secondary);">暂无上传文档</p>';
+        }
+        return '<div class="document-card">' +
+          '<div class="doc-icon">📄</div>' +
+          '<div class="doc-info">' +
+          '<div class="doc-name">' + (docInfo.filename || docInfo.file_name || '未知文件') + '</div>' +
+          '<div class="doc-meta">上传时间: ' + formatDate(docInfo.uploaded_at || docInfo.upload_time) + '</div>' +
+          '</div>' +
+          '<button class="doc-action" onclick="alert(\'文档预览功能开发中\')">👁️ 查看</button>' +
+          '</div>';
+      }
+
+      function calculateOverallScore(matrix) {
+        if (!matrix || matrix.length === 0) return 0;
+        var total = 0;
+        for (var i = 0; i < matrix.length; i++) {
+          total += matrix[i].avg_score || 0;
+        }
+        return total / matrix.length;
+      }
+
+      // ==================== 调整评分处理 ====================
+      var currentProfileData = null;
+      var currentMatrix = null;
+
+      function handleKpClick(e) {
+        var cell = e.target.closest('.kp-cell');
+        if (!cell) return;
+
+        var adjustBtn = e.target.closest('.kp-adjust');
+        if (!adjustBtn) return;
+
+        e.stopPropagation();
+
+        var dir = adjustBtn.getAttribute('data-dir');
+        var chapterIdx = parseInt(cell.getAttribute('data-chapter'));
+        var kpIdx = parseInt(cell.getAttribute('data-kp'));
+
+        if (isNaN(chapterIdx) || isNaN(kpIdx)) return;
+        if (!currentProfileData || !currentProfileData.capability_matrix) return;
+
+        // 优先使用数组格式
+        var chapters = currentProfileData.capability_matrix_array || currentProfileData.capability_matrix || [];
+        if (!Array.isArray(chapters)) {
+          // dict 格式转换
+          chapters = [];
+          var dict = currentProfileData.capability_matrix || {};
+          for (var chId in dict) {
+            if (dict.hasOwnProperty(chId)) {
+              var chData = dict[chId];
+              if (typeof chData === 'object' && chData !== null) {
+                var kps = [];
+                for (var kpName in chData) {
+                  if (chData.hasOwnProperty(kpName) && typeof chData[kpName] === 'object') {
+                    kps.push({ name: kpName, score: chData[kpName].score || 0 });
+                  }
+                }
+                var sum = 0;
+                for (var si = 0; si < kps.length; si++) { sum += kps[si].score; }
+                chapters.push({
+                  chapter_name: chId,
+                  avg_score: kps.length > 0 ? sum / kps.length : 0,
+                  knowledge_points: kps
+                });
+              }
+            }
+          }
+        }
+        if (chapterIdx >= chapters.length) return;
+        var kps = chapters[chapterIdx].knowledge_points || [];
+        if (kpIdx >= kps.length) return;
+
+        var delta = dir === 'up' ? 1 : -1;
+        var newScore = (kps[kpIdx].score || 0) + delta;
+        newScore = Math.round(newScore * 10) / 10;
+
+        if (newScore < 1) newScore = 1;
+        if (newScore > 5) newScore = 5;
+
+        kps[kpIdx].score = newScore;
+
+        // Recalculate matrix
+        currentMatrix = buildCapabilityMatrixData(chapters);
+
+        // Re-render
+        refreshAllRender(chapters, currentMatrix);
+
+        showToast('「' + kps[kpIdx].name + '」已调整为 ' + newScore.toFixed(1) + ' 分', 'success');
+      }
+
+      function refreshAllRender(chapters, matrix) {
+        // Update overall score header
+        var overallScore = calculateOverallScore(matrix);
+        var headerEl = document.getElementById('profileHeaderEl');
+        if (headerEl) {
+          var pct = (overallScore / 5 * 100).toFixed(0);
+          headerEl.innerHTML =
+            '<div class="profile-header-info">' +
+            '<h1>📊 学习画像详情</h1>' +
+            '<p>基于7个章节、能力矩阵综合分析</p>' +
+            '</div>' +
+            '<div class="profile-header-score">' +
+            '<div class="score-value">' + overallScore.toFixed(1) + '</div>' +
+            '<div class="score-label">综合评分 / 5.0</div>' +
+            '<div class="score-bar-wrap"><div class="score-bar-fill" style="width:' + pct + '%"></div></div>' +
+            '</div>';
+        }
+
+        // Update heatmap
+        var heatmapEl = document.getElementById('heatmapContainer');
+        if (heatmapEl) {
+          heatmapEl.innerHTML = renderHeatmap(chapters, matrix);
+        }
+
+        // Update radar
+        var radarCanvas = document.getElementById('radarCanvas');
+        if (radarCanvas) {
+          drawRadarChart(radarCanvas, matrix);
+        }
+
+        // Update weak/strong points
+        var allPoints = getAllKnowledgePoints(chapters);
+        var weakPoints = allPoints.filter(function (p) { return p.score <= 2.5; });
+        var strongPoints = allPoints.filter(function (p) { return p.score >= 3.5; });
+        weakPoints.sort(function (a, b) { return a.score - b.score; });
+        strongPoints.sort(function (a, b) { return b.score - a.score; });
+
+        var weakEl = document.getElementById('weakPointsContainer');
+        if (weakEl) weakEl.innerHTML = renderPointsList(weakPoints, 'weak');
+
+        var strongEl = document.getElementById('strongPointsContainer');
+        if (strongEl) strongEl.innerHTML = renderPointsList(strongPoints, 'strong');
+      }
+
+      // ==================== 主渲染 ====================
+      function renderAll(data) {
+        currentProfileData = data;
+
+        var basicInfo = data.basic_info || {};
+        var learningGoals = data.learning_goals || {};
+        var priorExp = data.prior_experience || {};
+        // 优先使用数组格式，兼容旧 dict 格式
+        var chapters = data.capability_matrix_array || [];
+        if (chapters.length === 0 && data.capability_matrix && typeof data.capability_matrix === 'object' && !Array.isArray(data.capability_matrix)) {
+          // 兜底：将 dict 格式转为 array 格式
+          chapters = [];
+          var dict = data.capability_matrix;
+          for (var chId in dict) {
+            if (dict.hasOwnProperty(chId)) {
+              var kps = dict[chId];
+              var kpList = [];
+              if (typeof kps === 'object' && kps !== null) {
+                for (var kpName in kps) {
+                  if (kps.hasOwnProperty(kpName)) {
+                    if (typeof kps[kpName] === 'object' && kps[kpName] !== null) {
+                      kpList.push({ name: kpName, score: kps[kpName].score || 0 });
+                    }
+                  }
+                }
+              }
+              var sumScores = 0;
+              for (var si = 0; si < kpList.length; si++) { sumScores += kpList[si].score; }
+              chapters.push({
+                chapter_name: chId,
+                avg_score: kpList.length > 0 ? sumScores / kpList.length : 0,
+                knowledge_points: kpList
+              });
+            }
+          }
+        }
+        if (typeof chapters === 'object' && !Array.isArray(chapters)) { chapters = []; }
+        var docInfo = data.document_info || data.uploaded_document || null;
+
+        currentMatrix = buildCapabilityMatrixData(chapters);
+        var overallScore = calculateOverallScore(currentMatrix);
+        var pct = (overallScore / 5 * 100).toFixed(0);
+
+        var allPoints = getAllKnowledgePoints(chapters);
+        var weakPoints = allPoints.filter(function (p) { return p.score <= 2.5; });
+        var strongPoints = allPoints.filter(function (p) { return p.score >= 3.5; });
+        weakPoints.sort(function (a, b) { return a.score - b.score; });
+        strongPoints.sort(function (a, b) { return b.score - a.score; });
+
+        var html = '';
+
+        // 1. 头部总评分
+        html += '<div class="profile-header" id="profileHeaderEl">' +
+          '<div class="profile-header-info">' +
+          '<h1>📊 学习画像详情</h1>' +
+          '<p>基于7个章节、能力矩阵综合分析</p>' +
+          '</div>' +
+          '<div class="profile-header-score">' +
+          '<div class="score-value">' + overallScore.toFixed(1) + '</div>' +
+          '<div class="score-label">综合评分 / 5.0</div>' +
+          '<div class="score-bar-wrap"><div class="score-bar-fill" style="width:' + pct + '%"></div></div>' +
+          '</div>' +
+          '</div>';
+
+        // 2. 基本信息
+        html += '<div class="section-card">' +
+          '<h2><span class="section-icon">👤</span>基本信息</h2>' +
+          renderBasicInfo(basicInfo) +
+          '</div>';
+
+        // 3. 学习目标
+        html += '<div class="section-card">' +
+          '<h2><span class="section-icon">🎯</span>学习目标</h2>' +
+          renderLearningGoals(learningGoals) +
+          '</div>';
+
+        // 4. 已有基础
+        html += '<div class="section-card">' +
+          '<h2><span class="section-icon">📋</span>已有基础</h2>' +
+          renderPriorExperience(priorExp) +
+          '</div>';
+
+        // 5. 能力矩阵 - 雷达图
+        html += '<div class="section-card">' +
+          '<h2><span class="section-icon">🕸️</span>能力矩阵 · 雷达图</h2>' +
+          '<div class="radar-container"><canvas id="radarCanvas"></canvas></div>' +
+          '</div>';
+
+        // 6. 能力矩阵 - 热力图
+        html += '<div class="section-card">' +
+          '<h2><span class="section-icon">🔥</span>能力矩阵 · 知识点热力图</h2>' +
+          '<p style="font-size:0.875rem;color:var(--text-secondary);margin-bottom:16px;">🟢 4-5分 熟练 &nbsp;|&nbsp; 🟡 2.5-3.9分 了解 &nbsp;|&nbsp; 🔴 1-2.4分 薄弱 · 点击知识点可调整评分</p>' +
+          '<div id="heatmapContainer">' + renderHeatmap(chapters, currentMatrix) + '</div>' +
+          '</div>';
+
+        // 7. 强弱项分析
+        html += '<div class="section-card">' +
+          '<h2><span class="section-icon">📈</span>强弱项分析</h2>' +
+          '<div class="points-grid">' +
+          '<div class="strong-point-card">' +
+          '<h3>💪 强项 (≥3.5分)</h3>' +
+          '<div id="strongPointsContainer">' + renderPointsList(strongPoints, 'strong') + '</div>' +
+          '</div>' +
+          '<div class="weak-point-card">' +
+          '<h3>🎯 薄弱项 (≤2.5分)</h3>' +
+          '<div id="weakPointsContainer">' + renderPointsList(weakPoints, 'weak') + '</div>' +
+          '</div>' +
+          '</div>' +
+          '</div>';
+
+        // 8. 上传文档
+        html += '<div class="section-card">' +
+          '<h2><span class="section-icon">📎</span>上传文档</h2>' +
+          renderDocumentInfo(docInfo) +
+          '</div>';
+
+        // 9. 操作按钮
+        html += '<div class="action-bar">' +
+          '<button class="btn btn-primary btn-lg" id="btnSave">💾 保存确认画像</button>' +
+          '<a href="profile.html" class="btn btn-secondary btn-lg">🔄 重新收集画像</a>' +
+          '<a href="index.html" class="btn btn-ghost btn-lg">🏠 返回首页</a>' +
+          '</div>';
+
+        var container = document.getElementById('mainContainer');
+        container.innerHTML = html;
+
+        // Draw radar chart
+        var radarCanvas = document.getElementById('radarCanvas');
+        if (radarCanvas && currentMatrix.length > 0) {
+          drawRadarChart(radarCanvas, currentMatrix);
+        }
+
+        // Bind heatmap click events for adjustments
+        container.addEventListener('click', handleKpClick);
+
+        // Bind save button
+        var btnSave = document.getElementById('btnSave');
+        if (btnSave) {
+          btnSave.addEventListener('click', function () {
+            handleSaveProfile();
+          });
+        }
+      }
+
+      function renderLoading() {
+        var container = document.getElementById('mainContainer');
+        container.innerHTML =
+          '<div class="loading-state">' +
+          '<div class="loading-spinner"></div>' +
+          '<p>正在加载学习画像数据...</p>' +
+          '</div>';
+      }
+
+      function renderError(message) {
+        var container = document.getElementById('mainContainer');
+        container.innerHTML =
+          '<div class="error-state">' +
+          '<div class="error-icon">⚠️</div>' +
+          '<h3>加载失败</h3>' +
+          '<p>' + (message || '未知错误') + '</p>' +
+          '<button class="btn btn-primary" onclick="location.reload()">🔄 重试</button>' +
+          '</div>';
+      }
+
+      function renderNoData() {
+        var container = document.getElementById('mainContainer');
+        container.innerHTML =
+          '<div class="no-data-state">' +
+          '<div class="error-icon">📭</div>' +
+          '<h3>暂无画像数据</h3>' +
+          '<p>请先完成AI画像收集，生成您的学习画像</p>' +
+          '<a href="profile.html" class="btn btn-primary">🚀 前往AI画像收集</a>' +
+          '</div>';
+      }
+
+      // ==================== 保存确认 ====================
+      async function handleSaveProfile() {
+        var userId = getUserId();
+        if (!userId) {
+          showToast('未找到用户ID，请先登录', 'error');
+          return;
+        }
+
+        var btnSave = document.getElementById('btnSave');
+        if (btnSave) {
+          btnSave.disabled = true;
+          btnSave.textContent = '⏳ 保存中...';
+        }
+
+        try {
+          // Build capability matrix for submission
+          var chapters = currentProfileData ? (currentProfileData.capability_matrix_array || currentProfileData.capability_matrix) : [];
+          if (!Array.isArray(chapters)) { chapters = currentMatrix || []; }
+          var submitMatrix = [];
+          for (var i = 0; i < chapters.length; i++) {
+            submitMatrix.push({
+              chapter_name: chapters[i].chapter_name,
+              knowledge_points: (chapters[i].knowledge_points || []).map(function (kp) {
+                return { name: kp.name, score: kp.score };
+              })
+            });
+          }
+
+          await confirmProfile(userId, submitMatrix);
+
+          // Also save to localStorage
+          try {
+            var profileToSave = {
+              dimensions: currentProfileData,
+              capability_matrix: submitMatrix,
+              overall_score: calculateOverallScore(currentMatrix),
+              confirmedAt: new Date().toISOString()
+            };
+            localStorage.setItem('ml_profile', JSON.stringify(profileToSave));
+          } catch (e) { /* ignore */ }
+
+          showToast('✅ 画像已保存确认！', 'success');
+        } catch (err) {
+          showToast('❌ 保存失败: ' + err.message, 'error');
+        } finally {
+          if (btnSave) {
+            btnSave.disabled = false;
+            btnSave.textContent = '💾 保存确认画像';
+          }
+        }
+      }
+
+      // ==================== 初始化 ====================
+      async function init() {
+        var userId = getUserId();
+
+        if (!userId) {
+          renderNoData();
+          return;
+        }
+
+        renderLoading();
+
+        try {
+          var data = await fetchFullProfile(userId);
+          if (!data || (data.capability_matrix && !Array.isArray(data.capability_matrix) && Object.keys(data.capability_matrix).length === 0 && !data.basic_info)) {
+            renderNoData();
+            return;
+          }
+          // 如果连 capability_matrix_array 也没有数据
+          if (!data || (((!data.capability_matrix_array || data.capability_matrix_array.length === 0) && (!data.capability_matrix || (typeof data.capability_matrix === 'object' && Object.keys(data.capability_matrix).length === 0))) && !data.basic_info && !data.overall_score)) {
+            renderNoData();
+            return;
+          }
+          renderAll(data);
+        } catch (err) {
+          console.error('加载画像失败:', err);
+          renderError(err.message);
+        }
+      }
+
+      // Handle window resize for radar redraw
+      var resizeTimer = null;
+      window.addEventListener('resize', function () {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function () {
+          var radarCanvas = document.getElementById('radarCanvas');
+          if (radarCanvas && currentMatrix && currentMatrix.length > 0) {
+            drawRadarChart(radarCanvas, currentMatrix);
+          }
+        }, 250);
+      });
+
+      // Start
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+    })();
+  </script>
+</body>
+</html>

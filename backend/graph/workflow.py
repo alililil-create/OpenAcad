@@ -8,6 +8,7 @@ from agents.mindmap_agent import MindmapAgent
 from agents.code_agent import CodeAgent
 from agents.path_agent import PathAgent
 from agents.tutor_agent import TutorAgent
+from agents.video_agent import VideoAgent
 import logging
 
 logger = logging.getLogger(__name__)
@@ -33,6 +34,7 @@ def create_learning_graph():
     code_agent = CodeAgent()
     path_agent = PathAgent()
     tutor_agent = TutorAgent()
+    video_agent = VideoAgent()
 
     # ===== 添加节点 =====
     workflow.add_node("analyze_intent", intent_router_node)
@@ -43,6 +45,7 @@ def create_learning_graph():
     workflow.add_node("generate_code", code_agent)
     workflow.add_node("plan_path", path_agent)
     workflow.add_node("tutor_answer", tutor_agent)
+    workflow.add_node("generate_video", video_agent)
     workflow.add_node("final_summary", summary_generator_node)
 
     # ===== 设置入口 =====
@@ -82,7 +85,8 @@ def create_learning_graph():
     workflow.add_edge("generate_questions", "generate_mindmap")
     workflow.add_edge("generate_mindmap", "generate_code")
     workflow.add_edge("generate_code", "plan_path")
-    workflow.add_edge("plan_path", "final_summary")
+    workflow.add_edge("plan_path", "generate_video")
+    workflow.add_edge("generate_video", "final_summary")
     workflow.add_edge("final_summary", END)
 
     # ===== 编译图 =====
@@ -195,6 +199,8 @@ async def execute_workflow(
         "questions": None,
         "code_examples": None,
         "reading_materials": None,
+        "video_result": None,
+        "video_skipped": False,
         "learning_path": None,
         "tutor_response": None,
         "final_summary": None,

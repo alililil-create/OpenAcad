@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>知识库 - 机器学习个性化智能学习平台</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/variables.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/components.css">
+  <link rel="stylesheet" href="styles/pages.css">
+</head>
+<body class="resources-page">
+  <!-- 导航栏 -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="index.html" class="navbar-logo">
+        <div class="navbar-logo-icon">🤖</div>
+        <span>ML智能学习</span>
+      </a>
+      <div class="navbar-nav">
+        <a href="index.html" class="navbar-link">首页</a>
+        <a href="learning-path.html" class="navbar-link">学习中心</a>
+        <a href="resources.html" class="navbar-link active">知识库</a>
+        <a href="exercises.html" class="navbar-link">练习</a>
+        <a href="report.html" class="navbar-link">学习报告</a>
+        <a href="profile-center.html" class="navbar-link">👤 个人中心</a>
+      </div>
+      <div class="navbar-user">
+        <div class="avatar" id="userAvatar">学</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 主内容 -->
+  <div class="resources-container">
+    <div class="resources-header">
+      <h1>📚 机器学习知识库</h1>
+      <p>系统化的知识点整理，随时查阅学习</p>
+    </div>
+
+    <!-- 分类Tab -->
+    <div class="resources-tabs">
+      <button class="tab-btn active" data-tab="all">全部</button>
+      <button class="tab-btn" data-tab="basics">基础概念</button>
+      <button class="tab-btn" data-tab="algorithms">核心算法</button>
+      <button class="tab-btn" data-tab="deeplearning">深度学习</button>
+      <button class="tab-btn" data-tab="tools">工具与框架</button>
+      <button class="tab-btn" data-tab="videos">🎥 教学视频</button>
+    </div>
+
+    <!-- 知识点卡片网格 -->
+    <div class="resources-grid" id="resourcesGrid">
+      <!-- 基础概念 -->
+      <div class="resource-card" data-category="basics">
+        <div class="resource-card-header">
+          <div class="resource-card-icon">🔢</div>
+          <h3 class="resource-card-title">线性代数基础</h3>
+        </div>
+        <div class="resource-card-body">
+          <p class="resource-card-desc">向量、矩阵、行列式、特征值与特征向量等核心概念</p>
+          <div class="resource-card-meta">
+            <span>⏱️ 约45分钟</span>
+            <span>📖 8个知识点</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource-card" data-category="basics">
+        <div class="resource-card-header">
+          <div class="resource-card-icon">📊</div>
+          <h3 class="resource-card-title">概率与统计</h3>
+        </div>
+        <div class="resource-card-body">
+          <p class="resource-card-desc">概率分布、贝叶斯定理、参数估计、假设检验</p>
+          <div class="resource-card-meta">
+            <span>⏱️ 约60分钟</span>
+            <span>📖 12个知识点</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource-card" data-category="basics">
+        <div class="resource-card-header">
+          <div class="resource-card-icon">📈</div>
+          <h3 class="resource-card-title">数据预处理</h3>
+        </div>
+        <div class="resource-card-body">
+          <p class="resource-card-desc">缺失值处理、异常值检测、特征缩放、数据编码</p>
+          <div class="resource-card-meta">
+            <span>⏱️ 约40分钟</span>
+            <span>📖 6个知识点</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 核心算法 -->
+      <div class="resource-card" data-category="algorithms">
+        <div class="resource-card-header">
+          <div class="resource-card-icon">📉</div>
+          <h3 class="resource-card-title">线性回归与逻辑回归</h3>
+        </div>
+        <div class="resource-card-body">
+          <p class="resource-card-desc">回归分析原理、损失函数、最优化方法</p>
+          <div class="resource-card-meta">
+            <span>⏱️ 约50分钟</span>
+            <span>📖 10个知识点</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource-card" data-category="algorithms">
+        <div class="resource-card-header">
+          <div class="resource-card-icon">🌲</div>
+          <h3 class="resource-card-title">决策树与随机森林</h3>
+        </div>
+        <div class="resource-card-body">
+          <p class="resource-card-desc">决策树算法、信息增益、集成学习Bagging</p>
+          <div class="resource-card-meta">
+            <span>⏱️ 约55分钟</span>
+            <span>📖 9个知识点</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource-card" data-category="algorithms">
+        <div class="resource-card-header">
+          <div class="resource-card-icon">🎯</div>
+          <h3 class="resource-card-title">支持向量机SVM</h3>
+        </div>
+        <div class="resource-card-body">
+          <p class="resource-card-desc">核函数、间隔最大化、软间隔与硬间隔</p>
+          <div class="resource-card-meta">
+            <span>⏱️ 约50分钟</span>
+            <span>📖 8个知识点</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 深度学习 -->
+      <div class="resource-card" data-category="deeplearning">
+        <div class="resource-card-header">
+          <div class="resource-card-icon">🧠</div>
+          <h3 class="resource-card-title">神经网络基础</h3>
+        </div>
+        <div class="resource-card-body">
+          <p class="resource-card-desc">感知机、多层感知机、激活函数、反向传播</p>
+          <div class="resource-card-meta">
+            <span>⏱️ 约60分钟</span>
+            <span>📖 11个知识点</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource-card" data-category="deeplearning">
+        <div class="resource-card-header">
+          <div class="resource-card-icon">👁️</div>
+          <h3 class="resource-card-title">卷积神经网络CNN</h3>
+        </div>
+        <div class="resource-card-body">
+          <p class="resource-card-desc">卷积层、池化层、图像特征提取经典架构</p>
+          <div class="resource-card-meta">
+            <span>⏱️ 约65分钟</span>
+            <span>📖 10个知识点</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource-card" data-category="deeplearning">
+        <div class="resource-card-header">
+          <div class="resource-card-icon">🔄</div>
+          <h3 class="resource-card-title">循环神经网络RNN</h3>
+        </div>
+        <div class="resource-card-body">
+          <p class="resource-card-desc">时序数据处理、LSTM、GRU、序列建模</p>
+          <div class="resource-card-meta">
+            <span>⏱️ 约55分钟</span>
+            <span>📖 9个知识点</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 工具与框架 -->
+      <div class="resource-card" data-category="tools">
+        <div class="resource-card-header">
+          <div class="resource-card-icon">🔬</div>
+          <h3 class="resource-card-title">NumPy使用指南</h3>
+        </div>
+        <div class="resource-card-body">
+          <p class="resource-card-desc">数组运算、矩阵操作、数学函数</p>
+          <div class="resource-card-meta">
+            <span>⏱️ 约40分钟</span>
+            <span>📖 7个知识点</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource-card" data-category="tools">
+        <div class="resource-card-header">
+          <div class="resource-card-icon">🐼</div>
+          <h3 class="resource-card-title">Pandas数据处理</h3>
+        </div>
+        <div class="resource-card-body">
+          <p class="resource-card-desc">DataFrame、数据清洗、统计分析</p>
+          <div class="resource-card-meta">
+            <span>⏱️ 约50分钟</span>
+            <span>📖 10个知识点</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource-card" data-category="tools">
+        <div class="resource-card-header">
+          <div class="resource-card-icon">🔥</div>
+          <h3 class="resource-card-title">PyTorch框架入门</h3>
+        </div>
+        <div class="resource-card-body">
+          <p class="resource-card-desc">张量操作、自动求导、模型构建与训练</p>
+          <div class="resource-card-meta">
+            <span>⏱️ 约70分钟</span>
+            <span>📖 12个知识点</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 教学视频区 / 动态生成 + 历史列表 -->
+      <div class="resource-card" data-category="videos" id="videoGenCard" style="border: 1px solid #E2E8F0; box-shadow: 0 4px 24px rgba(99,102,241,0.12);">
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 16px 24px; border-radius: 12px 12px 0 0; color: #fff;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 1.5rem;">🎬</span>
+            <div>
+              <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700;">AI 教学视频生成</h3>
+              <p style="margin: 2px 0 0; font-size: 0.75rem; opacity: 0.75;">输入知识点，Seedance 自动生成个性化教学视频</p>
+            </div>
+          </div>
+        </div>
+        <div style="padding: 20px 24px; background: #fff; border-radius: 0 0 12px 12px;">
+          <!-- 画像分析状态卡片 -->
+          <div id="profileStatusCard" style="padding: 14px 18px; background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 10px; margin-bottom: 16px; display: none;">
+            <div style="display: flex; align-items: flex-start; gap: 12px;">
+              <div style="flex-shrink: 0; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;" id="profileIconBox">👤</div>
+              <div style="flex: 1; min-width: 0;" id="profileStatusContent">
+                <div style="font-weight: 600; font-size: 0.9rem; color: #475569; margin-bottom: 2px;" id="profileStatusTitle">画像检查中...</div>
+                <div style="font-size: 0.78rem; color: #94A3B8; line-height: 1.5;" id="profileStatusDesc"></div>
+              </div>
+              <div style="flex-shrink: 0;" id="profileStatusBadge"></div>
+            </div>
+            <div id="profileWeakAreas" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #CBD5E1;"></div>
+          </div>
+
+          <!-- 视频生成表单 -->
+          <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 12px;">
+            <div style="flex: 1; min-width: 200px;">
+              <label style="display: block; font-size: 0.8rem; font-weight: 600; color: #475569; margin-bottom: 4px;">知识点</label>
+              <input type="text" id="videoTopic" placeholder="例如：梯度下降、反向传播..."
+                style="width: 100%; padding: 10px 14px; border: 1.5px solid #CBD5E1; border-radius: 8px; font-size: 0.9rem; outline: none; transition: border-color 0.2s;"
+                onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#CBD5E1'">
+            </div>
+            <div style="min-width: 100px;">
+              <label style="display: block; font-size: 0.8rem; font-weight: 600; color: #475569; margin-bottom: 4px;">时长</label>
+              <select id="videoDuration" style="padding: 10px 12px; border: 1.5px solid #CBD5E1; border-radius: 8px; font-size: 0.85rem; outline: none; background: #fff;">
+                <option value="5">5秒</option>
+                <option value="10">10秒</option>
+              </select>
+            </div>
+            <div style="min-width: 100px;">
+              <label style="display: block; font-size: 0.8rem; font-weight: 600; color: #475569; margin-bottom: 4px;">分辨率</label>
+              <select id="videoResolution" style="padding: 10px 12px; border: 1.5px solid #CBD5E1; border-radius: 8px; font-size: 0.85rem; outline: none; background: #fff;">
+                <option value="720p">720p</option>
+                <option value="1080p">1080p</option>
+              </select>
+            </div>
+            <button id="generateVideoBtn" onclick="handleGenerateVideo()"
+              style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: opacity 0.2s;">
+              🎥 生成视频
+            </button>
+          </div>
+
+          <!-- SSE 生成状态 -->
+          <div id="videoGenStatus" style="display: none; padding: 10px 14px; background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; font-size: 0.85rem; color: #166534; margin-bottom: 12px;"></div>
+
+          <!-- 历史视频列表标题 -->
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px; margin-bottom: 12px;">
+            <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: #1E293B;">📼 已生成的视频</h4>
+            <button onclick="loadVideoList()" style="background: none; border: 1px solid #CBD5E1; border-radius: 6px; padding: 4px 12px; font-size: 0.75rem; color: #64748B; cursor: pointer;">🔄 刷新</button>
+          </div>
+
+          <!-- 视频列表容器 -->
+          <div id="videoList" style="display: flex; flex-direction: column; gap: 8px; min-height: 60px;">
+            <div id="videoListLoading" style="text-align: center; color: #94A3B8; padding: 20px; font-size: 0.85rem;">加载中...</div>
+            <div id="videoListEmpty" style="display: none; text-align: center; color: #94A3B8; padding: 20px; font-size: 0.85rem;">暂无视频，输入知识点生成第一个吧 🎬</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- OpenMAIC 智能教学课堂 -->
+      <div class="resource-card" data-category="videos" style="border: none; box-shadow: 0 4px 24px rgba(99,102,241,0.12);">
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 16px 24px; border-radius: 12px 12px 0 0; color: #fff; display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 1.5rem;">🎬</span>
+            <div>
+              <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700;">📖 智能教学课堂</h3>
+              <p style="margin: 2px 0 0; font-size: 0.75rem; opacity: 0.75;">完整课程生成 · PPT · 语音朗读 · 交互测验</p>
+            </div>
+          </div>
+          <a href="http://localhost:3000" target="_blank" rel="noopener"
+            style="background: rgba(255,255,255,0.2); color: #fff; padding: 6px 14px; border-radius: 8px; font-size: 0.8rem; text-decoration: none; font-weight: 600; white-space: nowrap;"
+            onmouseover="this.style.background='rgba(255,255,255,0.35)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">🔗 新窗口打开</a>
+        </div>
+        <iframe id="openmaicFrame"
+          src="http://localhost:3000"
+          style="width: 100%; height: 85vh; border: none; border-radius: 0 0 12px 12px; display: block;"
+          allow="camera; microphone; autoplay; fullscreen"
+          loading="lazy">
+        </iframe>
+      </div>
+
+      <!-- 视频播放模态框 -->
+      <div id="videoPlayerModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); z-index: 9999; align-items: center; justify-content: center;" onclick="if(event.target===this)closeVideoPlayer()">
+        <div style="background: #fff; border-radius: 16px; overflow: hidden; width: 90%; max-width: 800px; position: relative;">
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background: #F8FAFC; border-bottom: 1px solid #E2E8F0;">
+            <span id="videoPlayerTitle" style="font-weight: 600; font-size: 0.95rem; color: #1E293B;">视频播放</span>
+            <button onclick="closeVideoPlayer()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748B; padding: 0; line-height: 1;">&times;</button>
+          </div>
+          <video id="videoPlayerEl" controls autoplay style="width: 100%; display: block; max-height: 70vh; background: #000;"></video>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 页脚 -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p>© 2026 ML智能学习平台 - 第十五届中国软件杯参赛作品</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 脚本 -->
+  <script src="scripts/localStorage.js"></script>
+  <script src="scripts/main.js"></script>
+  <script src="scripts/api.js"></script>
+  <script>
+    let isGenerating = false;
+    const videoScriptMap = {};
+
+    function getUserId() {
+      const user = Storage.getUser();
+      return user ? user.user_id : null;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initCommonPage();
+
+      if (!requireAuth()) return;
+
+      const user = Storage.getUser();
+      if (user && user.username) {
+        document.getElementById('userAvatar').textContent = user.username.charAt(0);
+      }
+
+      const tabBtns = document.querySelectorAll('.tab-btn');
+      const resourceCards = document.querySelectorAll('.resource-card');
+
+      tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          tabBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          const category = btn.dataset.tab;
+          resourceCards.forEach(card => {
+            if (category === 'all' || card.dataset.category === category) {
+              card.style.display = 'block';
+              card.classList.add('animate-fade-in-up');
+            } else {
+              card.style.display = 'none';
+            }
+          });
+
+          if (category === 'videos') {
+            loadProfileStatus();
+            loadVideoList();
+          }
+        });
+      });
+
+      if (document.querySelector('.tab-btn.active')?.dataset.tab === 'videos') {
+        loadProfileStatus();
+        loadVideoList();
+      }
+    });
+
+    async function loadProfileStatus() {
+      const userId = getUserId();
+      const card = document.getElementById('profileStatusCard');
+      const titleEl = document.getElementById('profileStatusTitle');
+      const descEl = document.getElementById('profileStatusDesc');
+      const badgeEl = document.getElementById('profileStatusBadge');
+      const iconBox = document.getElementById('profileIconBox');
+      const weakAreas = document.getElementById('profileWeakAreas');
+
+      if (!userId) {
+        card.style.display = 'block';
+        card.style.background = '#FFF7ED';
+        card.style.borderColor = '#FED7AA';
+        iconBox.style.background = '#FFF7ED';
+        iconBox.textContent = '⚠️';
+        titleEl.textContent = '未检测到用户画像';
+        titleEl.style.color = '#C2410C';
+        descEl.textContent = '请先登录并在"个人中心"完成画像构建，以获得个性化视频推荐。当前将使用默认模式生成。';
+        badgeEl.innerHTML = '<span style="background:#FED7AA;color:#C2410C;padding:3px 10px;border-radius:10px;font-size:0.72rem;font-weight:600;">默认模式</span>';
+        weakAreas.style.display = 'none';
+        return;
+      }
+
+      try {
+        const result = await apiClient.getProfile(userId);
+        const profile = result.data;
+
+        if (!profile) {
+          card.style.display = 'block';
+          card.style.background = '#F8FAFC';
+          card.style.borderColor = '#CBD5E1';
+          iconBox.style.background = '#F1F5F9';
+          iconBox.textContent = '👤';
+          titleEl.textContent = '默认生成模式';
+          titleEl.style.color = '#475569';
+          descEl.textContent = '暂无学习画像，视频将以通用模式生成。完成画像后可解锁个性化视频推荐。';
+          badgeEl.innerHTML = '<span style="background:#E2E8F0;color:#64748B;padding:3px 10px;border-radius:10px;font-size:0.72rem;font-weight:600;">📋 默认模式</span>';
+          weakAreas.style.display = 'none';
+          return;
+        }
+
+        const confidence = profile.confidence_score ? Math.round(profile.confidence_score * 100) : 0;
+        const major = profile.major || '未知专业';
+        const grade = profile.grade_level || '未知年级';
+        const target = profile.target_role || '';
+
+        const confidenceColor = confidence >= 60 ? '#059669' : confidence >= 30 ? '#D97706' : '#DC2626';
+        const confidenceBg = confidence >= 60 ? '#D1FAE5' : confidence >= 30 ? '#FEF3C7' : '#FEE2E2';
+
+        card.style.display = 'block';
+        card.style.background = '#EEF2FF';
+        card.style.borderColor = '#C7D2FE';
+        iconBox.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+        iconBox.textContent = '🧠';
+        iconBox.style.color = '#fff';
+        titleEl.textContent = `${major} · ${grade}${target ? ' → ' + target : ''}`;
+        titleEl.style.color = '#3730A3';
+        descEl.textContent = `画像置信度：${confidence}%（${confidence >= 60 ? '高' : confidence >= 30 ? '中' : '低'}）| 视频将基于您的知识水平个性化生成`;
+        badgeEl.innerHTML = `<span style="background:${confidenceBg};color:${confidenceColor};padding:3px 10px;border-radius:10px;font-size:0.72rem;font-weight:600;">🎯 个性化模式</span>`;
+
+        const skillMatrix = profile.skill_matrix || {};
+        const weakParts = [];
+        for (const cat in skillMatrix) {
+          const skills = skillMatrix[cat];
+          if (skills && typeof skills === 'object') {
+            for (const name in skills) {
+              const score = skills[name];
+              if (typeof score === 'number' && score <= 2.5) {
+                weakParts.push({ name: name, score: score, category: cat });
+              }
+            }
+          }
+        }
+
+        if (weakParts.length > 0) {
+          weakAreas.style.display = 'block';
+          const topWeak = weakParts.sort((a, b) => a.score - b.score).slice(0, 5);
+          weakAreas.innerHTML = `
+            <div style="font-size:0.75rem;font-weight:600;color:#475569;margin-bottom:6px;">📉 薄弱知识点（将重点讲解）</div>
+            <div style="display:flex;flex-wrap:wrap;gap:4px;">
+              ${topWeak.map(w => `<span style="background:#FEE2E2;color:#991B1B;padding:2px 8px;border-radius:6px;font-size:0.7rem;font-weight:500;">${w.name} ${w.score}/5</span>`).join('')}
+            </div>
+          `;
+        } else {
+          weakAreas.style.display = 'none';
+        }
+      } catch (e) {
+        card.style.display = 'block';
+        card.style.background = '#F8FAFC';
+        card.style.borderColor = '#E2E8F0';
+        iconBox.style.background = '#F1F5F9';
+        iconBox.textContent = '👤';
+        titleEl.textContent = '画像加载失败';
+        titleEl.style.color = '#64748B';
+        descEl.textContent = '无法获取画像数据，将使用默认模式。';
+        badgeEl.innerHTML = '<span style="background:#E2E8F0;color:#64748B;padding:3px 10px;border-radius:10px;font-size:0.72rem;font-weight:600;">默认模式</span>';
+        weakAreas.style.display = 'none';
+      }
+    }
+
+    async function handleGenerateVideo() {
+      const topic = document.getElementById('videoTopic').value.trim();
+      if (!topic) {
+        alert('请输入知识点');
+        return;
+      }
+
+      const userId = getUserId();
+      if (!userId) {
+        alert('请先登录');
+        return;
+      }
+
+      if (isGenerating) return;
+      isGenerating = true;
+
+      const btn = document.getElementById('generateVideoBtn');
+      const statusEl = document.getElementById('videoGenStatus');
+      btn.disabled = true;
+      btn.textContent = '⏳ 生成中...';
+      statusEl.style.display = 'block';
+      statusEl.textContent = '正在准备...';
+
+      try {
+        await apiClient.generateVideo(
+          {
+            topic: topic,
+            duration: parseInt(document.getElementById('videoDuration').value),
+            resolution: document.getElementById('videoResolution').value,
+            ratio: '16:9',
+            mode: 'quick',
+            user_id: userId
+          },
+          function onStatus(data) {
+            if (data.mode === 'personalized' && data.profile_summary) {
+              const card = document.getElementById('profileStatusCard');
+              card.style.background = '#DCFCE7';
+              card.style.borderColor = '#86EFAC';
+              const descEl = document.getElementById('profileStatusDesc');
+              descEl.textContent = '🎯 ' + data.profile_summary + ' | 正在分析薄弱项并生成个性化场景...';
+              statusEl.textContent = '🧠 ' + data.message;
+              statusEl.style.background = '#EEF2FF';
+              statusEl.style.borderColor = '#C7D2FE';
+              statusEl.style.color = '#3730A3';
+            } else if (data.mode === 'default') {
+              statusEl.textContent = '📋 ' + (data.message || '默认模式：正在生成通用视频场景...');
+              statusEl.style.background = '#F8FAFC';
+              statusEl.style.borderColor = '#CBD5E1';
+              statusEl.style.color = '#475569';
+            } else if (data.mode === 'lecture') {
+              statusEl.textContent = '📖 ' + (data.message || '课件模式：正在生成教学脚本...');
+              statusEl.style.background = '#F0FDF4';
+              statusEl.style.borderColor = '#BBF7D0';
+              statusEl.style.color = '#166534';
+            } else {
+              statusEl.textContent = data.message || '处理中...';
+            }
+          },
+          function onDone(data) {
+            statusEl.textContent = data.is_fallback
+              ? '📝 已生成视频脚本（降级模式）'
+              : '✅ 视频生成完成！';
+            statusEl.style.background = '#F0FDF4';
+            statusEl.style.borderColor = '#BBF7D0';
+            statusEl.style.color = '#166534';
+            loadVideoList();
+          },
+          function onError(msg) {
+            statusEl.textContent = '生成失败: ' + msg;
+            statusEl.style.background = '#FEF2F2';
+            statusEl.style.borderColor = '#FECACA';
+            statusEl.style.color = '#991B1B';
+          }
+        );
+      } catch (e) {
+        statusEl.textContent = '请求失败: ' + e.message;
+        statusEl.style.background = '#FEF2F2';
+        statusEl.style.borderColor = '#FECACA';
+        statusEl.style.color = '#991B1B';
+      } finally {
+        isGenerating = false;
+        btn.disabled = false;
+        btn.textContent = '🎥 生成视频';
+      }
+    }
+
+    async function loadVideoList() {
+      const userId = getUserId();
+      if (!userId) return;
+
+      const listEl = document.getElementById('videoList');
+      const loadingEl = document.getElementById('videoListLoading');
+      const emptyEl = document.getElementById('videoListEmpty');
+
+      loadingEl.style.display = 'block';
+      emptyEl.style.display = 'none';
+
+      try {
+        const result = await apiClient.getVideoList(userId);
+        const videos = result.data || [];
+
+        loadingEl.style.display = 'none';
+
+        const existingItems = listEl.querySelectorAll('.video-item');
+        existingItems.forEach(el => el.remove());
+
+        if (videos.length === 0) {
+          emptyEl.style.display = 'block';
+          return;
+        }
+
+        emptyEl.style.display = 'none';
+
+        videos.forEach(v => {
+          const content = v.content || {};
+          const hasUrl = content.url && content.url.length > 0;
+          const isFallback = content.is_fallback;
+          const duration = content.duration || 0;
+          const resolution = content.resolution || '720p';
+          const createdAt = v.created_at ? new Date(v.created_at).toLocaleString('zh-CN') : '';
+
+          if (isFallback && content.script) {
+            videoScriptMap[v.id] = content.script;
+          }
+
+          const item = document.createElement('div');
+          item.className = 'video-item';
+          item.style.cssText = 'display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; transition: background 0.2s;';
+          item.onmouseenter = function() { this.style.background = '#EEF2FF'; };
+          item.onmouseleave = function() { this.style.background = '#F8FAFC'; };
+
+          item.innerHTML = `
+            <div style="flex-shrink: 0; width: 44px; height: 44px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">🎥</div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-weight: 600; font-size: 0.9rem; color: #1E293B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(v.title || v.topic || '未命名视频')}</div>
+              <div style="font-size: 0.75rem; color: #94A3B8; margin-top: 2px;">
+                ${isFallback ? '📝 脚本模式' : `🎬 ${duration}s · ${resolution}`}
+                ${createdAt ? ' · ' + createdAt : ''}
+              </div>
+            </div>
+            <div style="flex-shrink: 0; display: flex; gap: 6px;">
+              ${hasUrl ? `<button onclick="playVideo('${escapeHtml(content.url)}', '${escapeHtml(v.title || v.topic || '')}')" style="background: #667eea; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; font-weight: 500;">▶ 播放</button>` : ''}
+              ${isFallback && content.script ? `<button onclick="showScript(${v.id})" style="background: #F1F5F9; color: #475569; border: 1px solid #CBD5E1; padding: 6px 14px; border-radius: 6px; font-size: 0.8rem; cursor: pointer;">📄 脚本</button>` : ''}
+              <button onclick="deleteVideoItem(${v.id})" style="background: none; border: none; color: #EF4444; cursor: pointer; font-size: 0.9rem; padding: 4px 8px;" title="删除">🗑️</button>
+            </div>
+          `;
+
+          listEl.appendChild(item);
+        });
+      } catch (e) {
+        loadingEl.style.display = 'none';
+        emptyEl.style.display = 'block';
+        emptyEl.textContent = '加载失败，请刷新重试';
+      }
+    }
+
+    async function deleteVideoItem(id) {
+      if (!confirm('确定删除这条视频记录吗？')) return;
+
+      try {
+        const result = await apiClient.deleteVideo(id);
+        if (result.success) {
+          loadVideoList();
+        }
+      } catch (e) {
+        alert('删除失败: ' + e.message);
+      }
+    }
+
+    function playVideo(url, title) {
+      const modal = document.getElementById('videoPlayerModal');
+      const player = document.getElementById('videoPlayerEl');
+      const titleEl = document.getElementById('videoPlayerTitle');
+      player.src = url;
+      titleEl.textContent = title || '视频播放';
+      modal.style.display = 'flex';
+    }
+
+    function closeVideoPlayer() {
+      const modal = document.getElementById('videoPlayerModal');
+      const player = document.getElementById('videoPlayerEl');
+      player.pause();
+      player.src = '';
+      modal.style.display = 'none';
+    }
+
+    function showScript(id) {
+      const script = videoScriptMap[id] || '';
+      const win = window.open('', '_blank', 'width=700,height=500');
+      win.document.write(
+        '<html><head><meta charset="utf-8"><style>body{font-family:sans-serif;padding:24px;line-height:1.6;white-space:pre-wrap;color:#1E293B;}</style></head><body>' +
+        script +
+        '</body></html>'
+      );
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>

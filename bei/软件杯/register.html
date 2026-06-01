@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>注册 - 机器学习智能学习平台</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&display=swap');
+  </style>
+  <link rel="stylesheet" href="styles/variables.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/components.css">
+  <link rel="stylesheet" href="styles/pages.css">
+</head>
+<body class="register-page">
+
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="index.html" class="navbar-logo">
+        <div class="navbar-logo-icon">S</div>
+        Scholar
+      </a>
+      <div class="navbar-nav">
+        <a href="login.html" class="navbar-link">已有账号？登录</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="register-container">
+    <div class="register-card">
+      <div class="register-header">
+        <h1>开始学习之旅</h1>
+        <p>创建账号，开启个性化机器学习学习体验</p>
+      </div>
+
+      <div class="knowledge-thread knowledge-thread-mini container">
+        <svg viewBox="0 0 900 40" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="threadGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="var(--primary)"/>
+              <stop offset="50%" stop-color="var(--secondary)"/>
+              <stop offset="100%" stop-color="var(--accent-green)"/>
+            </linearGradient>
+          </defs>
+          <path class="thread-line" d="M30,20 C200,5 400,30 600,20 C750,12 820,28 870,20"/>
+        </svg>
+      </div>
+
+      <form class="register-form" id="registerForm">
+        <div class="form-group">
+          <label class="form-label" for="username">账号</label>
+          <input
+            type="text"
+            id="username"
+            class="form-input"
+            placeholder="请输入账号"
+            autocomplete="username"
+          >
+          <div class="form-error" id="usernameError"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">密码</label>
+          <input
+            type="password"
+            id="password"
+            class="form-input"
+            placeholder="请输入密码"
+            autocomplete="new-password"
+          >
+          <div class="form-error" id="passwordError"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="confirmPassword">确认密码</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            class="form-input"
+            placeholder="请再次输入密码"
+            autocomplete="new-password"
+          >
+          <div class="form-error" id="confirmPasswordError"></div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg">注册</button>
+      </form>
+
+      <div class="register-footer">
+        已有账号？<a href="login.html">登录</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="scripts/localStorage.js"></script>
+  <script src="scripts/main.js"></script>
+  <script src="scripts/scrollReveal.js"></script>
+  <script src="scripts/register.js"></script>
+</body>
+</html>
