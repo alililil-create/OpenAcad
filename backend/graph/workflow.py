@@ -121,7 +121,16 @@ async def intent_router_node(state: AgentState) -> dict:
 
 只返回意图关键词，不要解释。"""
 
-    result = await llm.chat([{"role": "user", "content": prompt}])
+    result = await llm.chat(
+        [{"role": "user", "content": prompt}],
+        cache_agent="intent",
+        cache_chapter="intent_router",
+        cache_stage="na",
+        cache_profile_hash="",
+        cache_user_id=int(state.get("user_id") or 0),
+        use_cache=False,
+        write_cache=False,
+    )
     intent = result["content"].strip().lower()
 
     valid_intents = ["learn", "practice", "ask_tutor", "view_path"]
@@ -168,7 +177,8 @@ async def execute_workflow(
     user_query: str,
     chat_history: list = [],
     thread_id: str = "default",
-    existing_profile: dict = None
+    existing_profile: dict = None,
+    user_id: int = 0
 ):
     """
     执行多Agent工作流（主入口）
@@ -178,6 +188,7 @@ async def execute_workflow(
         chat_history: 对话历史 [{"role": "user/content", ...}]
         thread_id: 会话ID（用于状态恢复）
         existing_profile: 已有的学生画像（用于多轮对话中优化而非重建）
+        user_id: 用户ID（透传到所有 Agent，保证 LLM 缓存按用户隔离）
 
     Returns:
         最终状态字典
@@ -187,6 +198,7 @@ async def execute_workflow(
     initial_state: AgentState = {
         "messages": chat_history,
         "user_query": user_query,
+        "user_id": user_id,
         "user_intent": "",
         "student_profile": existing_profile,  # 注入已有画像 → 优化而非重建
         "profile_confidence": 0.0,

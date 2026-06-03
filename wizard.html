@@ -50,9 +50,43 @@
   .upload-zone:hover, .upload-zone.dragover { border-color: #a78bfa; background: rgba(124,58,237,0.08); }
   .upload-zone .upload-icon { font-size: 44px; margin-bottom: 10px; }
   .upload-zone .upload-hint { color: #8888aa; font-size: 13px; margin-top: 6px; }
+  .upload-zone.uploaded { border-color: rgba(52,211,153,0.45); border-style: solid; background: rgba(52,211,153,0.05); }
   .extracted-info { background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.25); border-radius: 12px; padding: 16px 20px; margin-top: 18px; display: none; }
   .extracted-info h4 { color: #6ee7b7; margin-bottom: 8px; font-size: 14px; }
   .extracted-info pre { white-space: pre-wrap; font-size: 13px; color: #b0b0c8; line-height: 1.6; }
+  .profile-agent-result { background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.25); border-radius: 12px; padding: 16px 20px; margin-top: 14px; display: none; }
+  .profile-agent-result h4 { color: #c4b5fd; margin-bottom: 10px; font-size: 14px; }
+  .profile-agent-result .agent-tag { display: inline-block; background: rgba(124,58,237,0.2); color: #a78bfa; padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; margin-bottom: 8px; }
+  .profile-agent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .profile-agent-item { background: rgba(255,255,255,0.04); border-radius: 8px; padding: 8px 12px; }
+  .profile-agent-item .label { font-size: 11px; color: #8888aa; }
+  .profile-agent-item .value { font-size: 13px; color: #e0e0e0; font-weight: 500; }
+  .skip-upload-btn { display: inline-flex; align-items: center; gap: 4px; margin-top: 12px; padding: 8px 16px; border-radius: 8px; background: transparent; border: 1px solid rgba(255,255,255,0.12); color: #8888aa; font-size: 13px; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+  .skip-upload-btn:hover { border-color: rgba(255,255,255,0.3); color: #b0b0c8; }
+
+  /* Chat Profile (Stage 1B) */
+  .chat-profile-container { display: flex; flex-direction: column; height: 450px; border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; overflow: hidden; margin-top: 16px; }
+  .chat-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .chat-msg { display: flex; gap: 10px; max-width: 85%; animation: fadeSlideIn 0.3s ease; }
+  .chat-msg.agent { align-self: flex-start; }
+  .chat-msg.user { align-self: flex-end; flex-direction: row-reverse; }
+  .chat-msg .avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .chat-msg.agent .avatar { background: rgba(124,58,237,0.2); }
+  .chat-msg.user .avatar { background: rgba(167,139,250,0.3); }
+  .chat-msg .bubble { padding: 10px 14px; border-radius: 12px; font-size: 14px; line-height: 1.55; }
+  .chat-msg.agent .bubble { background: rgba(255,255,255,0.06); color: #d0d0e0; }
+  .chat-msg.user .bubble { background: rgba(124,58,237,0.25); color: #e0e0e0; }
+  .chat-input-area { display: flex; gap: 8px; padding: 12px 16px; background: rgba(0,0,0,0.2); border-top: 1px solid rgba(255,255,255,0.08); }
+  .chat-input-area input { flex: 1; padding: 10px 14px; border-radius: 8px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); color: #e0e0e0; font-size: 14px; font-family: inherit; outline: none; }
+  .chat-input-area input:focus { border-color: #a78bfa; }
+  .chat-input-area button { padding: 10px 18px; border-radius: 8px; background: linear-gradient(135deg, #7c3aed, #a78bfa); color: #fff; border: none; cursor: pointer; font-size: 14px; font-weight: 600; font-family: inherit; transition: all 0.2s; }
+  .chat-input-area button:hover { box-shadow: 0 4px 12px rgba(124,58,237,0.35); }
+  .chat-input-area button:disabled { opacity: 0.4; cursor: not-allowed; }
+  .chat-typing { display: flex; align-items: center; gap: 4px; padding: 8px 12px; }
+  .chat-typing span { width: 6px; height: 6px; border-radius: 50%; background: #a78bfa; animation: bounce 1.4s infinite; }
+  .chat-typing span:nth-child(2) { animation-delay: 0.2s; }
+  .chat-typing span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%, 80%, 100% { transform: scale(0.6); } 40% { transform: scale(1); } }
 
   /* Stage 2 Subject */
   .subject-card { background: rgba(167,139,250,0.08); border: 2px solid #a78bfa; border-radius: 14px; padding: 20px 24px; display: flex; align-items: center; gap: 16px; }
@@ -137,8 +171,8 @@
 <div class="progress-bar-wrap">
   <div class="progress-steps" id="progressSteps">
     <div class="step" data-stage="0"><div class="circle">1</div><div class="label">欢迎</div></div>
-    <div class="step" data-stage="1"><div class="circle">2</div><div class="label">上传资料</div></div>
-    <div class="step" data-stage="2"><div class="circle">3</div><div class="label">选择学科</div></div>
+    <div class="step" data-stage="1"><div class="circle">2</div><div class="label">选择学科</div></div>
+    <div class="step" data-stage="2"><div class="circle">3</div><div class="label">上传资料</div></div>
     <div class="step" data-stage="3"><div class="circle">4</div><div class="label">能力测评</div></div>
     <div class="step" data-stage="4"><div class="circle">5</div><div class="label">生成画像</div></div>
     <div class="step" data-stage="5"><div class="circle">6</div><div class="label">画像展示</div></div>
@@ -148,22 +182,19 @@
 
 <div class="wizard-container" id="wizardContainer"></div>
 
-<script>
+<script src="scripts/localStorage.js"></script>
+  <script>
 (function(){
   'use strict';
 
   /* ====== STATE ====== */
   const BASE_URL = () => localStorage.getItem('api_base_url') || 'http://127.0.0.1:8000';
-  const USER_ID = () => {
-    try {
-      const user = JSON.parse(localStorage.getItem('ml_user') || 'null');
-      return user?.user_id || null;
-    } catch(e) { return null; }
-  };
+  const USER_ID = () => Storage.getUserID();
 
   let currentStage = 0;
   let uploadedFile = null;
   let uploadedFileInfo = null;
+  let llmProfileExtracted = null;
   let selectedSubject = 'machine_learning';
   let quizQuestions = [];
   let quizAnswers = [];
@@ -175,6 +206,21 @@
   let capabilityMatrix = null;
   let profileAdjustments = {};
   let weakPointsData = [];
+  let chatMessages = [];
+  let chatProfileReady = false;
+
+  var WIZARD_CHAPTERS = ['机器学习概述','数学基础','编程与数据处理','监督学习','无监督学习','神经网络基础','深度学习','模型评估','进阶方向'];
+  var CHAPTER_ID_MAP = {
+    '机器学习概述': 'ml_overview',
+    '数学基础': 'math_foundation',
+    '编程与数据处理': 'programming',
+    '监督学习': 'supervised_learning',
+    '无监督学习': 'unsupervised_learning',
+    '神经网络基础': 'neural_networks',
+    '深度学习': 'deep_learning',
+    '模型评估': 'model_evaluation',
+    '进阶方向': 'advanced_interest'
+  };
 
   /* ====== DOM REF ====== */
   const container = document.getElementById('wizardContainer');
@@ -193,18 +239,18 @@
   function renderStage() {
     updateProgress();
     switch (currentStage) {
-      case 0: renderStage0(); break;
-      case 1: renderStage1(); break;
-      case 2: renderStage2(); break;
-      case 3: renderStage3(); break;
-      case 4: renderStage4(); break;
-      case 5: renderStage5(); break;
-      case 6: renderStage6(); break;
+      case 0: renderStageWelcome(); break;
+      case 1: renderStageSubject(); break;
+      case 2: renderStageUpload(); break;
+      case 3: renderStageQuiz(); break;
+      case 4: renderStageGenerate(); break;
+      case 5: renderStageDisplay(); break;
+      case 6: renderStagePath(); break;
     }
   }
 
   /* ====== STAGE 0: Welcome ====== */
-  function renderStage0() {
+  function renderStageWelcome() {
     container.innerHTML = `
       <div class="stage-card">
         <div class="welcome-icon">🧠</div>
@@ -212,7 +258,7 @@
         <p>为了给你推荐最合适的学习内容，需要你花 <strong style="color:#c4b5fd;">5-8 分钟</strong> 完成画像构建。</p>
         <div class="info-box">
           <p style="margin:0;font-size:14px;">📋 <strong>流程说明：</strong></p>
-          <p style="margin:6px 0 0;font-size:13px;color:#b0b0c8;">上传资料 → 选择学科 → 能力测评 → 生成画像 → 查看画像 → 获取学习路径</p>
+          <p style="margin:6px 0 0;font-size:13px;color:#b0b0c8;">选择学科 → 上传资料 → 能力测评 → 生成画像 → 查看画像 → 获取学习路径</p>
         </div>
         <div class="info-box" style="margin-top:12px;">
           <p style="margin:0;font-size:14px;">💡 <strong>温馨提示：</strong></p>
@@ -224,8 +270,8 @@
       </div>`;
   }
 
-  /* ====== STAGE 1: Document Upload ====== */
-  function handleFile(file) {
+  /* ====== STAGE 2: Document Upload + 画像构建Agent ====== */
+  async function handleFile(file) {
     if (!file) return;
     const allowed = ['.txt','.pdf','.docx','.md'];
     const ext = '.' + file.name.split('.').pop().toLowerCase();
@@ -239,27 +285,81 @@
     }
     uploadedFile = file;
     uploadedFileInfo = { name: file.name, size: (file.size / 1024).toFixed(1) + ' KB', type: ext };
-    renderStage1();
+    llmProfileExtracted = null;
+    renderStageUpload();
+
+    const userId = USER_ID();
+    if (!userId) { alert('请先登录'); return; }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const resp = await apiCallForm('/api/wizard/upload-document/' + userId, formData);
+      if (resp && resp.success) {
+        uploadedFileInfo.extracted = resp.data?.extracted_info;
+        if (resp.data?.profile_extracted && Object.keys(resp.data.profile_extracted).length > 0) {
+          llmProfileExtracted = resp.data.profile_extracted;
+        }
+        renderStageUpload();
+      }
+    } catch(e) {
+      console.warn('[Wizard] 上传文件失败:', e.message);
+    }
   }
 
-  function renderStage1() {
+  function renderStageUpload() {
+    let profilePanelHtml = '';
+    if (llmProfileExtracted && Object.keys(llmProfileExtracted).length > 0) {
+      const p = llmProfileExtracted;
+      const major = p.major || '未识别';
+      const grade = p.grade_level || '未识别';
+      const role = p.target_role || '未识别';
+      const courses = (p.prior_courses && p.prior_courses.length > 0) ? p.prior_courses.slice(0, 4).join('、') : '未识别';
+      const lang = p.preferred_language || '未识别';
+      const conf = p.confidence_score ? Math.round(p.confidence_score * 100) + '%' : 'N/A';
+      const motivation = (p.motivation_profile && p.motivation_profile.primary_motivation) ? p.motivation_profile.primary_motivation : '未识别';
+      const cogStyle = (p.cognitive_profile && p.cognitive_profile.learning_style) ? p.cognitive_profile.learning_style : '未识别';
+
+      profilePanelHtml = `
+        <div class="profile-agent-result" style="display:block;">
+          <span class="agent-tag">🤖 画像构建Agent 已提取</span>
+          <h4>📊 从文档中提取的画像数据</h4>
+          <div class="profile-agent-grid">
+            <div class="profile-agent-item"><div class="label">专业</div><div class="value">${major}</div></div>
+            <div class="profile-agent-item"><div class="label">年级</div><div class="value">${grade}</div></div>
+            <div class="profile-agent-item"><div class="label">目标职业</div><div class="value">${role}</div></div>
+            <div class="profile-agent-item"><div class="label">编程语言</div><div class="value">${lang}</div></div>
+            <div class="profile-agent-item"><div class="label">学习动机</div><div class="value">${motivation}</div></div>
+            <div class="profile-agent-item"><div class="label">学习风格</div><div class="value">${cogStyle}</div></div>
+            <div class="profile-agent-item"><div class="label">已修课程</div><div class="value" style="font-size:12px;">${courses}</div></div>
+            <div class="profile-agent-item"><div class="label">置信度</div><div class="value">${conf}</div></div>
+          </div>
+          <p style="font-size:12px;color:#8888aa;margin-top:10px;">💡 以上数据已暂存，将在能力测评后（阶段5）合并生成完整画像。</p>
+        </div>`;
+    }
+
     container.innerHTML = `
       <div class="stage-card">
-        <h2>📄 上传学习资料</h2>
-        <p>上传你的简历、成绩单或相关学习记录（.txt / .pdf / .docx / .md），系统将自动提取关键信息。</p>
-        <div class="upload-zone" id="uploadZone">
-          <div class="upload-icon">📁</div>
-          <div style="font-size:15px;color:#c4b5fd;">拖拽文件到此处，或点击选择文件</div>
-          <div class="upload-hint">支持 .txt / .pdf / .docx / .md，最大 20MB</div>
+        <h2>📄 上传学习资料 / 画像构建</h2>
+        <p>上传你的简历、成绩单或相关学习记录，<strong style="color:#a78bfa;">画像构建Agent</strong> 将自动提取关键特征（专业、年级、知识基础、学习风格、目标、薄弱点等≥6维度）。</p>
+        <div class="upload-zone${uploadedFileInfo ? ' uploaded' : ''}" id="uploadZone">
+          <div class="upload-icon">${uploadedFileInfo ? '✅' : '📁'}</div>
+          <div style="font-size:15px;color:${uploadedFileInfo ? '#6ee7b7' : '#c4b5fd'};">${uploadedFileInfo ? '文件已就绪：' + uploadedFileInfo.name : '拖拽文件到此处，或点击选择文件'}</div>
+          <div class="upload-hint">${uploadedFileInfo ? uploadedFileInfo.size + ' · ' + uploadedFileInfo.type : '支持 .txt / .pdf / .docx / .md，最大 20MB'}</div>
           <input type="file" id="fileInput" accept=".txt,.pdf,.docx,.md" style="display:none;">
         </div>
-        <div class="extracted-info" id="extractedInfo">
-          <h4>✅ 已提取信息</h4>
-          <div id="extractedContent"></div>
+        <div class="extracted-info" id="extractedInfo" ${uploadedFileInfo && uploadedFileInfo.extracted ? 'style="display:block;"' : ''}>
+          <h4>✅ 文档解析结果</h4>
+          <div id="extractedContent">${uploadedFileInfo && uploadedFileInfo.extracted ? '<pre>' + JSON.stringify(uploadedFileInfo.extracted, null, 2) + '</pre>' : ''}</div>
+        </div>
+        ${profilePanelHtml}
+        <div style="text-align:center;margin-top:8px;">
+          <button class="skip-upload-btn" onclick="window._wizard.startChatProfile()">💬 没有文档？与画像构建Agent对话</button>
         </div>
         <div style="display:flex;gap:12px;justify-content:center;margin-top:20px;">
-          <button class="btn btn-secondary" onclick="window._wizard.goStage(0)">← 上一步</button>
-          <button class="btn btn-primary" id="btnNext1" ${uploadedFile ? '' : 'disabled'} onclick="window._wizard.goStage(2)">下一步 →</button>
+          <button class="btn btn-secondary" onclick="window._wizard.goStage(1)">← 上一步</button>
+          <button class="btn btn-primary" id="btnNext1" ${uploadedFile || llmProfileExtracted ? '' : 'disabled'} onclick="window._wizard.goStage(3)">下一步 →</button>
         </div>
       </div>`;
 
@@ -272,19 +372,10 @@
       zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('dragover'); handleFile(e.dataTransfer.files[0]); });
       input.addEventListener('change', e => handleFile(e.target.files[0]));
     }
-
-    if (uploadedFileInfo) {
-      const info = document.getElementById('extractedInfo');
-      const content = document.getElementById('extractedContent');
-      if (info && content) {
-        info.style.display = 'block';
-        content.innerHTML = `<pre>文件名: ${uploadedFileInfo.name}\n大小: ${uploadedFileInfo.size}\n类型: ${uploadedFileInfo.type}\n\n文件已就绪，系统将在后续步骤中提取关键信息。</pre>`;
-      }
-    }
   }
 
-  /* ====== STAGE 2: Select Subject ====== */
-  function renderStage2() {
+  /* ====== STAGE 1: Select Subject ====== */
+  function renderStageSubject() {
     container.innerHTML = `
       <div class="stage-card">
         <h2>📚 选择学习学科</h2>
@@ -297,42 +388,34 @@
           </div>
         </div>
         <div class="subject-info">
-          <div class="info-chip"><div class="num">7</div><div class="txt">章节数量</div></div>
-          <div class="info-chip"><div class="num">28</div><div class="txt">知识点数量</div></div>
+          <div class="info-chip"><div class="num">9</div><div class="txt">章节数量</div></div>
+          <div class="info-chip"><div class="num">45</div><div class="txt">知识点数量</div></div>
         </div>
-        <p style="margin-top:14px;font-size:13px;color:#8888aa;">涵盖：机器学习概述、线性回归、逻辑回归、决策树、支持向量机、神经网络、集成学习</p>
+        <p style="margin-top:14px;font-size:13px;color:#8888aa;">涵盖：机器学习概述、数学基础、监督学习、无监督学习、神经网络、深度学习(Transformer)、模型评估、进阶方向</p>
         <div style="display:flex;gap:12px;justify-content:center;margin-top:20px;">
-          <button class="btn btn-secondary" onclick="window._wizard.goStage(1)">← 上一步</button>
-          <button class="btn btn-primary" onclick="window._wizard.startQuiz()">开始测评 →</button>
+          <button class="btn btn-secondary" onclick="window._wizard.goStage(0)">← 上一步</button>
+          <button class="btn btn-primary" onclick="window._wizard.goStage(2)">下一步：上传资料 →</button>
         </div>
       </div>`;
   }
 
   /* ====== STAGE 3: Quiz ====== */
   const QUIZ_DATA = [
-    // Chapter 1: 机器学习概述 (q0-q1)
     { id: 'q0', chapter: '机器学习概述', chapterIdx: 0, question: '以下哪项最准确地描述了"机器学习"？', options: ['A. 计算机通过明确的规则编程来执行任务', 'B. 计算机从数据中自动学习模式和规律', 'C. 计算机模拟人类大脑的所有功能', 'D. 计算机执行预先定义的逻辑推理'], correct: 1, explanation: '机器学习的核心是从数据中自动学习规律，而无需显式编程。' },
-    { id: 'q1', chapter: '机器学习概述', chapterIdx: 0, question: '下列哪个不属于机器学习的主要类型？', options: ['A. 监督学习', 'B. 无监督学习', 'C. 强化学习', 'D. 演绎学习'], correct: 3, explanation: '机器学习的三种主要类型是监督学习、无监督学习和强化学习。"演绎学习"不是标准分类。' },
-    // Chapter 2: 线性回归 (q2-q3)
-    { id: 'q2', chapter: '线性回归', chapterIdx: 1, question: '在线性回归中，最常用的损失函数是？', options: ['A. 交叉熵损失', 'B. 均方误差 (MSE)', 'C. Hinge Loss', 'D. 对数损失'], correct: 1, explanation: '线性回归通常使用均方误差 (MSE) 作为损失函数，衡量预测值与真实值的平方差。' },
-    { id: 'q3', chapter: '线性回归', chapterIdx: 1, question: '过拟合（Overfitting）的典型表现是？', options: ['A. 训练误差和测试误差都很大', 'B. 训练误差小但测试误差大', 'C. 训练误差和测试误差都很小', 'D. 训练误差大但测试误差小'], correct: 1, explanation: '过拟合时模型在训练集上表现很好（误差小），但在测试集上泛化能力差（误差大）。' },
-    // Chapter 3: 逻辑回归 (q4-q5)
-    { id: 'q4', chapter: '逻辑回归', chapterIdx: 2, question: '逻辑回归主要用于解决什么问题？', options: ['A. 回归预测连续值', 'B. 分类问题（尤其是二分类）', 'C. 聚类分析', 'D. 降维'], correct: 1, explanation: '尽管名字叫"回归"，逻辑回归主要用于分类任务，尤其是二分类。' },
-    { id: 'q5', chapter: '逻辑回归', chapterIdx: 2, question: '逻辑回归中常用的激活函数是？', options: ['A. ReLU', 'B. Tanh', 'C. Sigmoid', 'D. Softmax'], correct: 2, explanation: '逻辑回归使用 Sigmoid 函数将线性输出映射到 (0,1) 区间，表示概率。' },
-    // Chapter 4: 决策树 (q6-q7)
-    { id: 'q6', chapter: '决策树', chapterIdx: 3, question: '决策树选择分裂节点时，常用的指标不包括？', options: ['A. 信息增益', 'B. 基尼指数', 'C. 均方误差', 'D. 信息增益率'], correct: 2, explanation: '信息增益、基尼指数和信息增益率是决策树分类的常用指标。MSE 主要用于回归。' },
-    { id: 'q7', chapter: '决策树', chapterIdx: 3, question: '防止决策树过拟合的常用方法是？', options: ['A. 增加树的深度', 'B. 剪枝 (Pruning)', 'C. 增加训练数据噪声', 'D. 使用更多特征'], correct: 1, explanation: '剪枝是防止决策树过拟合的主要方法，包括预剪枝和后剪枝。' },
-    // Chapter 5: 支持向量机 (q8-q9)
-    { id: 'q8', chapter: '支持向量机', chapterIdx: 4, question: 'SVM 中的"支持向量"指的是？', options: ['A. 所有训练样本', 'B. 距离决策边界最近的样本点', 'C. 被正确分类的样本', 'D. 噪声数据'], correct: 1, explanation: '支持向量是距离超平面最近的那些样本点，它们决定了分类边界的位置。' },
-    { id: 'q9', chapter: '支持向量机', chapterIdx: 4, question: 'SVM 中的核函数 (Kernel) 主要作用是？', options: ['A. 加速计算', 'B. 将数据映射到高维空间使其线性可分', 'C. 减少过拟合', 'D. 选择特征'], correct: 1, explanation: '核函数将低维数据映射到高维空间，使得在原空间非线性可分的数据在高维空间中变得线性可分。' },
-    // Chapter 6: 神经网络 (q10-q11)
-    { id: 'q10', chapter: '神经网络', chapterIdx: 5, question: '下列哪个不是常用的激活函数？', options: ['A. ReLU', 'B. Sigmoid', 'C. Linear', 'D. 信息增益函数'], correct: 3, explanation: '信息增益函数是决策树中使用的概念，不是激活函数。常用激活函数包括 ReLU、Sigmoid、Tanh 等。' },
-    { id: 'q11', chapter: '神经网络', chapterIdx: 5, question: '反向传播算法 (Backpropagation) 的主要目的是？', options: ['A. 初始化网络权重', 'B. 计算损失函数对各层权重的梯度', 'C. 增加网络层数', 'D. 选择最优激活函数'], correct: 1, explanation: '反向传播通过链式法则计算损失函数关于各层权重的梯度，用于梯度下降更新参数。' },
-    // Chapter 7: 集成学习 (q12-q14)
-    { id: 'q12', chapter: '集成学习', chapterIdx: 6, question: '随机森林 (Random Forest) 属于哪种集成方法？', options: ['A. Boosting', 'B. Bagging', 'C. Stacking', 'D. 以上都不是'], correct: 1, explanation: '随机森林使用 Bagging 策略，通过 Bootstrap 采样训练多棵决策树并投票。' },
-    { id: 'q13', chapter: '集成学习', chapterIdx: 6, question: '关于 Boosting 和 Bagging，以下哪项正确？', options: ['A. Boosting 模型并行训练，Bagging 串行训练', 'B. Boosting 串行训练，Bagging 并行训练', 'C. 两者都是并行训练', 'D. 两者都是串行训练'], correct: 1, explanation: 'Boosting（如 AdaBoost、GBDT）是串行的，每轮根据前一轮误差调整；Bagging（如随机森林）是并行的。' },
-    { id: 'q14', chapter: '集成学习', chapterIdx: 6, question: 'XGBoost 相比传统 GBDT 的主要优势是？', options: ['A. 更简单的模型结构', 'B. 引入正则化项和二阶梯度信息', 'C. 只能用于分类', 'D. 不需要调参'], correct: 1, explanation: 'XGBoost 引入了正则化项防止过拟合，并使用二阶泰勒展开逼近损失函数，提高了精度和效率。' }
+    { id: 'q1', chapter: '机器学习概述', chapterIdx: 0, question: '当模型复杂度增加时，偏差和方差分别如何变化？', options: ['A. 偏差增大，方差减小', 'B. 偏差减小，方差增大', 'C. 偏差和方差都增大', 'D. 偏差和方差都减小'], correct: 1, explanation: '模型复杂度增加时偏差减小但方差增大，这就是偏差-方差权衡。' },
+    { id: 'q2', chapter: '数学基础', chapterIdx: 1, question: '在机器学习中，矩阵乘法的核心作用是什么？', options: ['A. 仅用于数据存储', 'B. 实现线性变换和特征空间映射', 'C. 替代向量加法', 'D. 用于数据归一化'], correct: 1, explanation: '矩阵乘法对应线性变换，是神经网络前向传播和特征工程的数学基础。' },
+    { id: 'q3', chapter: '数学基础', chapterIdx: 1, question: '梯度下降算法中，梯度的方向代表什么？', options: ['A. 函数值下降最快的方向', 'B. 函数值上升最快的方向', 'C. 函数的等值线方向', 'D. 函数的二阶导数方向'], correct: 1, explanation: '梯度指向函数值上升最快的方向，梯度下降沿负梯度方向更新。' },
+    { id: 'q4', chapter: '监督学习', chapterIdx: 3, question: '线性回归和逻辑回归最主要的区别是什么？', options: ['A. 线性回归只能处理一维数据', 'B. 逻辑回归用于分类问题，线性回归用于回归问题', 'C. 逻辑回归不需要训练', 'D. 线性回归使用梯度下降，逻辑回归不使用'], correct: 1, explanation: '线性回归预测连续值，逻辑回归通过sigmoid函数输出概率用于分类。' },
+    { id: 'q5', chapter: '监督学习', chapterIdx: 3, question: 'KNN算法中，K值过小会导致什么问题？', options: ['A. 欠拟合', 'B. 过拟合，对噪声敏感', 'C. 计算速度变慢', 'D. 模型无法收敛'], correct: 1, explanation: 'K值过小时模型只关注最近的少数样本，容易受噪声影响导致过拟合。' },
+    { id: 'q6', chapter: '无监督学习', chapterIdx: 4, question: '关于K-means和PCA，以下说法正确的是？', options: ['A. 两者都是分类算法', 'B. K-means用于聚类，PCA用于降维', 'C. PCA需要标签', 'D. 两者都属于监督学习'], correct: 1, explanation: 'K-means是无监督聚类算法，PCA是无监督降维方法。' },
+    { id: 'q7', chapter: '深度学习', chapterIdx: 6, question: 'Transformer中的自注意力机制的核心思想是什么？', options: ['A. 只关注相邻的词', 'B. 通过Q-K-V计算序列中每个位置对所有位置的注意力权重', 'C. 使用卷积提取局部特征', 'D. 通过递归方式处理序列'], correct: 1, explanation: '自注意力通过Q-K-V机制实现全局依赖建模，是Transformer的核心。' },
+    { id: 'q8', chapter: '模型评估', chapterIdx: 7, question: '当模型在训练集准确率很高但测试集准确率很低时，这种现象叫什么？', options: ['A. 欠拟合', 'B. 过拟合', 'C. 正常现象', 'D. 数据泄露'], correct: 1, explanation: '训练集高、测试集低是典型的过拟合，可通过正则化、增加数据等策略缓解。' },
+    { id: 'q9', chapter: '进阶方向', chapterIdx: 8, question: '以下哪个方向你最感兴趣？', options: ['A. 自然语言处理(NLP)', 'B. 计算机视觉(CV)', 'C. 大语言模型(LLM)', 'D. 推荐系统/MLOps'], correct: -1, explanation: '此题不计分，用于探测学习兴趣方向。' }
   ];
+
+  function renderStageQuiz() {
+    startQuiz();
+  }
 
   function startQuiz() {
     quizQuestions = [...QUIZ_DATA];
@@ -341,7 +424,7 @@
     chapterCorrectCounts = {};
     chapterRequiredCorrect = {};
     chapterSkipped = {};
-    const chapters = ['机器学习概述','线性回归','逻辑回归','决策树','支持向量机','神经网络','集成学习'];
+    const chapters = ['机器学习概述','数学基础','编程与数据处理','监督学习','无监督学习','神经网络基础','深度学习','模型评估','进阶方向'];
     chapters.forEach((ch, i) => {
       const chQs = quizQuestions.filter(q => q.chapterIdx === i);
       chapterRequiredCorrect[ch] = Math.min(2, chQs.length);
@@ -350,7 +433,8 @@
     });
     activeChapter = null;
     currentStage = 3;
-    renderStage3Question();
+    updateProgress();
+    renderQuizQuestion();
   }
 
   function getCurrentValidQuestions() {
@@ -392,10 +476,10 @@
       chapterSkipped[q.chapter] = true;
     }
 
-    renderStage3QuestionWithAnswer(q, isCorrect);
+    renderQuizQuestionWithAnswer(q, isCorrect);
   }
 
-  function renderStage3Question() {
+  function renderQuizQuestion() {
     if (currentQuestionIndex >= quizQuestions.length) {
       finishQuiz();
       return;
@@ -403,7 +487,7 @@
     const q = quizQuestions[currentQuestionIndex];
     if (chapterSkipped[q.chapter]) {
       const next = findNextQuestionIndex();
-      if (next >= 0) { currentQuestionIndex = next; renderStage3Question(); }
+      if (next >= 0) { currentQuestionIndex = next; renderQuizQuestion(); }
       else { finishQuiz(); }
       return;
     }
@@ -444,7 +528,7 @@
       </div>`;
   }
 
-  function renderStage3QuestionWithAnswer(q, isCorrect) {
+  function renderQuizQuestionWithAnswer(q, isCorrect) {
     const opts = document.querySelectorAll('.option-btn');
     const expBox = document.getElementById('explanationBox');
     const btnNext = document.getElementById('btnNextQ');
@@ -481,7 +565,7 @@
     const q = quizQuestions.find(qq => qq.id === questionId);
     if (!q) return;
     quizAnswers.push({ question_id: q.id, selected_option: -1, is_correct: false });
-    renderStage3QuestionWithAnswer(q, false);
+    renderQuizQuestionWithAnswer(q, false);
   }
 
   function nextQuestion() {
@@ -491,39 +575,42 @@
       return;
     }
     currentQuestionIndex = next;
-    renderStage3Question();
+    renderQuizQuestion();
   }
 
   function finishQuiz() {
     currentStage = 4;
-    renderStage4();
+    updateProgress();
+    renderStageGenerate();
   }
 
   /* ====== STAGE 4: Profile Generation ====== */
-  function renderStage4() {
+  function renderStageGenerate() {
     container.innerHTML = `
       <div class="stage-card">
         <h2>🔄 正在生成学习画像</h2>
         <div class="loading-spinner">
           <div class="spinner"></div>
-          <div class="loading-text">系统正在分析你的答题数据...</div>
-          <div class="loading-sub">预计需要 10-15 秒</div>
+          <div class="loading-text">系统正在合并测评结果与暂存的画像数据...</div>
+          <div class="loading-sub">正在计算中，请稍候...</div>
           <div class="gen-steps" id="genSteps">
             <div class="gen-step" id="gs0"><span class="step-dot"></span> 分析答题情况</div>
             <div class="gen-step" id="gs1"><span class="step-dot"></span> 评估各章节掌握度</div>
-            <div class="gen-step" id="gs2"><span class="step-dot"></span> 生成能力矩阵</div>
-            <div class="gen-step" id="gs3"><span class="step-dot"></span> 识别强项与薄弱点</div>
-            <div class="gen-step" id="gs4"><span class="step-dot"></span> 计算综合评分</div>
+            <div class="gen-step" id="gs2"><span class="step-dot"></span> 合并暂存画像数据</div>
+            <div class="gen-step" id="gs3"><span class="step-dot"></span> 生成能力矩阵</div>
+            <div class="gen-step" id="gs4"><span class="step-dot"></span> 识别强项与薄弱点</div>
+            <div class="gen-step" id="gs5"><span class="step-dot"></span> 计算综合评分</div>
           </div>
         </div>
       </div>`;
 
     const steps = [
-      { el: 'gs0', delay: 800 },
-      { el: 'gs1', delay: 1800 },
-      { el: 'gs2', delay: 2800 },
-      { el: 'gs3', delay: 3800 },
-      { el: 'gs4', delay: 4800 }
+      { el: 'gs0', delay: 80 },
+      { el: 'gs1', delay: 160 },
+      { el: 'gs2', delay: 240 },
+      { el: 'gs3', delay: 320 },
+      { el: 'gs4', delay: 400 },
+      { el: 'gs5', delay: 480 }
     ];
 
     steps.forEach(({ el, delay }) => {
@@ -535,12 +622,12 @@
 
     setTimeout(() => {
       generateProfile();
-    }, 5500);
+    }, 600);
   }
 
   function generateProfile() {
     // Compute capability matrix from quiz answers
-    const chapters = ['机器学习概述','线性回归','逻辑回归','决策树','支持向量机','神经网络','集成学习'];
+    const chapters = WIZARD_CHAPTERS;
     capabilityMatrix = {};
     chapters.forEach(ch => {
       const chQs = quizQuestions.filter(q => q.chapter === ch);
@@ -558,12 +645,13 @@
     chapters.forEach(ch => { profileAdjustments[ch] = 0; });
 
     currentStage = 5;
-    renderStage5();
+    updateProgress();
+    renderStageDisplay();
   }
 
   /* ====== STAGE 5: Profile Display ====== */
-  function renderStage5() {
-    const chapters = ['机器学习概述','线性回归','逻辑回归','决策树','支持向量机','神经网络','集成学习'];
+  function renderStageDisplay() {
+    const chapters = WIZARD_CHAPTERS;
     const scores = chapters.map(ch => capabilityMatrix[ch] || 50);
     const overall = Math.round(scores.reduce((a,b) => a + b, 0) / scores.length);
     const sorted = chapters.map(ch => ({ name: ch, score: capabilityMatrix[ch] || 50 })).sort((a,b) => b.score - a.score);
@@ -628,7 +716,7 @@
       profileAdjustments[chapterName] -= delta;
       return;
     }
-    renderStage5();
+    renderStageDisplay();
   }
 
   function drawRadarChart(scores, labels) {
@@ -709,18 +797,62 @@
     }
   }
 
-  function confirmProfile() {
-    const chapters = ['机器学习概述','线性回归','逻辑回归','决策树','支持向量机','神经网络','集成学习'];
+  let confirmingProfile = false;
+
+  async function confirmProfile() {
+    // 防止重复点击
+    if (confirmingProfile) return;
+    confirmingProfile = true;
+
+    const chapters = WIZARD_CHAPTERS;
+    // 将调整后的评分传给后端合并生成完整画像（转为后端 chapter_id）
+    const adjustedMatrix = {};
+    chapters.forEach(ch => {
+      adjustedMatrix[ch] = Math.min(100, Math.max(1, (capabilityMatrix[ch] || 50) + (profileAdjustments[ch] || 0)));
+    });
+
+    // 更新 capabilityMatrix 为调整后的值（用于后续学习路径展示）
+    chapters.forEach(ch => { capabilityMatrix[ch] = adjustedMatrix[ch]; });
+
+    // 转换为后端 chapter_id 格式
+    const adjustedMatrixById = {};
+    chapters.forEach(ch => {
+      var chId = CHAPTER_ID_MAP[ch] || ch;
+      adjustedMatrixById[chId] = adjustedMatrix[ch];
+    });
+
     weakPointsData = chapters
-      .map(ch => ({ chapter: ch, score: (capabilityMatrix[ch] || 50) + (profileAdjustments[ch] || 0) }))
+      .map(ch => ({ chapter: ch, score: adjustedMatrix[ch] }))
       .filter(item => item.score < 60)
       .sort((a, b) => a.score - b.score);
     currentStage = 6;
-    renderStage6();
+    updateProgress();
+    renderStagePath();
+
+    // 使用 requestAnimationFrame 确保 UI 先渲染再发起后台请求
+    requestAnimationFrame(() => {
+      setTimeout(async () => {
+        const userId = USER_ID();
+        if (userId) {
+          try {
+            const resp = await apiCall('POST', '/api/wizard/combine-and-generate-profile/' + userId, {
+              capability_matrix: adjustedMatrixById,
+              quiz_answers: quizAnswers
+            });
+            if (resp && resp.success) {
+              console.log('[Wizard] 合并画像生成完成:', resp.data);
+            }
+          } catch(e) {
+            console.warn('[Wizard] 合并画像生成失败:', e.message);
+          }
+        }
+        confirmingProfile = false;
+      }, 0);
+    });
   }
 
   /* ====== STAGE 6: Final ====== */
-  function renderStage6() {
+  function renderStagePath() {
     const pathItems = generateLearningPath();
     container.innerHTML = `
       <div class="stage-card">
@@ -745,7 +877,7 @@
   }
 
   function generateLearningPath() {
-    const chapters = ['机器学习概述','线性回归','逻辑回归','决策树','支持向量机','神经网络','集成学习'];
+    const chapters = WIZARD_CHAPTERS;
     const all = chapters.map(ch => ({
       chapter: ch,
       score: (capabilityMatrix[ch] || 50) + (profileAdjustments[ch] || 0)
@@ -778,12 +910,17 @@
   }
 
   async function finishWizard() {
-    // 调用后端 API 保存画像到数据库
+    // 调用后端 API 保存画像到数据库（转为后端 chapter_id 格式）
     const userId = USER_ID();
     if (userId && capabilityMatrix) {
       try {
+        var matrixById = {};
+        WIZARD_CHAPTERS.forEach(function(ch) {
+          var chId = CHAPTER_ID_MAP[ch] || ch;
+          matrixById[chId] = capabilityMatrix[ch] || 50;
+        });
         const resp = await apiCall('POST', `/api/wizard/save-computed-profile/${userId}`, {
-          capability_matrix: capabilityMatrix,
+          capability_matrix: matrixById,
           quiz_answers: quizAnswers
         });
         if (resp && resp.success) {
@@ -818,7 +955,243 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  /* ====== API (stub — real API calls prepared) ====== */
+  /* ====== 对话式画像构建 (Stage 1B: Chat Profile Building) ====== */
+  let chatStage = 'intro'; // intro / chatting / generating / done
+
+  function startChatProfile() {
+    chatMessages = [];
+    chatProfileReady = false;
+    chatStage = 'intro';
+    renderChatProfile();
+  }
+
+  function renderChatProfile() {
+    if (chatStage === 'intro') {
+      container.innerHTML = `
+        <div class="stage-card">
+          <h2>💬 画像构建Agent - 对话式画像构建</h2>
+          <p>没有文档？没关系！与画像构建Agent进行一次简短的对话，它会从对话中提取你的专业、年级、知识基础、学习风格、目标等关键信息。</p>
+          <div class="info-box">
+            <p style="margin:0;font-size:14px;">🤖 <strong>Agent 将询问以下信息：</strong></p>
+            <p style="margin:6px 0 0;font-size:13px;color:#b0b0c8;">专业/年级 → 已修课程 → 技能水平 → 学习目标 → 学习风格偏好 → 薄弱点</p>
+          </div>
+          <div style="display:flex;gap:12px;justify-content:center;margin-top:20px;">
+            <button class="btn btn-secondary" onclick="window._wizard.goStage(2)">← 返回上传</button>
+            <button class="btn btn-primary" onclick="window._wizard.beginChatProfile()">开始对话 →</button>
+          </div>
+        </div>`;
+    } else if (chatStage === 'chatting' || chatStage === 'generating') {
+      renderChatInterface();
+    } else if (chatStage === 'done') {
+      renderChatProfileDone();
+    }
+  }
+
+  function renderChatInterface() {
+    container.innerHTML = `
+      <div class="stage-card">
+        <h2>💬 画像构建Agent</h2>
+        <p style="font-size:13px;color:#8888aa;">与画像构建Agent对话，让它了解你的学习背景</p>
+        <div class="chat-profile-container">
+          <div class="chat-messages" id="chatMessages"></div>
+          <div class="chat-input-area" id="chatInputArea">
+            <input type="text" id="chatInput" placeholder="输入你的回答..." onkeydown="if(event.key==='Enter')window._wizard.sendChatMessage()">
+            <button id="chatSendBtn" onclick="window._wizard.sendChatMessage()">发送</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;justify-content:center;margin-top:14px;">
+          <button class="btn btn-secondary" onclick="window._wizard.goStage(2)">← 返回上传</button>
+          
+        </div>
+      </div>`;
+
+    renderChatMessages();
+
+    if (chatStage === 'generating') {
+      disableChatInput(true);
+      showTypingIndicator();
+    }
+  }
+
+  function renderChatMessages() {
+    const msgsEl = document.getElementById('chatMessages');
+    if (!msgsEl) return;
+    const iconAgent = '🤖';
+    const iconUser = '👤';
+    msgsEl.innerHTML = chatMessages.map(m => `
+      <div class="chat-msg ${m.role}">
+        <div class="avatar">${m.role === 'agent' ? iconAgent : iconUser}</div>
+        <div class="bubble">${escapeHtml(m.content)}</div>
+      </div>`).join('');
+
+    if (chatStage === 'generating') {
+      showTypingIndicator();
+    }
+
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+  }
+
+  function showTypingIndicator() {
+    const msgsEl = document.getElementById('chatMessages');
+    if (!msgsEl) return;
+    const typingEl = document.createElement('div');
+    typingEl.className = 'chat-msg agent';
+    typingEl.id = 'typingIndicator';
+    typingEl.innerHTML = '<div class="avatar">🤖</div><div class="chat-typing"><span></span><span></span><span></span></div>';
+    msgsEl.appendChild(typingEl);
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+  }
+
+  function removeTypingIndicator() {
+    const el = document.getElementById('typingIndicator');
+    if (el) el.remove();
+  }
+
+  function disableChatInput(disabled) {
+    const input = document.getElementById('chatInput');
+    const btn = document.getElementById('chatSendBtn');
+    if (input) input.disabled = disabled;
+    if (btn) btn.disabled = disabled;
+  }
+
+  async function beginChatProfile() {
+    chatMessages = [{ role: 'agent', content: '你好！我是你的画像构建助手 🤖 为了更好地为你推荐学习内容，我想了解你的学习背景。\n\n首先，能告诉我你的专业和年级吗？' }];
+    chatStage = 'chatting';
+    renderChatProfile();
+  }
+
+  async function sendChatMessage() {
+    const input = document.getElementById('chatInput');
+    if (!input || !input.value.trim()) return;
+
+    const userMsg = input.value.trim();
+    input.value = '';
+    input.focus();
+
+    chatMessages.push({ role: 'user', content: userMsg });
+    renderChatMessages();
+    disableChatInput(true);
+
+    showTypingIndicator();
+
+    const userId = USER_ID();
+    if (!userId) {
+      removeTypingIndicator();
+      chatMessages.push({ role: 'agent', content: '请先登录后再进行对话。' });
+      renderChatMessages();
+      disableChatInput(false);
+      return;
+    }
+
+    try {
+      const apiMessages = chatMessages.map(m => ({ role: m.role, content: m.content }));
+      const resp = await apiCall('POST', '/api/wizard/chat-profile/' + userId, { messages: apiMessages });
+      removeTypingIndicator();
+
+      if (resp && resp.success) {
+        const reply = resp.data?.reply || '好的，我了解了。请继续告诉我更多信息。';
+        chatMessages.push({ role: 'agent', content: reply });
+
+        if (resp.data?.profile_ready) {
+          chatStage = 'chatting';
+          chatMessages.push({ role: 'agent', content: '✅ 我已经收集了足够的信息！正在为你保存这些数据，它们将在能力测评后（阶段5）合并生成完整画像。' });
+          renderChatProfile();
+          setTimeout(() => generateChatProfileResult(), 500);
+          return;
+        }
+      } else {
+        chatMessages.push({ role: 'agent', content: '抱歉，网络似乎有些问题。请稍后重试或返回上传文档。' });
+      }
+    } catch(e) {
+      removeTypingIndicator();
+      console.warn('[ChatProfile] 对话失败:', e.message);
+      chatMessages.push({ role: 'agent', content: '抱歉，连接出现了问题。你可以先返回上传文档页面。' });
+    }
+
+    renderChatProfile();
+  }
+
+  async function generateChatProfileResult() {
+    chatStage = 'generating';
+    renderChatProfile();
+    disableChatInput(true);
+
+    const userId = USER_ID();
+    if (!userId) return;
+
+    try {
+      const apiMessages = chatMessages.filter(m => m.content && !m.content.startsWith('✅')).map(m => ({ role: m.role, content: m.content }));
+      const resp = await apiCall('POST', '/api/wizard/generate-chat-profile/' + userId, { messages: apiMessages });
+      removeTypingIndicator();
+
+      if (resp && resp.success) {
+        llmProfileExtracted = resp.data?.profile;
+        chatStage = 'done';
+      } else {
+        chatStage = 'chatting';
+        chatMessages.push({ role: 'agent', content: '画像生成遇到了一些问题，请再提供一些信息。' });
+      }
+    } catch(e) {
+      removeTypingIndicator();
+      console.warn('[ChatProfile] 生成画像失败:', e.message);
+      chatStage = 'chatting';
+      chatMessages.push({ role: 'agent', content: '抱歉，生成画像时出错了。你可以先返回上传文档页面。' });
+    }
+
+    renderChatProfile();
+  }
+
+  function renderChatProfileDone() {
+    let profileHtml = '';
+    if (llmProfileExtracted) {
+      const p = llmProfileExtracted;
+      profileHtml = `
+        <div class="profile-agent-result" style="display:block;">
+          <span class="agent-tag">🤖 画像构建Agent 已提取</span>
+          <h4>📊 通过对话提取的画像数据</h4>
+          <div class="profile-agent-grid">
+            <div class="profile-agent-item"><div class="label">专业</div><div class="value">${p.major || '未识别'}</div></div>
+            <div class="profile-agent-item"><div class="label">年级</div><div class="value">${p.grade_level || '未识别'}</div></div>
+            <div class="profile-agent-item"><div class="label">目标职业</div><div class="value">${p.target_role || '未识别'}</div></div>
+            <div class="profile-agent-item"><div class="label">置信度</div><div class="value">${p.confidence_score ? Math.round(p.confidence_score * 100) + '%' : 'N/A'}</div></div>
+          </div>
+          <p style="font-size:12px;color:#8888aa;margin-top:10px;">💡 数据已暂存，将在能力测评后（阶段5）合并生成完整画像。</p>
+        </div>`;
+    }
+
+    container.innerHTML = `
+      <div class="stage-card">
+        <h2>✅ 信息收集完成</h2>
+        <p>画像构建Agent 已通过对话提取了你的关键特征，数据已暂存。完成能力测评后，系统将在阶段5合并生成完整画像。</p>
+        <div class="chat-profile-container" style="height:250px;">
+          <div class="chat-messages" id="chatMessagesDone"></div>
+        </div>
+        ${profileHtml}
+        <div style="display:flex;gap:12px;justify-content:center;margin-top:20px;">
+          <button class="btn btn-secondary" onclick="window._wizard.startChatProfile()">↺ 重新对话</button>
+          <button class="btn btn-secondary" onclick="window._wizard.goStage(2)">← 返回上传资料</button>
+          <button class="btn btn-primary" onclick="window._wizard.startQuiz()">进入能力测评 →</button>
+        </div>
+      </div>`;
+
+    const msgsEl = document.getElementById('chatMessagesDone');
+    if (msgsEl) {
+      const recentMsgs = chatMessages.slice(-8);
+      msgsEl.innerHTML = recentMsgs.map(m => `
+        <div class="chat-msg ${m.role}">
+          <div class="avatar">${m.role === 'agent' ? '🤖' : '👤'}</div>
+          <div class="bubble">${escapeHtml(m.content)}</div>
+        </div>`).join('');
+    }
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  /* ====== API ====== */
   async function apiCall(method, path, body = null) {
     const url = BASE_URL() + path;
     const opts = {
@@ -836,6 +1209,18 @@
     }
   }
 
+  async function apiCallForm(path, formData) {
+    const url = BASE_URL() + path;
+    try {
+      const resp = await fetch(url, { method: 'POST', body: formData });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      return await resp.json();
+    } catch (err) {
+      console.warn('API form call failed:', err.message);
+      return null;
+    }
+  }
+
   /* ====== EXPORT ====== */
   window._wizard = {
     goStage,
@@ -845,7 +1230,11 @@
     nextQuestion,
     adjustProfile,
     confirmProfile,
-    finishWizard
+    finishWizard,
+    startChatProfile,
+    beginChatProfile,
+    sendChatMessage,
+    generateChatProfileResult
   };
 
   /* ====== INIT ====== */

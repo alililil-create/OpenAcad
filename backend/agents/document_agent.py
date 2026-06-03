@@ -90,9 +90,17 @@ class DocumentAgent:
 语言风格：{'轻松活泼' if profile.get('grade_level') in ['大一', '大二'] else '严谨专业'}
 """
 
+        uid = int(input_data.get("user_id") or 0)
         result = await llm.chat(
             messages=[{"role": "user", "content": prompt}],
-            system_prompt=f"你擅长将复杂概念简单化，特别擅长为{profile.get('grade_level', '')}学生定制教学内容。"
+            system_prompt=f"你擅长将复杂概念简单化，特别擅长为{profile.get('grade_level', '')}学生定制教学内容。",
+            cache_agent="doc",
+            cache_chapter=str(input_data.get("topic", ""))[:32],
+            cache_stage="agent",
+            cache_profile_hash=str(uid),
+            cache_user_id=uid,
+            use_cache=False,
+            write_cache=False,
         )
 
         return {

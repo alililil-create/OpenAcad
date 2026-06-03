@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>学习资料库 - ML智能学习</title>
+  <link rel="stylesheet" href="styles/variables.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/components.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', 'STHeiti', sans-serif;
+      background: #0F172A;
+      color: #E2E8F0;
+      min-height: 100vh;
+    }
+
+    .navbar {
+      background: linear-gradient(135deg, #1E293B, #334155);
+      padding: 0 32px;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid rgba(99,102,241,0.2);
+    }
+    .navbar-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      width: 100%;
+      justify-content: space-between;
+    }
+    .navbar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: white;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+    .navbar-logo-icon { font-size: 1.4rem; }
+    .navbar-nav {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .navbar-nav a {
+      padding: 6px 14px;
+      border-radius: 8px;
+      color: #CBD5E1;
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .navbar-nav a:hover, .navbar-nav a.active {
+      background: rgba(255,255,255,0.12);
+      color: white;
+    }
+
+    .navbar-user {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .user-badge-label {
+      color: rgba(255,255,255,0.85);
+      font-size: 0.9rem;
+    }
+    .user-select {
+      background: rgba(255,255,255,0.12);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      outline: none;
+    }
+    .user-select option {
+      color: #1a1a1a;
+      background: white;
+    }
+    .user-select:focus {
+      border-color: rgba(255,255,255,0.6);
+      background: rgba(255,255,255,0.2);
+    }
+
+    .main-layout {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px 32px;
+      display: flex;
+      gap: 24px;
+      min-height: calc(100vh - 58px);
+    }
+
+    .sidebar {
+      width: 320px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .sidebar-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #94A3B8;
+      padding: 0 4px 8px;
+      border-bottom: 1px solid rgba(148,163,184,0.15);
+      margin-bottom: 4px;
+    }
+    .chapter-card {
+      background: #1E293B;
+      border-radius: 12px;
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 2px solid transparent;
+      position: relative;
+    }
+    .chapter-card:hover {
+      background: #263548;
+      border-color: rgba(99,102,241,0.3);
+    }
+    .chapter-card.active {
+      background: #1E293B;
+      border-color: #6366F1;
+      box-shadow: 0 0 20px rgba(99,102,241,0.15);
+    }
+    .chapter-card.weak {
+      border-color: rgba(239,68,68,0.5);
+    }
+    .chapter-card.weak:hover {
+      border-color: rgba(239,68,68,0.7);
+    }
+    .chapter-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .chapter-card-icon {
+      font-size: 1.3rem;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(99,102,241,0.1);
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+    .chapter-card-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #F1F5F9;
+      flex: 1;
+    }
+    .chapter-card-bell {
+      font-size: 0.85rem;
+      animation: bellShake 2s ease infinite;
+    }
+    @keyframes bellShake {
+      0%, 80%, 100% { transform: rotate(0); }
+      85% { transform: rotate(10deg); }
+      90% { transform: rotate(-10deg); }
+      95% { transform: rotate(5deg); }
+    }
+    .chapter-card-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .chapter-card-progress {
+      flex: 1;
+      height: 6px;
+      background: rgba(148,163,184,0.15);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .chapter-card-progress-bar {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.5s ease;
+    }
+    .chapter-card-stage {
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .stage-seedling { background: rgba(34,197,94,0.15); color: #4ADE80; }
+    .stage-sprout { background: rgba(59,130,246,0.15); color: #60A5FA; }
+    .stage-practice { background: rgba(249,115,22,0.15); color: #FB923C; }
+    .stage-advanced { background: rgba(168,85,247,0.15); color: #C084FC; }
+    .stage-master { background: rgba(234,179,8,0.15); color: #FACC15; }
+    .chapter-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 6px;
+      font-size: 0.72rem;
+      color: #64748B;
+    }
+    .chapter-card-material {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .chapter-card-material.has { color: #4ADE80; }
+
+    .content-area {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .overview-panel {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      animation: fadeIn 0.3s;
+    }
+    .overview-card {
+      background: #1E293B;
+      border-radius: 14px;
+      padding: 24px;
+      text-align: center;
+      border: 1px solid rgba(148,163,184,0.1);
+    }
+    .overview-card-icon {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+    .overview-card-value {
+      font-size: 2.2rem;
+      font-weight: 700;
+      font-family: 'Segoe UI', 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      margin-bottom: 4px;
+    }
+    .overview-card-label {
+      font-size: 0.82rem;
+      color: #94A3B8;
+    }
+    .overview-card:nth-child(1) .overview-card-value { color: #6366F1; }
+    .overview-card:nth-child(2) .overview-card-value { color: #F59E0B; }
+    .overview-card:nth-child(3) .overview-card-value { color: #EF4444; }
+
+    .detail-panel {
+      display: none;
+      flex-direction: column;
+      gap: 20px;
+      animation: fadeIn 0.3s;
+    }
+    .detail-panel.visible {
+      display: flex;
+    }
+
+    .mastery-dashboard {
+      background: #1E293B;
+      border-radius: 14px;
+      padding: 24px;
+      border: 1px solid rgba(148,163,184,0.1);
+    }
+    .mastery-dashboard-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .mastery-dashboard-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #F1F5F9;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .mastery-big-number {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+    .mastery-big-number .num {
+      font-size: 3rem;
+      font-weight: 800;
+      font-family: 'Segoe UI', 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: linear-gradient(135deg, #6366F1, #8B5CF6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .mastery-big-number .unit {
+      font-size: 1rem;
+      color: #94A3B8;
+      font-weight: 600;
+    }
+    .stage-pipeline {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-top: 16px;
+    }
+    .stage-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      flex: 1;
+      position: relative;
+    }
+    .stage-node .dot {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      background: rgba(148,163,184,0.1);
+      border: 2.5px solid rgba(148,163,184,0.2);
+      transition: all 0.4s;
+      z-index: 1;
+    }
+    .stage-node .label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #64748B;
+      text-align: center;
+    }
+    .stage-node.current .dot {
+      background: rgba(99,102,241,0.2);
+      border-color: #6366F1;
+      box-shadow: 0 0 20px rgba(99,102,241,0.3);
+      animation: pulse 2s ease infinite;
+    }
+    .stage-node.current .label { color: #818CF8; }
+    .stage-node.passed .dot {
+      background: rgba(16,185,129,0.2);
+      border-color: #10B981;
+    }
+    .stage-node.passed .label { color: #34D399; }
+    .stage-connector {
+      flex: 1;
+      height: 2px;
+      background: rgba(148,163,184,0.15);
+      margin: 0 -4px;
+      margin-bottom: 22px;
+      transition: background 0.4s;
+    }
+    .stage-connector.passed {
+      background: #10B981;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.4); }
+      50% { box-shadow: 0 0 0 10px rgba(99,102,241,0); }
+    }
+
+    .material-section {
+      background: #1E293B;
+      border-radius: 14px;
+      border: 1px solid rgba(148,163,184,0.1);
+      overflow: hidden;
+    }
+    .material-section-header {
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+      background: rgba(148,163,184,0.03);
+      border-bottom: 1px solid rgba(148,163,184,0.08);
+      transition: background 0.15s;
+    }
+    .material-section-header:hover { background: rgba(148,163,184,0.06); }
+    .material-section-header .icon { font-size: 1.2rem; }
+    .material-section-header .title { font-weight: 700; font-size: 0.92rem; color: #F1F5F9; flex: 1; }
+    .material-section-header .badge {
+      font-size: 0.68rem;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-weight: 600;
+    }
+    .badge-doc { background: rgba(245,158,11,0.15); color: #FBBF24; }
+    .badge-quiz { background: rgba(16,185,129,0.15); color: #34D399; }
+    .material-section-header .chevron {
+      font-size: 0.72rem;
+      transition: transform 0.3s;
+      color: #94A3B8;
+    }
+    .material-section-header .chevron.open { transform: rotate(180deg); }
+    .material-section-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, padding 0.4s ease;
+    }
+    .material-section-body.open {
+      max-height: 5000px;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .material-section-body .content {
+      font-size: 0.88rem;
+      line-height: 1.85;
+      color: #CBD5E1;
+    }
+    .material-section-body h2, .material-section-body h3, .material-section-body h4 {
+      color: #F1F5F9;
+      margin-top: 18px;
+      margin-bottom: 10px;
+    }
+    .material-section-body p { margin: 8px 0; }
+    .material-section-body ul, .material-section-body ol {
+      padding-left: 24px;
+      margin: 8px 0;
+    }
+    .material-section-body li { margin-bottom: 6px; }
+    .material-section-body pre {
+      background: #0F172A;
+      color: #E2E8F0;
+      padding: 16px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-size: 0.82rem;
+      line-height: 1.7;
+      margin: 12px 0;
+      border: 1px solid rgba(148,163,184,0.1);
+    }
+    .material-section-body code {
+      background: rgba(99,102,241,0.15);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.86em;
+      color: #818CF8;
+    }
+    .material-section-body pre code {
+      background: none;
+      padding: 0;
+      color: #E2E8F0;
+    }
+
+    .quiz-item {
+      background: rgba(148,163,184,0.05);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 14px;
+      border: 1px solid rgba(148,163,184,0.08);
+    }
+    .quiz-item-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .quiz-item-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(99,102,241,0.15);
+      color: #818CF8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.78rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .quiz-item-type {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 99px;
+      background: rgba(99,102,241,0.1);
+      color: #818CF8;
+      font-weight: 600;
+    }
+    .quiz-item-question {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #F1F5F9;
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .quiz-option {
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1.5px solid rgba(148,163,184,0.15);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.85rem;
+      color: #CBD5E1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .quiz-option:hover {
+      border-color: rgba(99,102,241,0.4);
+      background: rgba(99,102,241,0.05);
+    }
+    .quiz-option.selected {
+      border-color: #6366F1;
+      background: rgba(99,102,241,0.1);
+      color: #F1F5F9;
+    }
+    .quiz-option.correct {
+      border-color: #10B981;
+      background: rgba(16,185,129,0.1);
+      color: #34D399;
+    }
+    .quiz-option.wrong {
+      border-color: #EF4444;
+      background: rgba(239,68,68,0.1);
+      color: #FCA5A5;
+    }
+    .quiz-option.disabled {
+      cursor: default;
+      pointer-events: none;
+    }
+    .quiz-option-letter {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(148,163,184,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .quiz-explanation {
+      margin-top: 10px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      line-height: 1.6;
+      display: none;
+    }
+    .quiz-explanation.visible { display: block; }
+    .quiz-explanation.correct-exp {
+      background: rgba(16,185,129,0.08);
+      border-left: 3px solid #10B981;
+      color: #6EE7B7;
+    }
+    .quiz-explanation.wrong-exp {
+      background: rgba(239,68,68,0.08);
+      border-left: 3px solid #EF4444;
+      color: #FCA5A5;
+    }
+    .quiz-fill-input {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: rgba(15,23,42,0.6);
+      border: 1.5px solid rgba(99,102,241,0.3);
+      color: #E2E8F0;
+      font-size: 0.9rem;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .quiz-fill-input:focus { outline: none; border-color: #6366F1; background: rgba(15,23,42,0.8); }
+    .quiz-fill-input.correct { border-color: #10B981; background: rgba(16,185,129,0.1); color: #6EE7B7; }
+    .quiz-fill-input.wrong { border-color: #EF4444; background: rgba(239,68,68,0.1); color: #FCA5A5; }
+    .quiz-text-area, .quiz-code-area {
+      width: 100%;
+      min-height: 90px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      background: rgba(15,23,42,0.6);
+      border: 1.5px solid rgba(99,102,241,0.3);
+      color: #E2E8F0;
+      font-size: 0.88rem;
+      font-family: inherit;
+      line-height: 1.6;
+      resize: vertical;
+      transition: all 0.2s;
+    }
+    .quiz-code-area { font-family: 'Fira Code', 'Consolas', 'Monaco', monospace; min-height: 160px; font-size: 0.82rem; }
+    .quiz-text-area:focus, .quiz-code-area:focus { outline: none; border-color: #6366F1; background: rgba(15,23,42,0.8); }
+    .quiz-text-area.correct, .quiz-code-area.correct { border-color: #10B981; background: rgba(16,185,129,0.08); }
+    .quiz-text-area.wrong, .quiz-code-area.wrong { border-color: #EF4444; background: rgba(239,68,68,0.08); }
+    .quiz-coding-hint {
+      font-size: 0.8rem;
+      color: #A78BFA;
+      margin-bottom: 6px;
+      padding: 6px 10px;
+      background: rgba(167,139,250,0.08);
+      border-radius: 6px;
+      border-left: 3px solid #A78BFA;
+    }
+
+    .mastery-curve {
+      background: #1E293B;
+      border-radius: 14px;
+      padding: 20px;
+      border: 1px solid rgba(148,163,184,0.1);
+    }
+    .mastery-curve-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #F1F5F9;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .mastery-curve-chart {
+      font-family: 'Courier New', monospace;
+      font-size: 0.72rem;
+      line-height: 1.4;
+      color: #64748B;
+      overflow-x: auto;
+      white-space: pre;
+      background: #0F172A;
+      border-radius: 8px;
+      padding: 14px;
+      border: 1px solid rgba(148,163,184,0.08);
+    }
+
+    .weak-points-section {
+      background: #1E293B;
+      border-radius: 14px;
+      padding: 20px;
+      border: 1px solid rgba(148,163,184,0.1);
+    }
+    .weak-points-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #F1F5F9;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .weak-point-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: rgba(239,68,68,0.05);
+      border-left: 3px solid rgba(239,68,68,0.5);
+      margin-bottom: 8px;
+      transition: all 0.2s;
+    }
+    .weak-point-item.resolved {
+      background: rgba(16,185,129,0.05);
+      border-left-color: #10B981;
+      opacity: 0.6;
+    }
+    .weak-point-name {
+      flex: 1;
+      font-size: 0.85rem;
+      color: #FCA5A5;
+    }
+    .weak-point-item.resolved .weak-point-name { color: #6EE7B7; text-decoration: line-through; }
+    .weak-point-count {
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: 99px;
+      background: rgba(239,68,68,0.15);
+      color: #FCA5A5;
+      font-weight: 600;
+    }
+    .weak-point-resolve-btn {
+      font-size: 0.72rem;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(16,185,129,0.15);
+      color: #34D399;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .weak-point-resolve-btn:hover {
+      background: rgba(16,185,129,0.25);
+    }
+
+    .action-bar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .btn-generate {
+      padding: 12px 28px;
+      border-radius: 99px;
+      background: linear-gradient(135deg, #6366F1, #8B5CF6);
+      color: white;
+      font-weight: 700;
+      font-size: 0.9rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 20px rgba(99,102,241,0.3);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-generate:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(99,102,241,0.45);
+    }
+    .btn-generate:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    .btn-generate.generating {
+      background: linear-gradient(135deg, #10B981, #059669);
+    }
+    .btn-quiz {
+      padding: 12px 28px;
+      border-radius: 99px;
+      background: transparent;
+      color: #818CF8;
+      font-weight: 700;
+      font-size: 0.9rem;
+      border: 2px solid rgba(99,102,241,0.4);
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-quiz:hover:not(:disabled) {
+      background: rgba(99,102,241,0.1);
+      border-color: #6366F1;
+    }
+    .btn-quiz:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .btn-submit-quiz {
+      padding: 12px 28px;
+      border-radius: 99px;
+      background: linear-gradient(135deg, #10B981, #059669);
+      color: white;
+      font-weight: 700;
+      font-size: 0.9rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 20px rgba(16,185,129,0.3);
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-submit-quiz.visible { display: flex; }
+    .btn-submit-quiz:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(16,185,129,0.45);
+    }
+    .btn-submit-quiz:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .streaming-banner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(139,92,246,0.1));
+      border-radius: 12px;
+      border: 1px solid rgba(99,102,241,0.2);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #818CF8;
+      animation: fadeIn 0.3s;
+    }
+    .streaming-banner .dots {
+      display: flex;
+      gap: 4px;
+    }
+    .streaming-banner .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #6366F1;
+      animation: blink 1s ease infinite;
+    }
+    .streaming-banner .dot:nth-child(2) { animation-delay: 0.2s; }
+    .streaming-banner .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .empty-detail {
+      text-align: center;
+      padding: 60px 40px;
+      background: #1E293B;
+      border-radius: 14px;
+      border: 1px solid rgba(148,163,184,0.1);
+    }
+    .empty-detail .icon { font-size: 3.5rem; margin-bottom: 16px; }
+    .empty-detail h3 { font-size: 1.2rem; color: #F1F5F9; margin-bottom: 8px; }
+    .empty-detail p { color: #94A3B8; font-size: 0.9rem; line-height: 1.6; }
+
+    .toast {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      padding: 14px 28px;
+      border-radius: 10px;
+      color: white;
+      font-weight: 600;
+      font-size: 0.9rem;
+      z-index: 999;
+      animation: slideIn 0.3s;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    }
+    .toast-success { background: linear-gradient(135deg, #10B981, #059669); }
+    .toast-error { background: linear-gradient(135deg, #EF4444, #DC2626); }
+    .toast-info { background: linear-gradient(135deg, #6366F1, #8B5CF6); }
+    @keyframes slideIn {
+      from { transform: translateX(100px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .upgrade-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15,23,42,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      animation: fadeIn 0.3s;
+    }
+    .upgrade-card {
+      background: #1E293B;
+      border-radius: 20px;
+      padding: 48px;
+      text-align: center;
+      border: 2px solid rgba(234,179,8,0.3);
+      box-shadow: 0 0 60px rgba(234,179,8,0.15);
+      animation: upgradePop 0.5s ease;
+    }
+    @keyframes upgradePop {
+      0% { transform: scale(0.5); opacity: 0; }
+      60% { transform: scale(1.1); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .upgrade-card .emoji { font-size: 4rem; margin-bottom: 16px; }
+    .upgrade-card h2 {
+      font-size: 1.6rem;
+      color: #FACC15;
+      margin-bottom: 8px;
+    }
+    .upgrade-card p {
+      color: #94A3B8;
+      font-size: 0.95rem;
+      margin-bottom: 24px;
+    }
+    .upgrade-card .btn-close {
+      padding: 10px 28px;
+      border-radius: 99px;
+      background: linear-gradient(135deg, #6366F1, #8B5CF6);
+      color: white;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .no-material-hint {
+      text-align: center;
+      padding: 40px 20px;
+      color: #64748B;
+      font-size: 0.9rem;
+    }
+    .no-material-hint .icon { font-size: 2.5rem; margin-bottom: 12px; }
+
+    .version-switcher {
+      margin-bottom: 16px;
+      padding: 12px;
+      background: #F8FAFC;
+      border-radius: 10px;
+      border: 1px solid #E2E8F0;
+    }
+    .version-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #475569;
+      display: block;
+      margin-bottom: 8px;
+    }
+    .version-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .version-tab {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1.5px solid #E2E8F0;
+      background: #fff;
+      cursor: pointer;
+      font-size: 0.8rem;
+      color: #475569;
+      transition: all 0.2s;
+    }
+    .version-tab:hover { border-color: #3B82F6; background: #EFF6FF; }
+    .version-tab.active { border-color: #3B82F6; background: #DBEAFE; color: #1E40AF; }
+    .version-tab.is-current { border-color: #22C55E; }
+    .version-tab.active.is-current { background: #DCFCE7; border-color: #16A34A; color: #15803D; }
+    .version-date { font-size: 0.7rem; color: #94A3B8; margin-top: 2px; }
+    .version-current-tag {
+      font-size: 0.65rem;
+      background: #DCFCE7;
+      color: #15803D;
+      padding: 1px 6px;
+      border-radius: 4px;
+      margin-top: 3px;
+    }
+
+    @media (max-width: 1024px) {
+      .main-layout { flex-direction: column; padding: 16px; }
+      .sidebar { width: 100%; }
+      .overview-panel { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .navbar-nav { display: none; }
+      .main-layout { padding: 12px; gap: 16px; }
+      .overview-panel { grid-template-columns: 1fr; }
+      .stage-pipeline { flex-wrap: wrap; }
+      .stage-connector { display: none; }
+      .action-bar { flex-direction: column; }
+      .btn-generate, .btn-quiz, .btn-submit-quiz { width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="index.html" class="navbar-logo">
+        <div class="navbar-logo-icon">📚</div>
+        <span>学习资料库</span>
+      </a>
+      <div class="navbar-nav">
+        <a href="index.html">首页</a>
+        <a href="knowledge-center.html">知识中心</a>
+        <a href="study.html">学习中心</a>
+        <a href="materials.html" class="active">资料库</a>
+      </div>
+      <div class="navbar-user">
+        <span class="user-badge-label" id="currentUserLabel">👤 用户</span>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-layout">
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-title">📖 章节列表</div>
+    </div>
+    <div class="content-area" id="contentArea">
+      <div class="overview-panel" id="overviewPanel">
+        <div class="overview-card">
+          <div class="overview-card-icon">📚</div>
+          <div class="overview-card-value" id="totalMaterials">-</div>
+          <div class="overview-card-label">总资料数</div>
+        </div>
+        <div class="overview-card">
+          <div class="overview-card-icon">🔔</div>
+          <div class="overview-card-value" id="dueReviews">-</div>
+          <div class="overview-card-label">待复习</div>
+        </div>
+        <div class="overview-card">
+          <div class="overview-card-icon">⚠️</div>
+          <div class="overview-card-value" id="totalWeakPoints">-</div>
+          <div class="overview-card-label">薄弱知识点</div>
+        </div>
+      </div>
+      <div class="detail-panel" id="detailPanel">
+        <div class="mastery-dashboard" id="masteryDashboard"></div>
+        <div id="streamingBanner" class="streaming-banner" style="display:none;">
+          <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <span id="streamingText">智能体正在协作...</span>
+        </div>
+        <div id="versionSwitcher"></div>
+        <div id="materialSections"></div>
+        <div class="mastery-curve" id="masteryCurve" style="display:none;">
+          <div class="mastery-curve-title">📈 掌握度变化曲线</div>
+          <div class="mastery-curve-chart" id="masteryCurveChart"></div>
+        </div>
+        <div class="weak-points-section" id="weakPointsSection" style="display:none;">
+          <div class="weak-points-title">🎯 薄弱知识点</div>
+          <div id="weakPointsList"></div>
+        </div>
+        <div class="action-bar" id="actionBar">
+          <button class="btn-generate" id="btnGenerate" onclick="App.generateMaterial()">✨ 生成新资料</button>
+          <button class="btn-quiz" id="btnQuiz" onclick="App.startQuiz()" disabled>✏️ 开始做题</button>
+          <button class="btn-submit-quiz" id="btnSubmitQuiz" onclick="App.submitQuiz()">📤 提交答案</button>
+        </div>
+      </div>
+      <div class="empty-detail" id="emptyDetail" style="display:none;">
+        <div class="icon">👈</div>
+        <h3>选择左侧章节查看详情</h3>
+        <p>点击章节卡片查看掌握度、学习资料和薄弱知识点</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="scripts/localStorage.js"></script>
+  <script>
+    var App = (function() {
+      var API_BASE = localStorage.getItem('ml_api_base_url') || 'http://127.0.0.1:8000';
+      var userId = 0;
+      var libraryData = null;
+      var selectedChapterId = null;
+      var detailData = null;
+      var isGenerating = false;
+      var quizMode = false;
+      var quizAnswers = {};
+      var abortCtrl = null;
+
+      var STAGES = [
+        { key: 'seedling', label: '🌱 启蒙', cls: 'stage-seedling' },
+        { key: 'sprout',   label: '📖 入门', cls: 'stage-sprout' },
+        { key: 'practice', label: '🔧 巩固', cls: 'stage-practice' },
+        { key: 'advanced', label: '🚀 进阶', cls: 'stage-advanced' },
+        { key: 'master',   label: '👑 精通', cls: 'stage-master' }
+      ];
+
+      var STAGE_ORDER = ['seedling', 'sprout', 'practice', 'advanced', 'master'];
+      var STAGE_LABELS = { seedling: '🌱启蒙', sprout: '📖入门', practice: '🔧巩固', advanced: '🚀进阶', master: '👑精通' };
+
+      function init() {
+        userId = Storage.getUserID();
+        if (!userId || userId <= 0) {
+          document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-size:1.2rem;color:#94A3B8;">请先登录后再访问资料库</div>';
+          return;
+        }
+        var user = Storage.getUser();
+        var label = document.getElementById('currentUserLabel');
+        if (label && user && user.username) {
+          label.textContent = '👤 ' + user.username;
+        } else if (label) {
+          label.textContent = '👤 用户 #' + userId;
+        }
+        loadLibrary();
+      }
+
+      async function loadLibrary() {
+        try {
+          var resp = await fetch(API_BASE + '/api/materials/library/' + userId);
+          var json = await resp.json();
+          if (json.success) {
+            libraryData = json.data;
+            renderSidebar();
+            renderOverview();
+          }
+        } catch(e) {
+          console.error('加载资料库失败:', e);
+          showToast('加载资料库失败', 'error');
+        }
+      }
+
+      function renderSidebar() {
+        var sidebar = document.getElementById('sidebar');
+        var html = '<div class="sidebar-title">📖 章节列表</div>';
+        libraryData.chapters.forEach(function(ch) {
+          var isWeak = ch.mastery <= 2.5 && ch.mastery > 0;
+          var stageInfo = STAGES.find(function(s) { return s.key === ch.stage; }) || STAGES[0];
+          var pct = Math.round((ch.mastery / 5) * 100);
+          var gradColor = ch.mastery <= 1.5 ? '#22C55E' : ch.mastery <= 2.5 ? '#3B82F6' : ch.mastery <= 3.5 ? '#F97316' : ch.mastery <= 4.5 ? '#A855F7' : '#EAB308';
+          html += '<div class="chapter-card' + (isWeak ? ' weak' : '') + '" data-id="' + ch.id + '" onclick="App.selectChapter(\'' + ch.id + '\')">';
+          html += '<div class="chapter-card-header">';
+          html += '<div class="chapter-card-icon">' + ch.icon + '</div>';
+          html += '<div class="chapter-card-name">' + esc(ch.name) + '</div>';
+          if (ch.is_due_review) html += '<span class="chapter-card-bell">🔔</span>';
+          html += '</div>';
+          html += '<div class="chapter-card-meta">';
+          html += '<div class="chapter-card-progress"><div class="chapter-card-progress-bar" style="width:' + pct + '%;background:linear-gradient(90deg,' + gradColor + ',' + gradColor + 'aa);"></div></div>';
+          html += '<span class="chapter-card-stage ' + stageInfo.cls + '">' + stageInfo.label + '</span>';
+          html += '</div>';
+          html += '<div class="chapter-card-footer">';
+          html += '<span>掌握度 ' + ch.mastery.toFixed(1) + '/5.0</span>';
+          html += '<span class="chapter-card-material' + (ch.has_material ? ' has' : '') + '">' + (ch.has_material ? '📄 ' + ch.material_count + '份资料' : '—') + '</span>';
+          html += '</div>';
+          html += '</div>';
+        });
+        sidebar.innerHTML = html;
+      }
+
+      function renderOverview() {
+        if (!libraryData) return;
+        document.getElementById('totalMaterials').textContent = libraryData.total_materials;
+        document.getElementById('dueReviews').textContent = libraryData.due_reviews ? libraryData.due_reviews.length : 0;
+        document.getElementById('totalWeakPoints').textContent = libraryData.total_weak_points;
+      }
+
+      async function selectChapter(chapterId) {
+        selectedChapterId = chapterId;
+        document.querySelectorAll('.chapter-card').forEach(function(c) { c.classList.remove('active'); });
+        var card = document.querySelector('.chapter-card[data-id="' + chapterId + '"]');
+        if (card) card.classList.add('active');
+
+        document.getElementById('overviewPanel').style.display = 'none';
+        document.getElementById('emptyDetail').style.display = 'none';
+        document.getElementById('detailPanel').classList.add('visible');
+
+        await loadDetail(chapterId);
+      }
+
+      async function loadDetail(chapterId) {
+        try {
+          var resp = await fetch(API_BASE + '/api/materials/detail/' + userId + '/' + chapterId);
+          var json = await resp.json();
+          if (json.success) {
+            detailData = json.data;
+            renderDetail();
+          }
+        } catch(e) {
+          console.error('加载章节详情失败:', e);
+          showToast('加载章节详情失败', 'error');
+        }
+      }
+
+      var currentMaterialIdx = 0;
+
+      function renderDetail() {
+        if (!detailData) return;
+        currentMaterialIdx = 0;
+        renderMasteryDashboard();
+        renderVersionSwitcher();
+        renderMaterialSections();
+        renderMasteryCurve();
+        renderWeakPoints();
+        updateActionButtons();
+      }
+
+      function renderVersionSwitcher() {
+        var container = document.getElementById('versionSwitcher');
+        if (!container) return;
+        var mats = detailData.all_materials || [];
+        if (mats.length <= 1) {
+          container.innerHTML = '';
+          return;
+        }
+        var html = '<div class="version-switcher">';
+        html += '<span class="version-label">📚 历史版本 (' + mats.length + '份)</span>';
+        html += '<div class="version-tabs">';
+        mats.forEach(function(m, i) {
+          var stageLabel = STAGE_LABELS[m.stage] || m.stage;
+          var dateStr = m.created_at ? m.created_at.substring(5, 16).replace('T', ' ') : '';
+          var cls = i === currentMaterialIdx ? 'version-tab active' : 'version-tab';
+          if (m.is_current) cls += ' is-current';
+          html += '<button class="' + cls + '" onclick="App.switchVersion(' + i + ')">';
+          html += stageLabel;
+          html += '<span class="version-date">' + dateStr + '</span>';
+          if (m.is_current) html += '<span class="version-current-tag">当前</span>';
+          html += '</button>';
+        });
+        html += '</div></div>';
+        container.innerHTML = html;
+      }
+
+      function switchVersion(idx) {
+        var mats = detailData.all_materials || [];
+        if (idx < 0 || idx >= mats.length) return;
+        currentMaterialIdx = idx;
+        detailData.material = mats[idx];
+        renderVersionSwitcher();
+        renderMaterialSections();
+      }
+
+      function renderMasteryDashboard() {
+        var d = detailData;
+        var stageIdx = STAGE_ORDER.indexOf(d.stage);
+        var html = '<div class="mastery-dashboard-header">';
+        html += '<div class="mastery-dashboard-title">📊 掌握度仪表盘</div>';
+        html += '<div class="mastery-big-number"><span class="num">' + d.mastery.toFixed(1) + '</span><span class="unit">/ 5.0</span></div>';
+        html += '</div>';
+        html += '<div class="stage-pipeline">';
+        STAGES.forEach(function(s, i) {
+          if (i > 0) {
+            var connClass = i <= stageIdx ? ' passed' : '';
+            html += '<div class="stage-connector' + connClass + '"></div>';
+          }
+          var nodeClass = '';
+          if (i < stageIdx) nodeClass = ' passed';
+          else if (i === stageIdx) nodeClass = ' current';
+          html += '<div class="stage-node' + nodeClass + '">';
+          html += '<div class="dot">' + s.label.split(' ')[0] + '</div>';
+          html += '<div class="label">' + s.label.split(' ')[1] + '</div>';
+          html += '</div>';
+        });
+        html += '</div>';
+        document.getElementById('masteryDashboard').innerHTML = html;
+      }
+
+      function renderMaterialSections() {
+        var container = document.getElementById('materialSections');
+        var mat = detailData.material;
+        if (!mat) {
+          container.innerHTML = '<div class="no-material-hint"><div class="icon">📝</div><p>暂无学习资料，点击下方「生成新资料」开始学习</p></div>';
+          return;
+        }
+        var content = mat.content || {};
+        var html = '';
+
+        if (content.document) {
+          var docData = content.document;
+          var docContent = docData.content || '';
+          html += '<div class="material-section">';
+          html += '<div class="material-section-header" onclick="App.toggleSection(this)">';
+          html += '<span class="icon">📖</span>';
+          html += '<span class="title">' + esc(docData.title || '学习文档') + '</span>';
+          html += '<span class="badge badge-doc">文档</span>';
+          html += '<span class="chevron open">▼</span>';
+          html += '</div>';
+          html += '<div class="material-section-body open"><div class="content">' + formatMd(docContent) + '</div></div>';
+          html += '</div>';
+        }
+
+        if (content.questions && content.questions.length > 0) {
+          html += '<div class="material-section">';
+          html += '<div class="material-section-header" onclick="App.toggleSection(this)">';
+          html += '<span class="icon">✏️</span>';
+          html += '<span class="title">练习题 (' + content.questions.length + '题)</span>';
+          html += '<span class="badge badge-quiz">题库</span>';
+          html += '<span class="chevron">▼</span>';
+          html += '</div>';
+          html += '<div class="material-section-body"><div class="content">';
+          content.questions.forEach(function(q, idx) {
+            html += renderQuizItem(q, idx);
+          });
+          html += '</div></div>';
+          html += '</div>';
+        }
+
+        container.innerHTML = html;
+      }
+
+      function renderQuizItem(q, idx) {
+        var qType = q.type || 'choice';
+        var typeLabel = { choice: '选择题', judge: '判断题', fill: '填空题', text: '简答题', coding: '编程题', case_study: '案例分析' }[qType] || '题目';
+        var qid = q.id || 'q' + (idx + 1);
+        var html = '<div class="quiz-item" data-qid="' + esc(qid) + '">';
+        html += '<div class="quiz-item-header">';
+        html += '<div class="quiz-item-num">' + (idx + 1) + '</div>';
+        html += '<span class="quiz-item-type">' + typeLabel + '</span>';
+        if (q.knowledge_point) html += '<span style="font-size:0.72rem;color:#64748B;margin-left:auto;">' + esc(q.knowledge_point) + '</span>';
+        html += '</div>';
+        html += '<div class="quiz-item-question">' + esc(q.question || '') + '</div>';
+
+        if (qType === 'choice' && q.options) {
+          html += '<div class="quiz-options">';
+          q.options.forEach(function(opt, oi) {
+            var letter = String.fromCharCode(65 + oi);
+            var optText = typeof opt === 'string' ? opt.replace(/^[A-D][.、)\s]+/, '') : String(opt);
+            html += '<div class="quiz-option" data-letter="' + letter + '" onclick="App.selectOption(this, \'' + qid + '\', \'' + letter + '\')">';
+            html += '<span class="quiz-option-letter">' + letter + '</span>';
+            html += '<span>' + esc(optText) + '</span>';
+            html += '</div>';
+          });
+          html += '</div>';
+        } else if (qType === 'judge') {
+          html += '<div class="quiz-options">';
+          ['正确', '错误'].forEach(function(opt, oi) {
+            var letter = oi === 0 ? 'T' : 'F';
+            html += '<div class="quiz-option" data-letter="' + letter + '" onclick="App.selectOption(this, \'' + qid + '\', \'' + letter + '\')">';
+            html += '<span class="quiz-option-letter">' + letter + '</span>';
+            html += '<span>' + opt + '</span>';
+            html += '</div>';
+          });
+          html += '</div>';
+        } else if (qType === 'fill') {
+          html += '<input class="quiz-fill-input" type="text" placeholder="请输入答案..." data-qid="' + esc(qid) + '" oninput="App.fillAnswer(this, \'' + qid + '\')">';
+        } else if (qType === 'text') {
+          html += '<textarea class="quiz-text-area" placeholder="请输入你的回答(系统将根据关键概念自动评分)..." data-qid="' + esc(qid) + '" oninput="App.fillAnswer(this, \'' + qid + '\')"></textarea>';
+        } else if (qType === 'coding') {
+          html += '<div class="quiz-coding-hint">💻 编程题：请用代码实现以下功能</div>';
+          html += '<textarea class="quiz-code-area" placeholder="# 请在这里编写代码..." data-qid="' + esc(qid) + '" oninput="App.fillAnswer(this, \'' + qid + '\')" spellcheck="false"></textarea>';
+        } else if (qType === 'case_study') {
+          if (q.options && q.options.length > 0) {
+            html += '<div class="quiz-options">';
+            q.options.forEach(function(opt, oi) {
+              var letter = String.fromCharCode(65 + oi);
+              var optText = typeof opt === 'string' ? opt.replace(/^[A-D][.、)\s]+/, '') : String(opt);
+              html += '<div class="quiz-option" data-letter="' + letter + '" onclick="App.selectOption(this, \'' + qid + '\', \'' + letter + '\')">';
+              html += '<span class="quiz-option-letter">' + letter + '</span>';
+              html += '<span>' + esc(optText) + '</span>';
+              html += '</div>';
+            });
+            html += '</div>';
+          } else {
+            html += '<textarea class="quiz-text-area" placeholder="请分析这个案例(系统将根据分析维度自动评分)..." data-qid="' + esc(qid) + '" oninput="App.fillAnswer(this, \'' + qid + '\')"></textarea>';
+          }
+        }
+
+        html += '<div class="quiz-explanation" id="exp-' + qid + '">';
+        if (q.answer) html += '<strong>答案：</strong>' + esc(String(q.answer));
+        if (q.explanation) html += '<br><strong>解析：</strong>' + esc(q.explanation);
+        if (q.key_points && q.key_points.length > 0) {
+          html += '<br><strong>评分关键词：</strong><span style="color:#A78BFA;">' + esc(q.key_points.join('、')) + '</span>';
+        }
+        html += '</div>';
+        html += '</div>';
+        return html;
+      }
+
+      function renderMasteryCurve() {
+        var history = detailData.mastery_history || [];
+        if (history.length < 2) {
+          document.getElementById('masteryCurve').style.display = 'none';
+          return;
+        }
+        document.getElementById('masteryCurve').style.display = 'block';
+        var chart = document.getElementById('masteryCurveChart');
+        var values = history.map(function(h) { return h.mastery; });
+        var maxVal = 5;
+        var rows = 10;
+        var cols = Math.min(values.length, 30);
+        var recent = values.slice(-cols);
+        var grid = [];
+        for (var r = rows; r >= 0; r--) {
+          var row = [];
+          var yVal = (r / rows) * maxVal;
+          var label = yVal.toFixed(1);
+          row.push(label.padStart(4) + ' │');
+          for (var c = 0; c < recent.length; c++) {
+            var normVal = (recent[c] / maxVal) * rows;
+            if (Math.abs(normVal - r) < 0.5) {
+              row.push(' ●');
+            } else if (r === 0) {
+              row.push('──');
+            } else {
+              row.push('  ');
+            }
+          }
+          grid.push(row.join(''));
+        }
+        var axis = '     └' + '──'.repeat(recent.length);
+        grid.push(axis);
+        var xLabels = '       ';
+        for (var c = 0; c < recent.length; c++) {
+          if (c % 3 === 0) xLabels += (c + 1) + ' ';
+          else xLabels += '  ';
+        }
+        grid.push(xLabels);
+        chart.textContent = grid.join('\n');
+      }
+
+      function renderWeakPoints() {
+        var wps = detailData.weak_points || [];
+        if (wps.length === 0) {
+          document.getElementById('weakPointsSection').style.display = 'none';
+          return;
+        }
+        document.getElementById('weakPointsSection').style.display = 'block';
+        var html = '';
+        wps.forEach(function(wp) {
+          html += '<div class="weak-point-item" id="wp-' + wp.id + '">';
+          html += '<div class="weak-point-name">' + esc(wp.point) + '</div>';
+          html += '<span class="weak-point-count">×' + wp.count + '</span>';
+          html += '<button class="weak-point-resolve-btn" onclick="App.resolveWeakPoint(' + wp.id + ')">✓ 已解决</button>';
+          html += '</div>';
+        });
+        document.getElementById('weakPointsList').innerHTML = html;
+      }
+
+      function updateActionButtons() {
+        var hasMaterial = detailData && detailData.material;
+        var hasQuestions = hasMaterial && detailData.material.content && detailData.material.content.questions && detailData.material.content.questions.length > 0;
+        document.getElementById('btnQuiz').disabled = !hasQuestions;
+      }
+
+      function selectOption(el, qid, letter) {
+        if (el.classList.contains('disabled')) return;
+        var item = el.closest('.quiz-item');
+        item.querySelectorAll('.quiz-option').forEach(function(o) { o.classList.remove('selected'); });
+        el.classList.add('selected');
+        quizAnswers[qid] = letter;
+        checkQuizComplete();
+      }
+
+      function fillAnswer(el, qid) {
+        quizAnswers[qid] = el.value;
+        checkQuizComplete();
+      }
+
+      function gradeEssay(userAns, correctAnswer, explanation, keyPoints) {
+        var ans = (userAns || '').trim();
+        if (!ans || ans.length < 3) return false;
+        var trivialList = ['不知道','不会','不懂','无','没学过','不清楚','none','no','n/a','na','-'];
+        var ansLow = ans.toLowerCase();
+        for (var i = 0; i < trivialList.length; i++) {
+          if (ansLow === trivialList[i]) return false;
+        }
+        var keywords = [];
+        if (keyPoints && Array.isArray(keyPoints) && keyPoints.length > 0) {
+          keywords = keyPoints.map(function(kp) { return String(kp).trim(); }).filter(function(kp) { return kp.length >= 2; });
+        }
+        if (keywords.length === 0) {
+          var stopWords = ['的','了','是','在','有','和','与','或','不','也','都','而','为','中','上','下','到','从','被','把','让','给','对','等','着','过','地','得','之','其','这','那','它','他','我','你','们','会','能','可','要','将','就','已','所','以','因','如','但','又','很','更','最','比','还','当','于','及','个','种','些','样','类','间','内','外','前','后','时','里','只','即','则','若','虽','且','并','故','遂'];
+          var sourceTexts = [correctAnswer || '', explanation || ''];
+          sourceTexts.forEach(function(text) {
+            var terms = text.replace(/[，。、；：！？（）\(\)\[\]{}""''《》\s\d]/g, '|').split('|');
+            terms.forEach(function(t) {
+              t = t.trim();
+              if (t.length >= 2 && t.length <= 8 && keywords.indexOf(t) === -1 && stopWords.indexOf(t) === -1) {
+                keywords.push(t);
+              }
+            });
+          });
+        }
+        if (keywords.length === 0) return ans.length > 10;
+        var matched = 0;
+        var firstMatchIdx = -1;
+        keywords.forEach(function(kw, i) {
+          if (ans.indexOf(kw) !== -1) {
+            matched++;
+            if (firstMatchIdx === -1) firstMatchIdx = i;
+          }
+        });
+        var ratio = matched / keywords.length;
+        if (ratio >= 0.4) return true;
+        if (matched >= 1 && ans.length >= 10) return true;
+        return false;
+      }
+
+      function checkQuizComplete() {
+        if (!detailData || !detailData.material || !detailData.material.content || !detailData.material.content.questions) return;
+        var questions = detailData.material.content.questions;
+        var allAnswered = questions.every(function(q) {
+          var ans = quizAnswers[q.id || ''];
+          if (ans === undefined) return false;
+          if (q.type === 'choice' || q.type === 'judge' || q.type === 'case_study') {
+            return !!ans;
+          } else {
+            return typeof ans === 'string' && ans.trim().length >= 2;
+          }
+        });
+        var btn = document.getElementById('btnSubmitQuiz');
+        if (quizMode) {
+          btn.classList.add('visible');
+          btn.disabled = !allAnswered;
+        }
+      }
+
+      function startQuiz() {
+        quizMode = true;
+        quizAnswers = {};
+        var sections = document.querySelectorAll('.material-section');
+        sections.forEach(function(sec) {
+          var header = sec.querySelector('.material-section-header');
+          var body = sec.querySelector('.material-section-body');
+          var chevron = header.querySelector('.chevron');
+          var badge = header.querySelector('.badge');
+          if (badge && badge.classList.contains('badge-quiz')) {
+            if (!body.classList.contains('open')) {
+              body.classList.add('open');
+              chevron.classList.add('open');
+            }
+            sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+        document.getElementById('btnSubmitQuiz').classList.add('visible');
+        document.getElementById('btnSubmitQuiz').disabled = true;
+        showToast('做题模式已开启，选择答案后提交', 'info');
+      }
+
+      async function submitQuiz() {
+        if (!detailData || !detailData.material) return;
+        var questions = detailData.material.content.questions || [];
+        var answers = [];
+        questions.forEach(function(q) {
+          var qid = q.id || '';
+          var userAns = quizAnswers[qid] || '';
+          var correct = false;
+          if (q.type === 'choice' || q.type === 'judge' || (q.type === 'case_study' && q.options)) {
+            correct = String(userAns).toUpperCase() === String(q.answer).toUpperCase();
+          } else if (q.type === 'fill') {
+            var ansNorm = String(userAns).trim().toLowerCase().replace(/\s+/g, '');
+            var correctNorm = String(q.answer || '').trim().toLowerCase().replace(/\s+/g, '');
+            correct = ansNorm.length > 0 && ansNorm === correctNorm;
+          } else {
+            correct = gradeEssay(userAns, q.answer, q.explanation, q.key_points);
+          }
+          answers.push({
+            question_id: qid,
+            correct: correct,
+            difficulty: q.difficulty || 2,
+            knowledge_point: q.knowledge_point || '',
+            doc_section_id: q.doc_section_id || ''
+          });
+        });
+
+        revealAnswers(questions);
+
+        try {
+          var resp = await fetch(API_BASE + '/api/materials/quiz-submit/' + userId + '/' + selectedChapterId, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ answers: answers })
+          });
+          var json = await resp.json();
+          if (json.success) {
+            var data = json.data;
+            showToast('答题完成！掌握度 ' + data.old_mastery.toFixed(1) + ' → ' + data.new_mastery.toFixed(1), 'success');
+            if (data.stage_upgraded) {
+              showUpgradeAnimation(data.new_stage_label);
+            }
+            setTimeout(function() { loadDetail(selectedChapterId); loadLibrary(); }, 1500);
+          }
+        } catch(e) {
+          console.error('提交答案失败:', e);
+          showToast('提交答案失败', 'error');
+        }
+
+        quizMode = false;
+        document.getElementById('btnSubmitQuiz').classList.remove('visible');
+      }
+
+      function revealAnswers(questions) {
+        questions.forEach(function(q) {
+          var qid = q.id || '';
+          var item = document.querySelector('.quiz-item[data-qid="' + qid + '"]');
+          if (!item) return;
+          var options = item.querySelectorAll('.quiz-option');
+          var userAns = quizAnswers[qid] || '';
+          var isCorrect = false;
+          if (q.type === 'choice' || q.type === 'judge' || (q.type === 'case_study' && q.options)) {
+            isCorrect = String(userAns).toUpperCase() === String(q.answer).toUpperCase();
+            options.forEach(function(opt) {
+              opt.classList.add('disabled');
+              var letter = opt.getAttribute('data-letter');
+              if (String(letter).toUpperCase() === String(q.answer).toUpperCase()) {
+                opt.classList.add('correct');
+              }
+              if (String(letter).toUpperCase() === String(userAns).toUpperCase() && String(userAns).toUpperCase() !== String(q.answer).toUpperCase()) {
+                opt.classList.add('wrong');
+              }
+            });
+          } else if (q.type === 'fill') {
+            isCorrect = String(userAns).trim().toLowerCase() === String(q.answer).trim().toLowerCase();
+            var fillInput = item.querySelector('.quiz-fill-input');
+            if (fillInput) {
+              fillInput.disabled = true;
+              fillInput.classList.add(isCorrect ? 'correct' : 'wrong');
+            }
+          } else {
+            isCorrect = gradeEssay(userAns, q.answer, q.explanation, q.key_points);
+            var ta = item.querySelector('.quiz-text-area, .quiz-code-area');
+            if (ta) {
+              ta.disabled = true;
+              ta.classList.add(isCorrect ? 'correct' : 'wrong');
+            }
+          }
+          var exp = document.getElementById('exp-' + qid);
+          if (exp) {
+            exp.className = 'quiz-explanation visible ' + (isCorrect ? 'correct-exp' : 'wrong-exp');
+          }
+        });
+      }
+
+      async function generateMaterial() {
+        if (!selectedChapterId || isGenerating) return;
+        isGenerating = true;
+        abortCtrl = new AbortController();
+
+        document.getElementById('btnGenerate').disabled = true;
+        document.getElementById('btnGenerate').classList.add('generating');
+        document.getElementById('btnGenerate').innerHTML = '⏳ 生成中...';
+        document.getElementById('streamingBanner').style.display = 'flex';
+        document.getElementById('streamingText').textContent = '正在初始化...';
+        document.getElementById('materialSections').innerHTML = '';
+
+        try {
+          var resp = await fetch(API_BASE + '/api/materials/generate/' + userId + '/' + selectedChapterId, {
+            method: 'POST',
+            signal: abortCtrl.signal
+          });
+          if (!resp.ok) throw new Error('请求失败: ' + resp.status);
+
+          var reader = resp.body.getReader();
+          var decoder = new TextDecoder();
+          var buffer = '';
+          var generatedContent = {};
+
+          while (true) {
+            var result = await reader.read();
+            if (result.done) break;
+            buffer += decoder.decode(result.value, { stream: true });
+            var lines = buffer.split('\n');
+            buffer = lines.pop() || '';
+
+            for (var i = 0; i < lines.length; i++) {
+              var line = lines[i].trim();
+              if (!line.startsWith('data: ')) continue;
+              try {
+                var event = JSON.parse(line.substring(6));
+                handleGenEvent(event, generatedContent);
+              } catch(e) {}
+            }
+          }
+          finishGeneration();
+        } catch(e) {
+          if (e.name !== 'AbortError') {
+            console.error(e);
+            showToast('生成失败: ' + e.message, 'error');
+          }
+          finishGeneration();
+        }
+      }
+
+      function handleGenEvent(event, generatedContent) {
+        if (event.type === 'stage_info') {
+          document.getElementById('streamingText').textContent = '阶段: ' + event.stage_label + ' | 章节: ' + event.chapter;
+        } else if (event.type === 'agent_start') {
+          document.getElementById('streamingText').textContent = '正在执行: ' + (event.name || event.agent) + '...';
+        } else if (event.type === 'agent_content') {
+          if (event.content_parts) {
+            Object.entries(event.content_parts).forEach(function(e) {
+              generatedContent[e[0]] = e[1];
+            });
+          }
+        } else if (event.type === 'agent_complete') {
+          document.getElementById('streamingText').textContent = '完成: ' + (event.name || event.agent);
+        } else if (event.type === 'done') {
+          if (Object.keys(generatedContent).length > 0) {
+            detailData.material = detailData.material || {};
+            detailData.material.content = generatedContent;
+            renderMaterialSections();
+            updateActionButtons();
+          }
+        } else if (event.type === 'error') {
+          showToast('错误: ' + (event.message || ''), 'error');
+        }
+      }
+
+      function finishGeneration() {
+        isGenerating = false;
+        document.getElementById('streamingBanner').style.display = 'none';
+        document.getElementById('btnGenerate').disabled = false;
+        document.getElementById('btnGenerate').classList.remove('generating');
+        document.getElementById('btnGenerate').innerHTML = '✨ 生成新资料';
+        showToast('🎉 资料生成完成！', 'success');
+        loadDetail(selectedChapterId);
+        loadLibrary();
+      }
+
+      async function resolveWeakPoint(wpId) {
+        try {
+          var resp = await fetch(API_BASE + '/api/materials/weak-point/resolve/' + wpId, { method: 'POST' });
+          var json = await resp.json();
+          if (json.success) {
+            var el = document.getElementById('wp-' + wpId);
+            if (el) {
+              el.classList.add('resolved');
+              var btn = el.querySelector('.weak-point-resolve-btn');
+              if (btn) { btn.textContent = '已解决'; btn.disabled = true; }
+            }
+            showToast('薄弱点已标记为解决', 'success');
+          }
+        } catch(e) {
+          showToast('操作失败', 'error');
+        }
+      }
+
+      function showUpgradeAnimation(stageLabel) {
+        var overlay = document.createElement('div');
+        overlay.className = 'upgrade-overlay';
+        overlay.innerHTML = '<div class="upgrade-card">' +
+          '<div class="emoji">🎉</div>' +
+          '<h2>阶段升级！</h2>' +
+          '<p>恭喜！你已晋升到 <strong>' + stageLabel + '</strong> 阶段</p>' +
+          '<button class="btn-close" onclick="this.closest(\'.upgrade-overlay\').remove()">继续学习</button>' +
+          '</div>';
+        document.body.appendChild(overlay);
+        setTimeout(function() { if (overlay.parentNode) overlay.remove(); }, 8000);
+      }
+
+      function toggleSection(header) {
+        var body = header.nextElementSibling;
+        var chevron = header.querySelector('.chevron');
+        body.classList.toggle('open');
+        chevron.classList.toggle('open');
+      }
+
+      function formatMd(text) {
+        if (!text) return '';
+        text = esc(String(text));
+        text = text.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+        text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+        text = text.replace(/^### (.+)$/gm, '<h4>$1</h4>');
+        text = text.replace(/^## (.+)$/gm, '<h3>$1</h3>');
+        text = text.replace(/^# (.+)$/gm, '<h2>$1</h2>');
+        text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        text = text.replace(/\n\n/g, '</p><p>');
+        text = text.replace(/\n/g, '<br>');
+        if (!text.startsWith('<')) text = '<p>' + text;
+        if (!text.endsWith('>')) text += '</p>';
+        return text;
+      }
+
+      function esc(s) {
+        if (!s) return '';
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
+
+      function showToast(msg, type) {
+        var t = document.createElement('div');
+        t.className = 'toast toast-' + type;
+        t.textContent = msg;
+        document.body.appendChild(t);
+        setTimeout(function() { t.remove(); }, 3500);
+      }
+
+      return {
+        init: init,
+        selectChapter: selectChapter,
+        generateMaterial: generateMaterial,
+        startQuiz: startQuiz,
+        submitQuiz: submitQuiz,
+        resolveWeakPoint: resolveWeakPoint,
+        toggleSection: toggleSection,
+        selectOption: selectOption,
+        switchVersion: switchVersion
+      };
+    })();
+
+    App.init();
+  </script>
+</body>
+</html>

@@ -95,6 +95,7 @@ class CodeAgent:
 5. 使用真实的库和API
 """
 
+        uid = int(input_data.get("user_id") or 0)
         result = await llm.structured_output(
             messages=[{"role": "user", "content": prompt}],
             output_schema={
@@ -107,7 +108,8 @@ class CodeAgent:
                     }
                 ]
             },
-            system_prompt=f"你擅长编写教学用的{language}代码，注重代码质量和可读性。"
+            system_prompt=f"你擅长编写教学用的{language}代码，注重代码质量和可读性。",
+            cache_user_id=uid,
         )
 
         return {"code_examples": result.get("code_examples", [])}

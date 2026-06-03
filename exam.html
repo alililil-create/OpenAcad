@@ -1,0 +1,1719 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ML考试与练习中心</title>
+  <link rel="stylesheet" href="styles/variables.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/components.css">
+  <style>
+    :root {
+      --exam-primary: #4F46E5;
+      --exam-primary-light: #6366F1;
+      --exam-primary-bg: rgba(79, 70, 229, 0.08);
+      --exam-success: #16A34A;
+      --exam-success-light: #22C55E;
+      --exam-success-bg: rgba(22, 163, 74, 0.08);
+      --exam-warning: #CA8A04;
+      --exam-warning-light: #EAB308;
+      --exam-warning-bg: rgba(202, 138, 4, 0.08);
+      --exam-danger: #DC2626;
+      --exam-danger-light: #EF4444;
+      --exam-danger-bg: rgba(220, 38, 38, 0.08);
+      --exam-bg: #F8FAFC;
+      --exam-card: #FFFFFF;
+      --exam-border: #E2E8F0;
+      --exam-text: #1E293B;
+      --exam-text-sec: #64748B;
+      --exam-text-muted: #94A3B8;
+      --exam-radius: 12px;
+      --exam-radius-sm: 8px;
+      --exam-radius-lg: 16px;
+      --exam-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      --exam-shadow-md: 0 4px 16px rgba(0,0,0,0.1);
+    }
+
+    body {
+      background: var(--exam-bg);
+      font-family: 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', 'STHeiti', sans-serif;
+      color: var(--exam-text);
+      padding-top: var(--navbar-height);
+    }
+
+    .exam-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px 32px;
+    }
+
+    .exam-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .exam-header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--exam-text);
+      margin-bottom: 8px;
+    }
+    .exam-header .subtitle {
+      font-size: 0.95rem;
+      color: var(--exam-text-sec);
+      font-weight: 500;
+    }
+
+    .mode-selector {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .mode-card {
+      background: var(--exam-card);
+      border: 2px solid var(--exam-border);
+      border-radius: var(--exam-radius);
+      padding: 20px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: var(--exam-shadow);
+    }
+    .mode-card:hover {
+      border-color: var(--exam-primary-light);
+      box-shadow: var(--exam-shadow-md);
+      transform: translateY(-2px);
+    }
+    .mode-card.active {
+      border-color: var(--exam-primary);
+      background: var(--exam-primary-bg);
+      box-shadow: 0 4px 20px rgba(79, 70, 229, 0.15);
+    }
+    .mode-card .mode-icon {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+    .mode-card .mode-label {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--exam-text);
+      margin-bottom: 6px;
+    }
+    .mode-card .mode-desc {
+      font-size: 0.78rem;
+      color: var(--exam-text-sec);
+      line-height: 1.5;
+    }
+    .mode-card .mode-time {
+      margin-top: 10px;
+      font-size: 0.72rem;
+      color: var(--exam-text-muted);
+      background: rgba(100, 116, 139, 0.08);
+      padding: 3px 10px;
+      border-radius: 20px;
+      display: inline-block;
+    }
+    .mode-card.active .mode-label {
+      color: var(--exam-primary);
+    }
+
+    .section-card {
+      background: var(--exam-card);
+      border: 1px solid var(--exam-border);
+      border-radius: var(--exam-radius-lg);
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--exam-shadow);
+    }
+    .section-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--exam-text);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chapter-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .chapter-check {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border: 1.5px solid var(--exam-border);
+      border-radius: var(--exam-radius-sm);
+      cursor: pointer;
+      transition: all 0.15s;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--exam-text);
+      background: var(--exam-card);
+    }
+    .chapter-check:hover {
+      border-color: var(--exam-primary-light);
+      background: var(--exam-primary-bg);
+    }
+    .chapter-check.checked {
+      border-color: var(--exam-primary);
+      background: var(--exam-primary-bg);
+      color: var(--exam-primary);
+    }
+    .chapter-check input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--exam-primary);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .chapter-check .ch-icon {
+      font-size: 1rem;
+    }
+
+    .quick-select-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .quick-btn {
+      padding: 6px 16px;
+      border-radius: 20px;
+      border: 1.5px solid var(--exam-border);
+      background: var(--exam-card);
+      color: var(--exam-text-sec);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .quick-btn:hover {
+      border-color: var(--exam-primary-light);
+      color: var(--exam-primary);
+      background: var(--exam-primary-bg);
+    }
+
+    .btn-generate {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 16px;
+      border-radius: var(--exam-radius);
+      background: var(--exam-primary);
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 16px rgba(79, 70, 229, 0.25);
+    }
+    .btn-generate:hover:not(:disabled) {
+      background: var(--exam-primary-light);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(79, 70, 229, 0.35);
+    }
+    .btn-generate:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .btn-generate.loading {
+      background: var(--exam-text-sec);
+    }
+
+    .main-layout {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .exam-area {
+      min-height: 300px;
+    }
+
+    .empty-exam {
+      text-align: center;
+      padding: 60px 40px;
+      color: var(--exam-text-muted);
+    }
+    .empty-exam .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+    }
+    .empty-exam h3 {
+      font-size: 1.1rem;
+      color: var(--exam-text-sec);
+      margin-bottom: 8px;
+    }
+    .empty-exam p {
+      font-size: 0.88rem;
+      color: var(--exam-text-muted);
+    }
+
+    .exam-info-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      background: var(--exam-primary-bg);
+      border: 1.5px solid rgba(79, 70, 229, 0.15);
+      border-radius: var(--exam-radius);
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .exam-info-bar .info-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .exam-info-bar .info-tag {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--exam-primary);
+    }
+    .exam-info-bar .timer {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--exam-primary);
+      font-family: 'Segoe UI', 'Helvetica Neue', monospace;
+    }
+    .exam-info-bar .timer.warning {
+      color: var(--exam-warning);
+    }
+    .exam-info-bar .timer.danger {
+      color: var(--exam-danger);
+    }
+
+    .question-block {
+      background: var(--exam-card);
+      border: 1px solid var(--exam-border);
+      border-radius: var(--exam-radius);
+      padding: 24px;
+      margin-bottom: 16px;
+      box-shadow: var(--exam-shadow);
+    }
+    .question-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .question-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--exam-primary-bg);
+      color: var(--exam-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .question-type-badge {
+      font-size: 0.72rem;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+    .badge-choice { background: rgba(79,70,229,0.1); color: var(--exam-primary); }
+    .badge-fill { background: rgba(22,163,74,0.1); color: var(--exam-success); }
+    .badge-derivation { background: rgba(202,138,4,0.1); color: var(--exam-warning); }
+    .badge-calculation { background: rgba(220,38,38,0.1); color: var(--exam-danger); }
+    .badge-essay { background: rgba(139,92,246,0.1); color: #7C3AED; }
+    .badge-compare { background: rgba(6,182,212,0.1); color: #0891B2; }
+    .badge-code { background: rgba(234,88,12,0.1); color: #C2410C; }
+    .badge-report { background: rgba(99,102,241,0.1); color: #4F46E5; }
+    .question-points {
+      margin-left: auto;
+      font-size: 0.78rem;
+      color: var(--exam-text-muted);
+      font-weight: 600;
+    }
+    .question-text {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--exam-text);
+      margin-bottom: 16px;
+      line-height: 1.7;
+    }
+
+    .option-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .option-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border: 1.5px solid var(--exam-border);
+      border-radius: var(--exam-radius-sm);
+      cursor: pointer;
+      transition: all 0.15s;
+      font-size: 0.9rem;
+      color: var(--exam-text);
+    }
+    .option-item:hover {
+      border-color: var(--exam-primary-light);
+      background: var(--exam-primary-bg);
+    }
+    .option-item.selected {
+      border-color: var(--exam-primary);
+      background: var(--exam-primary-bg);
+      color: var(--exam-primary);
+      font-weight: 600;
+    }
+    .option-item.correct {
+      border-color: var(--exam-success);
+      background: var(--exam-success-bg);
+      color: var(--exam-success);
+    }
+    .option-item.wrong {
+      border-color: var(--exam-danger);
+      background: var(--exam-danger-bg);
+      color: var(--exam-danger);
+    }
+    .option-item.disabled {
+      cursor: default;
+      pointer-events: none;
+    }
+    .option-letter {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(100,116,139,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.78rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .option-item.selected .option-letter {
+      background: var(--exam-primary);
+      color: #fff;
+    }
+    .option-item.correct .option-letter {
+      background: var(--exam-success);
+      color: #fff;
+    }
+    .option-item.wrong .option-letter {
+      background: var(--exam-danger);
+      color: #fff;
+    }
+
+    .fill-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid var(--exam-border);
+      border-radius: var(--exam-radius-sm);
+      font-size: 0.9rem;
+      color: var(--exam-text);
+      background: var(--exam-card);
+      transition: border-color 0.15s;
+      font-family: inherit;
+    }
+    .fill-input:focus {
+      border-color: var(--exam-primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+    }
+
+    .essay-textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid var(--exam-border);
+      border-radius: var(--exam-radius-sm);
+      font-size: 0.9rem;
+      color: var(--exam-text);
+      background: var(--exam-card);
+      resize: vertical;
+      min-height: 120px;
+      font-family: inherit;
+      line-height: 1.7;
+      transition: border-color 0.15s;
+    }
+    .essay-textarea:focus {
+      border-color: var(--exam-primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+    }
+
+    .derivation-step {
+      border: 1px solid var(--exam-border);
+      border-radius: var(--exam-radius-sm);
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .step-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: rgba(100,116,139,0.03);
+      cursor: pointer;
+    }
+    .step-header .step-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--exam-text);
+    }
+    .step-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .step-btn {
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid;
+      transition: all 0.15s;
+    }
+    .step-btn-hint {
+      border-color: var(--exam-warning);
+      color: var(--exam-warning);
+      background: transparent;
+    }
+    .step-btn-hint:hover {
+      background: var(--exam-warning-bg);
+    }
+    .step-btn-answer {
+      border-color: var(--exam-primary);
+      color: var(--exam-primary);
+      background: transparent;
+    }
+    .step-btn-answer:hover {
+      background: var(--exam-primary-bg);
+    }
+    .step-content {
+      padding: 0 16px;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+    }
+    .step-content.visible {
+      max-height: 500px;
+      padding: 12px 16px;
+    }
+    .step-hint-text {
+      font-size: 0.85rem;
+      color: var(--exam-warning);
+      background: var(--exam-warning-bg);
+      padding: 8px 12px;
+      border-radius: var(--exam-radius-sm);
+      border-left: 3px solid var(--exam-warning);
+    }
+    .step-answer-text {
+      font-size: 0.85rem;
+      color: var(--exam-primary);
+      background: var(--exam-primary-bg);
+      padding: 8px 12px;
+      border-radius: var(--exam-radius-sm);
+      border-left: 3px solid var(--exam-primary);
+      margin-top: 8px;
+      font-family: 'Courier New', monospace;
+    }
+
+    .compare-table-wrap {
+      overflow-x: auto;
+      margin-bottom: 16px;
+    }
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    .compare-table th {
+      background: var(--exam-primary-bg);
+      color: var(--exam-primary);
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      border: 1px solid var(--exam-border);
+    }
+    .compare-table td {
+      padding: 10px 14px;
+      border: 1px solid var(--exam-border);
+      color: var(--exam-text);
+      vertical-align: top;
+      line-height: 1.6;
+    }
+    .compare-table tr:nth-child(even) td {
+      background: rgba(100,116,139,0.02);
+    }
+
+    .code-editor-area {
+      position: relative;
+    }
+    .code-textarea {
+      width: 100%;
+      min-height: 300px;
+      padding: 16px;
+      border: 1.5px solid var(--exam-border);
+      border-radius: var(--exam-radius-sm);
+      font-family: 'Courier New', 'Consolas', monospace;
+      font-size: 0.88rem;
+      line-height: 1.7;
+      color: var(--exam-text);
+      background: #FAFBFC;
+      resize: vertical;
+      tab-size: 4;
+      transition: border-color 0.15s;
+    }
+    .code-textarea:focus {
+      border-color: var(--exam-primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+    }
+    .code-hints {
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .code-hint-item {
+      font-size: 0.82rem;
+      color: var(--exam-text-sec);
+      padding: 6px 12px;
+      background: rgba(100,116,139,0.04);
+      border-radius: var(--exam-radius-sm);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .code-hint-item:hover {
+      background: var(--exam-primary-bg);
+      color: var(--exam-primary);
+    }
+    .test-case {
+      margin-top: 12px;
+      padding: 10px 14px;
+      background: rgba(100,116,139,0.04);
+      border-radius: var(--exam-radius-sm);
+      font-size: 0.82rem;
+      color: var(--exam-text-sec);
+    }
+    .test-case strong {
+      color: var(--exam-text);
+    }
+
+    .report-section {
+      border: 1px solid var(--exam-border);
+      border-radius: var(--exam-radius-sm);
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+    .report-section-header {
+      padding: 12px 16px;
+      background: rgba(100,116,139,0.03);
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--exam-text);
+      border-bottom: 1px solid var(--exam-border);
+    }
+    .report-section-body {
+      padding: 16px;
+    }
+    .report-section-body .template-hint {
+      font-size: 0.8rem;
+      color: var(--exam-text-muted);
+      margin-bottom: 8px;
+      font-style: italic;
+    }
+    .report-section-body textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 10px 14px;
+      border: 1.5px solid var(--exam-border);
+      border-radius: var(--exam-radius-sm);
+      font-size: 0.88rem;
+      color: var(--exam-text);
+      background: var(--exam-card);
+      resize: vertical;
+      font-family: inherit;
+      line-height: 1.7;
+      transition: border-color 0.15s;
+    }
+    .report-section-body textarea:focus {
+      border-color: var(--exam-primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+    }
+    .report-question {
+      margin-top: 8px;
+      padding: 8px 12px;
+      background: var(--exam-warning-bg);
+      border-radius: var(--exam-radius-sm);
+      font-size: 0.82rem;
+      color: var(--exam-warning);
+      font-weight: 500;
+    }
+
+    .btn-submit-exam {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 14px;
+      border-radius: var(--exam-radius);
+      background: var(--exam-success);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 16px rgba(22,163,74,0.25);
+      margin-top: 20px;
+    }
+    .btn-submit-exam:hover:not(:disabled) {
+      background: var(--exam-success-light);
+      transform: translateY(-1px);
+    }
+    .btn-submit-exam:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .result-card {
+      background: var(--exam-card);
+      border: 2px solid var(--exam-success);
+      border-radius: var(--exam-radius-lg);
+      padding: 32px;
+      text-align: center;
+      box-shadow: var(--exam-shadow-md);
+    }
+    .result-card .result-icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+    }
+    .result-card .result-score {
+      font-size: 2.5rem;
+      font-weight: 700;
+      font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+      color: var(--exam-primary);
+    }
+    .result-card .result-total {
+      font-size: 1rem;
+      color: var(--exam-text-sec);
+      margin-bottom: 16px;
+    }
+    .result-card .result-grade {
+      font-size: 1.1rem;
+      font-weight: 600;
+      padding: 6px 20px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-bottom: 20px;
+    }
+    .grade-a { background: var(--exam-success-bg); color: var(--exam-success); }
+    .grade-b { background: var(--exam-primary-bg); color: var(--exam-primary); }
+    .grade-c { background: var(--exam-warning-bg); color: var(--exam-warning); }
+    .grade-d { background: var(--exam-danger-bg); color: var(--exam-danger); }
+
+    .grading-detail {
+      margin-top: 20px;
+      text-align: left;
+    }
+    .grading-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--exam-border);
+      font-size: 0.85rem;
+    }
+    .grading-row:last-child {
+      border-bottom: none;
+    }
+    .grading-row .gq-num {
+      width: 24px;
+      font-weight: 700;
+      color: var(--exam-text-sec);
+      flex-shrink: 0;
+    }
+    .grading-row .gq-result {
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .gq-correct { background: var(--exam-success-bg); color: var(--exam-success); }
+    .gq-wrong { background: var(--exam-danger-bg); color: var(--exam-danger); }
+    .gq-partial { background: var(--exam-warning-bg); color: var(--exam-warning); }
+    .grading-row .gq-score {
+      margin-left: auto;
+      font-weight: 600;
+      color: var(--exam-text-sec);
+    }
+
+    .history-sidebar .section-card {
+      padding: 20px;
+    }
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+    .history-item {
+      padding: 12px;
+      border: 1px solid var(--exam-border);
+      border-radius: var(--exam-radius-sm);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .history-item:hover {
+      border-color: var(--exam-primary-light);
+      background: var(--exam-primary-bg);
+    }
+    .history-item .hi-type {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--exam-primary);
+      margin-bottom: 4px;
+    }
+    .history-item .hi-score {
+      font-size: 0.78rem;
+      color: var(--exam-text-sec);
+    }
+    .history-item .hi-date {
+      font-size: 0.72rem;
+      color: var(--exam-text-muted);
+      margin-top: 4px;
+    }
+    .history-item .hi-status {
+      display: inline-block;
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    .status-draft { background: var(--exam-warning-bg); color: var(--exam-warning); }
+    .status-completed { background: var(--exam-success-bg); color: var(--exam-success); }
+
+    .loading-overlay {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 40px;
+      text-align: center;
+    }
+    .loading-spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid var(--exam-border);
+      border-top-color: var(--exam-primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 16px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .loading-text {
+      font-size: 0.95rem;
+      color: var(--exam-text-sec);
+      font-weight: 500;
+    }
+    .loading-sub {
+      font-size: 0.82rem;
+      color: var(--exam-text-muted);
+      margin-top: 8px;
+    }
+
+    .toast {
+      position: fixed;
+      top: 90px;
+      right: 24px;
+      padding: 14px 24px;
+      border-radius: var(--exam-radius-sm);
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.9rem;
+      z-index: 9999;
+      animation: slideIn 0.3s ease;
+      box-shadow: var(--exam-shadow-md);
+    }
+    .toast-success { background: var(--exam-success); }
+    .toast-error { background: var(--exam-danger); }
+    .toast-info { background: var(--exam-primary); }
+    @keyframes slideIn {
+      from { transform: translateX(100px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .btn-new-exam {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 24px;
+      border-radius: var(--exam-radius);
+      background: var(--exam-primary);
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.9rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 16px;
+    }
+    .btn-new-exam:hover {
+      background: var(--exam-primary-light);
+    }
+
+    @media (max-width: 900px) {
+      .mode-selector {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .main-layout {
+        grid-template-columns: 1fr;
+      }
+      .exam-container {
+        padding: 16px;
+      }
+    }
+    @media (max-width: 600px) {
+      .mode-selector {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="index.html" class="navbar-logo">
+        <div class="navbar-logo-icon">🤖</div>
+        <span>ML智能学习</span>
+      </a>
+      <div class="navbar-nav">
+        <a href="index.html" class="navbar-link">首页</a>
+        <a href="knowledge-center.html" class="navbar-link">知识中心</a>
+        <a href="study.html" class="navbar-link">学习中心</a>
+        <a href="materials.html" class="navbar-link">资料库</a>
+        <a href="exam.html" class="navbar-link active">考试中心</a>
+        <a href="profile-center.html" class="navbar-link">个人中心</a>
+      </div>
+      <div class="navbar-user">
+        <div class="avatar" id="userAvatar">学</div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="exam-container">
+    <div class="exam-header">
+      <h1>🧠 ML考试与练习中心</h1>
+      <div class="subtitle">5大模式 · 针对ML课程深度优化</div>
+    </div>
+
+    <div class="mode-selector" id="modeSelector"></div>
+
+    <div class="section-card" id="chapterSection">
+      <div class="section-title">📚 选择章节范围</div>
+      <div class="chapter-grid" id="chapterGrid"></div>
+      <div class="quick-select-bar">
+        <button class="quick-btn" onclick="ExamApp.quickSelect('basic')">全选基础层</button>
+        <button class="quick-btn" onclick="ExamApp.quickSelect('all')">全选</button>
+        <button class="quick-btn" onclick="ExamApp.quickSelect('clear')">清空</button>
+        <button class="quick-btn" onclick="ExamApp.quickSelect('weak')">推荐补弱</button>
+      </div>
+    </div>
+
+    <button class="btn-generate" id="btnGenerate" onclick="ExamApp.generateExam()" disabled>
+      📝 生成试卷
+    </button>
+
+    <div class="main-layout" id="mainLayout" style="margin-top: 24px;">
+      <div class="exam-area" id="examArea">
+        <div class="empty-exam">
+          <div class="empty-icon">🎯</div>
+          <h3>选择模式和章节后生成试卷</h3>
+          <p>系统将根据你的学习画像智能出题，针对性强化薄弱环节</p>
+        </div>
+      </div>
+      <div class="history-sidebar">
+        <div class="section-card">
+          <div class="section-title">📋 历史记录</div>
+          <div class="history-list" id="historyList">
+            <div style="text-align:center;padding:20px;color:var(--exam-text-muted);font-size:0.85rem;">暂无记录</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="scripts/localStorage.js"></script>
+  <script>
+    var ExamApp = (function() {
+      var API_BASE = localStorage.getItem('ml_api_base_url') || 'http://127.0.0.1:8000';
+      var userId = null;
+      var examTypes = {};
+      var chapters = [];
+      var selectedMode = null;
+      var selectedChapters = new Set();
+      var currentExam = null;
+      var userAnswers = {};
+      var examSubmitted = false;
+      var timerInterval = null;
+      var timeRemaining = 0;
+
+      var MODE_INFO = {
+        mock: { icon: '🧪', label: '期末模拟', desc: '全题型综合模拟考试', defaultTime: 120 },
+        derivation: { icon: '📐', label: '推导专练', desc: '逐步推导与公式证明', defaultTime: 60 },
+        compare: { icon: '⚖️', label: '算法对比', desc: '算法特性横向对比分析', defaultTime: 45 },
+        code_lab: { icon: '💻', label: '代码实验', desc: '手写代码实现算法', defaultTime: 90 },
+        report: { icon: '📊', label: '实验报告', desc: '完整实验报告撰写', defaultTime: 120 }
+      };
+
+      function init() {
+        resolveUserId();
+        loadExamTypes();
+        loadChapters();
+        loadHistory();
+        renderModeSelector();
+      }
+
+      function resolveUserId() {
+        userId = Storage.getUserID();
+        if (!userId || userId <= 0) {
+          document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-size:1.2rem;color:#94A3B8;">请先登录后再访问考试中心</div>';
+        }
+      }
+
+      function getApiUrl(path) {
+        return API_BASE + path;
+      }
+
+      async function loadExamTypes() {
+        try {
+          var resp = await fetch(getApiUrl('/api/exam/types'));
+          var json = await resp.json();
+          if (json.success) {
+            examTypes = json.data;
+            renderModeSelector();
+          }
+        } catch(e) {
+          console.error('Failed to load exam types:', e);
+        }
+      }
+
+      async function loadChapters() {
+        try {
+          var resp = await fetch(getApiUrl('/api/plans/chapters'));
+          var json = await resp.json();
+          if (json.success) {
+            chapters = json.data || [];
+            renderChapterGrid();
+          }
+        } catch(e) {
+          console.error('Failed to load chapters:', e);
+          chapters = getDefaultChapters();
+          renderChapterGrid();
+        }
+      }
+
+      function getDefaultChapters() {
+        return [
+          { id: 'ml_overview', name: '机器学习概述', icon: '🤖', difficulty: 1, estimated_hours: 4, depends_on: [] },
+          { id: 'math_foundation', name: '数学基础', icon: '🔢', difficulty: 2, estimated_hours: 8, depends_on: [] },
+          { id: 'programming', name: '编程与数据处理', icon: '💻', difficulty: 2, estimated_hours: 6, depends_on: ['math_foundation'] },
+          { id: 'supervised_learning', name: '监督学习', icon: '🎯', difficulty: 3, estimated_hours: 12, depends_on: ['math_foundation', 'programming'] },
+          { id: 'unsupervised_learning', name: '无监督学习', icon: '🔍', difficulty: 3, estimated_hours: 8, depends_on: ['supervised_learning'] },
+          { id: 'neural_networks', name: '神经网络基础', icon: '🧠', difficulty: 4, estimated_hours: 10, depends_on: ['supervised_learning'] },
+          { id: 'deep_learning', name: '深度学习', icon: '🔥', difficulty: 5, estimated_hours: 12, depends_on: ['neural_networks'] },
+          { id: 'model_evaluation', name: '模型评估', icon: '📊', difficulty: 3, estimated_hours: 6, depends_on: ['supervised_learning'] },
+          { id: 'advanced_interest', name: '进阶方向', icon: '🚀', difficulty: 5, estimated_hours: 10, depends_on: ['deep_learning'] }
+        ];
+      }
+
+      async function loadHistory() {
+        if (!userId) return;
+        try {
+          var resp = await fetch(getApiUrl('/api/exam/list/' + userId));
+          var json = await resp.json();
+          if (json.success) {
+            renderHistory(json.data || []);
+          }
+        } catch(e) {
+          console.error('Failed to load history:', e);
+        }
+      }
+
+      function renderModeSelector() {
+        var container = document.getElementById('modeSelector');
+        var html = '';
+        var modes = ['mock', 'derivation', 'compare', 'code_lab', 'report'];
+        modes.forEach(function(mode) {
+          var info = MODE_INFO[mode];
+          var typeData = examTypes[mode] || {};
+          var label = typeData.label || (info.icon + ' ' + info.label);
+          var timeMin = typeData.time_min || info.defaultTime;
+          var isActive = selectedMode === mode ? ' active' : '';
+          html += '<div class="mode-card' + isActive + '" onclick="ExamApp.selectMode(\'' + mode + '\')">';
+          html += '<div class="mode-icon">' + info.icon + '</div>';
+          html += '<div class="mode-label">' + esc(label) + '</div>';
+          html += '<div class="mode-desc">' + esc(info.desc) + '</div>';
+          html += '<div class="mode-time">⏱ ' + timeMin + '分钟</div>';
+          html += '</div>';
+        });
+        container.innerHTML = html;
+      }
+
+      function renderChapterGrid() {
+        var grid = document.getElementById('chapterGrid');
+        var html = '';
+        chapters.forEach(function(ch) {
+          var checked = selectedChapters.has(ch.id) ? ' checked' : '';
+          var cls = selectedChapters.has(ch.id) ? ' checked' : '';
+          html += '<label class="chapter-check' + cls + '" data-id="' + esc(ch.id) + '">';
+          html += '<input type="checkbox"' + checked + ' onchange="ExamApp.toggleChapter(\'' + esc(ch.id) + '\')">';
+          html += '<span class="ch-icon">' + esc(ch.icon || '📖') + '</span>';
+          html += '<span>' + esc(ch.name) + '</span>';
+          html += '</label>';
+        });
+        grid.innerHTML = html;
+      }
+
+      function renderHistory(exams) {
+        var list = document.getElementById('historyList');
+        if (!exams || exams.length === 0) {
+          list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--exam-text-muted);font-size:0.85rem;">暂无记录</div>';
+          return;
+        }
+        var html = '';
+        exams.forEach(function(ex) {
+          var typeInfo = MODE_INFO[ex.exam_type] || { icon: '📝', label: ex.exam_type };
+          var statusCls = ex.status === 'completed' ? 'status-completed' : 'status-draft';
+          var statusText = ex.status === 'completed' ? '已完成' : '未完成';
+          html += '<div class="history-item" onclick="ExamApp.viewExam(' + ex.id + ')">';
+          html += '<div class="hi-type">' + typeInfo.icon + ' ' + esc(typeInfo.label) + '</div>';
+          if (ex.status === 'completed' && ex.score != null) {
+            html += '<div class="hi-score">得分: ' + ex.score + ' / ' + ex.total_score + '</div>';
+          }
+          html += '<span class="hi-status ' + statusCls + '">' + statusText + '</span>';
+          html += '<div class="hi-date">' + esc(ex.created_at || '') + '</div>';
+          html += '</div>';
+        });
+        list.innerHTML = html;
+      }
+
+      function selectMode(mode) {
+        selectedMode = mode;
+        renderModeSelector();
+        updateGenerateBtn();
+      }
+
+      function toggleChapter(chId) {
+        if (selectedChapters.has(chId)) {
+          selectedChapters.delete(chId);
+        } else {
+          selectedChapters.add(chId);
+        }
+        renderChapterGrid();
+        updateGenerateBtn();
+      }
+
+      function quickSelect(type) {
+        if (type === 'all') {
+          chapters.forEach(function(ch) { selectedChapters.add(ch.id); });
+        } else if (type === 'clear') {
+          selectedChapters.clear();
+        } else if (type === 'basic') {
+          chapters.forEach(function(ch) {
+            if (ch.difficulty <= 2) selectedChapters.add(ch.id);
+          });
+        } else if (type === 'weak') {
+          chapters.forEach(function(ch) {
+            if (ch.difficulty >= 3 && (!ch.depends_on || ch.depends_on.length > 0)) {
+              selectedChapters.add(ch.id);
+            }
+          });
+        }
+        renderChapterGrid();
+        updateGenerateBtn();
+      }
+
+      function updateGenerateBtn() {
+        var btn = document.getElementById('btnGenerate');
+        btn.disabled = !selectedMode || selectedChapters.size === 0;
+      }
+
+      async function generateExam() {
+        if (!selectedMode || selectedChapters.size === 0) return;
+        var btn = document.getElementById('btnGenerate');
+        btn.disabled = true;
+        btn.classList.add('loading');
+        btn.innerHTML = '⏳ 正在生成试卷...';
+
+        var examArea = document.getElementById('examArea');
+        examArea.innerHTML = '<div class="loading-overlay"><div class="loading-spinner"></div><div class="loading-text">AI正在为你智能出题...</div><div class="loading-sub">根据学习画像和章节掌握度个性化生成</div></div>';
+
+        try {
+          var resp = await fetch(getApiUrl('/api/exam/create'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              user_id: userId,
+              exam_type: selectedMode,
+              chapter_ids: Array.from(selectedChapters)
+            })
+          });
+          var json = await resp.json();
+          if (json.success) {
+            currentExam = json.data;
+            userAnswers = {};
+            examSubmitted = false;
+            renderExam(currentExam);
+            startTimer(currentExam.time_limit_min);
+            showToast('试卷生成成功！', 'success');
+          } else {
+            showToast('生成失败: ' + (json.detail || '未知错误'), 'error');
+            examArea.innerHTML = '<div class="empty-exam"><div class="empty-icon">❌</div><h3>生成失败</h3><p>请稍后重试</p></div>';
+          }
+        } catch(e) {
+          console.error('Generate exam error:', e);
+          showToast('网络错误: ' + e.message, 'error');
+          examArea.innerHTML = '<div class="empty-exam"><div class="empty-icon">❌</div><h3>网络错误</h3><p>请检查后端服务是否运行</p></div>';
+        }
+
+        btn.disabled = false;
+        btn.classList.remove('loading');
+        btn.innerHTML = '📝 生成试卷';
+      }
+
+      function startTimer(minutes) {
+        if (timerInterval) clearInterval(timerInterval);
+        timeRemaining = (minutes || 60) * 60;
+        updateTimerDisplay();
+        timerInterval = setInterval(function() {
+          timeRemaining--;
+          updateTimerDisplay();
+          if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            showToast('考试时间到！', 'error');
+            submitExam();
+          }
+        }, 1000);
+      }
+
+      function updateTimerDisplay() {
+        var timerEl = document.getElementById('examTimer');
+        if (!timerEl) return;
+        var min = Math.floor(timeRemaining / 60);
+        var sec = timeRemaining % 60;
+        timerEl.textContent = String(min).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+        timerEl.className = 'timer';
+        if (timeRemaining < 300) timerEl.classList.add('danger');
+        else if (timeRemaining < 600) timerEl.classList.add('warning');
+      }
+
+      function renderExam(exam) {
+        var area = document.getElementById('examArea');
+        var typeInfo = MODE_INFO[exam.exam_type] || MODE_INFO.mock;
+        var questions = exam.questions || [];
+
+        var html = '';
+        html += '<div class="exam-info-bar">';
+        html += '<div class="info-left">';
+        html += '<span class="info-tag">' + typeInfo.icon + ' ' + esc(typeInfo.label) + '</span>';
+        html += '<span class="info-tag">📋 ' + questions.length + '题</span>';
+        html += '<span class="info-tag">💯 总分 ' + (exam.total_score || 100) + '</span>';
+        html += '</div>';
+        html += '<div class="timer" id="examTimer">00:00</div>';
+        html += '</div>';
+
+        if (exam.exam_type === 'mock') {
+          html += renderMockExam(questions);
+        } else if (exam.exam_type === 'derivation') {
+          html += renderDerivationExam(questions);
+        } else if (exam.exam_type === 'compare') {
+          html += renderCompareExam(questions);
+        } else if (exam.exam_type === 'code_lab') {
+          html += renderCodeLabExam(questions);
+        } else if (exam.exam_type === 'report') {
+          html += renderReportExam(questions);
+        } else {
+          html += renderMockExam(questions);
+        }
+
+        html += '<button class="btn-submit-exam" id="btnSubmitExam" onclick="ExamApp.submitExam()">📤 提交答案</button>';
+        area.innerHTML = html;
+      }
+
+      function renderMockExam(questions) {
+        var html = '';
+        var typeLabels = { choice: '选择题', fill: '填空题', derivation: '推导题', calculation: '计算题', essay: '简答题' };
+        var typeBadges = { choice: 'badge-choice', fill: 'badge-fill', derivation: 'badge-derivation', calculation: 'badge-calculation', essay: 'badge-essay' };
+
+        questions.forEach(function(q, idx) {
+          var qType = q.type || 'choice';
+          var typeLabel = typeLabels[qType] || '题目';
+          var badgeCls = typeBadges[qType] || 'badge-choice';
+          var content = q.content || q.question || q.title || '';
+
+          html += '<div class="question-block" data-qi="' + idx + '">';
+          html += '<div class="question-header">';
+          html += '<div class="question-num">' + (idx + 1) + '</div>';
+          html += '<span class="question-type-badge ' + badgeCls + '">' + typeLabel + '</span>';
+          if (q.points) html += '<span class="question-points">' + q.points + '分</span>';
+          html += '</div>';
+          html += '<div class="question-text">' + esc(content) + '</div>';
+
+          if (qType === 'choice' && q.options) {
+            html += '<div class="option-list">';
+            q.options.forEach(function(opt, oi) {
+              var letter = String.fromCharCode(65 + oi);
+              var optText = typeof opt === 'string' ? opt.replace(/^[A-D][.、)\s]+/, '') : String(opt);
+              html += '<div class="option-item" data-qi="' + idx + '" data-letter="' + letter + '" onclick="ExamApp.selectOption(this, ' + idx + ', \'' + letter + '\')">';
+              html += '<span class="option-letter">' + letter + '</span>';
+              html += '<span>' + esc(optText) + '</span>';
+              html += '</div>';
+            });
+            html += '</div>';
+          } else if (qType === 'fill') {
+            html += '<input class="fill-input" type="text" placeholder="请输入答案..." data-qi="' + idx + '" oninput="ExamApp.fillAnswer(this, ' + idx + ')">';
+          } else if (qType === 'derivation' || qType === 'calculation') {
+            html += '<textarea class="essay-textarea" placeholder="请写出推导/计算过程..." data-qi="' + idx + '" oninput="ExamApp.fillAnswer(this, ' + idx + ')"></textarea>';
+            if (q.steps && q.steps.length > 0) {
+              html += renderDerivationSteps(q.steps, idx);
+            }
+          } else if (qType === 'essay') {
+            html += '<textarea class="essay-textarea" placeholder="请输入你的回答..." data-qi="' + idx + '" oninput="ExamApp.fillAnswer(this, ' + idx + ')"></textarea>';
+            if (q.key_points) {
+              html += '<div style="margin-top:8px;font-size:0.8rem;color:var(--exam-text-muted);">💡 参考要点: ' + q.key_points.map(function(kp) { return esc(kp); }).join('、') + '</div>';
+            }
+          }
+
+          html += '<div class="explanation-area" id="exp-' + idx + '" style="display:none;margin-top:12px;padding:12px;border-radius:8px;font-size:0.85rem;line-height:1.7;"></div>';
+          html += '</div>';
+        });
+        return html;
+      }
+
+      function renderDerivationExam(questions) {
+        var html = '';
+        questions.forEach(function(q, idx) {
+          var title = q.title || q.content || '推导题 ' + (idx + 1);
+          var steps = q.steps || [];
+          html += '<div class="question-block" data-qi="' + idx + '">';
+          html += '<div class="question-header">';
+          html += '<div class="question-num">' + (idx + 1) + '</div>';
+          html += '<span class="question-type-badge badge-derivation">推导题</span>';
+          if (q.total_points || q.points) html += '<span class="question-points">' + (q.total_points || q.points) + '分</span>';
+          html += '</div>';
+          html += '<div class="question-text">' + esc(title) + '</div>';
+          if (q.content && q.content !== title) {
+            html += '<div style="font-size:0.88rem;color:var(--exam-text-sec);margin-bottom:16px;line-height:1.7;">' + esc(q.content) + '</div>';
+          }
+          html += renderDerivationSteps(steps, idx);
+          html += '<div style="margin-top:12px;">';
+          html += '<textarea class="essay-textarea" placeholder="请写出你的推导过程..." data-qi="' + idx + '" oninput="ExamApp.fillAnswer(this, ' + idx + ')" style="min-height:150px;"></textarea>';
+          html += '</div>';
+          html += '</div>';
+        });
+        return html;
+      }
+
+      function renderDerivationSteps(steps, qIdx) {
+        var html = '';
+        steps.forEach(function(step, si) {
+          var stepId = 'step-' + qIdx + '-' + si;
+          html += '<div class="derivation-step">';
+          html += '<div class="step-header">';
+          html += '<span class="step-label">步骤 ' + (step.step || (si + 1)) + ': ' + esc(step.instruction || '') + '</span>';
+          html += '<div class="step-actions">';
+          if (step.hint) {
+            html += '<button class="step-btn step-btn-hint" onclick="ExamApp.toggleStep(\'' + stepId + '-hint\')">显示提示</button>';
+          }
+          if (step.answer) {
+            html += '<button class="step-btn step-btn-answer" onclick="ExamApp.toggleStep(\'' + stepId + '-answer\')">显示答案</button>';
+          }
+          html += '</div>';
+          html += '</div>';
+          html += '<div class="step-content" id="' + stepId + '-hint">';
+          html += '<div class="step-hint-text">💡 ' + esc(step.hint || '') + '</div>';
+          html += '</div>';
+          html += '<div class="step-content" id="' + stepId + '-answer">';
+          html += '<div class="step-answer-text">' + esc(step.answer || '') + '</div>';
+          html += '</div>';
+          html += '</div>';
+        });
+        return html;
+      }
+
+      function renderCompareExam(questions) {
+        var html = '';
+        questions.forEach(function(q, idx) {
+          var title = q.title || '算法对比 ' + (idx + 1);
+          var algorithms = q.algorithms || [];
+          var dimensions = q.dimensions || [];
+          var compareQuestions = q.questions || [];
+
+          html += '<div class="question-block" data-qi="' + idx + '">';
+          html += '<div class="question-header">';
+          html += '<div class="question-num">' + (idx + 1) + '</div>';
+          html += '<span class="question-type-badge badge-compare">算法对比</span>';
+          if (q.difficulty) html += '<span class="question-points">难度 ' + q.difficulty + '/5</span>';
+          html += '</div>';
+          html += '<div class="question-text">' + esc(title) + '</div>';
+
+          if (algorithms.length > 0 && dimensions.length > 0) {
+            html += '<div class="compare-table-wrap">';
+            html += '<table class="compare-table">';
+            html += '<thead><tr><th>对比维度</th>';
+            algorithms.forEach(function(alg) {
+              html += '<th>' + esc(alg) + '</th>';
+            });
+            html += '</tr></thead>';
+            html += '<tbody>';
+            dimensions.forEach(function(dim) {
+              html += '<tr>';
+              html += '<td><strong>' + esc(dim.name) + '</strong></td>';
+              (dim.values || []).forEach(function(val) {
+                html += '<td>' + esc(val) + '</td>';
+              });
+              html += '</tr>';
+            });
+            html += '</tbody></table></div>';
+          }
+
+          if (compareQuestions.length > 0) {
+            html += '<div style="margin-top:16px;">';
+            html += '<div style="font-size:0.9rem;font-weight:600;color:var(--exam-text);margin-bottom:12px;">📝 对比思考题</div>';
+            compareQuestions.forEach(function(cq, cqi) {
+              var subIdx = idx + '_' + cqi;
+              html += '<div style="margin-bottom:12px;">';
+              html += '<div style="font-size:0.88rem;color:var(--exam-text);margin-bottom:8px;">' + (cqi + 1) + '. ' + esc(cq.content) + '</div>';
+              if (cq.options) {
+                html += '<div class="option-list">';
+                cq.options.forEach(function(opt, oi) {
+                  var letter = String.fromCharCode(65 + oi);
+                  html += '<div class="option-item" data-qi="' + subIdx + '" data-letter="' + letter + '" onclick="ExamApp.selectOption(this, \'' + subIdx + '\', \'' + letter + '\')">';
+                  html += '<span class="option-letter">' + letter + '</span>';
+                  html += '<span>' + esc(opt) + '</span>';
+                  html += '</div>';
+                });
+                html += '</div>';
+              } else {
+                html += '<textarea class="essay-textarea" placeholder="请输入你的分析..." data-qi="' + subIdx + '" oninput="ExamApp.fillAnswer(this, \'' + subIdx + '\')" style="min-height:80px;"></textarea>';
+              }
+              html += '</div>';
+            });
+            html += '</div>';
+          }
+
+          html += '</div>';
+        });
+        return html;
+      }
+
+      function renderCodeLabExam(questions) {
+        var html = '';
+        questions.forEach(function(q, idx) {
+          var title = q.title || '代码实验 ' + (idx + 1);
+          var skeleton = q.skeleton || '';
+          var hints = q.hints || [];
+          var testCases = q.test_cases || [];
+
+          html += '<div class="question-block" data-qi="' + idx + '">';
+          html += '<div class="question-header">';
+          html += '<div class="question-num">' + (idx + 1) + '</div>';
+          html += '<span class="question-type-badge badge-code">代码实验</span>';
+          if (q.estimated_min) html += '<span class="question-points">预计 ' + q.estimated_min + '分钟</span>';
+          if (q.difficulty) html += '<span class="question-points" style="margin-left:4px;">难度 ' + q.difficulty + '/5</span>';
+          html += '</div>';
+          html += '<div class="question-text">' + esc(title) + '</div>';
+          if (q.description) {
+            html += '<div style="font-size:0.88rem;color:var(--exam-text-sec);margin-bottom:16px;line-height:1.7;">' + esc(q.description) + '</div>';
+          }
+
+          html += '<div class="code-editor-area">';
+          html += '<textarea class="code-textarea" data-qi="' + idx + '" oninput="ExamApp.fillAnswer(this, ' + idx + ')" placeholder="# 在此编写代码...">' + esc(skeleton) + '</textarea>';
+
+          if (hints.length > 0) {
+            html += '<div class="code-hints">';
+            html += '<div style="font-size:0.82rem;font-weight:600;color:var(--exam-text-sec);margin-bottom:4px;">💡 提示</div>';
+            hints.forEach(function(h, hi) {
+              html += '<div class="code-hint-item" onclick="this.style.color=\'var(--exam-primary)\';this.style.background=\'var(--exam-primary-bg)\'">提示 ' + (hi + 1) + ': ' + esc(h) + '</div>';
+            });
+            html += '</div>';
+          }
+
+          if (testCases.length > 0) {
+            html += '<div style="margin-top:12px;">';
+            html += '<div style="font-size:0.82rem;font-weight:600;color:var(--exam-text-sec);margin-bottom:8px;">🧪 测试用例</div>';
+            testCases.forEach(function(tc) {
+              html += '<div class="test-case"><strong>输入:</strong> ' + esc(tc.input || '') + ' → <strong>期望输出:</strong> ' + esc(tc.expected_output || '') + '</div>';
+            });
+            html += '</div>';
+          }
+
+          html += '</div>';
+          html += '</div>';
+        });
+        return html;
+      }
+
+      function renderReportExam(questions) {
+        var html = '';
+        var q = Array.isArray(questions) ? questions[0] : questions;
+        if (!q) {
+          html += '<div class="empty-exam"><div class="empty-icon">📊</div><h3>暂无报告模板</h3></div>';
+          return html;
+        }
+
+        var title = q.title || '实验报告';
+        var sections = q.sections || [];
+
+        html += '<div class="question-block">';
+        html += '<div class="question-header">';
+        html += '<div class="question-num">1</div>';
+        html += '<span class="question-type-badge badge-report">实验报告</span>';
+        if (q.difficulty) html += '<span class="question-points">难度 ' + q.difficulty + '/5</span>';
+        html += '</div>';
+        html += '<div class="question-text">' + esc(title) + '</div>';
+
+        sections.forEach(function(sec, si) {
+          html += '<div class="report-section">';
+          html += '<div class="report-section-header">' + esc(sec.heading) + '</div>';
+          html += '<div class="report-section-body">';
+          if (sec.template) {
+            html += '<div class="template-hint">模板参考: ' + esc(sec.template) + '</div>';
+          }
+          if (sec.content) {
+            html += '<div style="font-size:0.85rem;color:var(--exam-text-sec);margin-bottom:8px;line-height:1.6;">' + esc(sec.content) + '</div>';
+          }
+          html += '<textarea class="essay-textarea" data-qi="report-' + si + '" oninput="ExamApp.fillAnswer(this, \'report-' + si + '\')" placeholder="请填写此部分内容..." style="min-height:80px;"></textarea>';
+          if (sec.questions && sec.questions.length > 0) {
+            sec.questions.forEach(function(sq) {
+              html += '<div class="report-question">❓ ' + esc(sq) + '</div>';
+            });
+          }
+          if (sec.subsections && sec.subsections.length > 0) {
+            sec.subsections.forEach(function(sub) {
+              html += '<div style="margin-top:12px;padding-left:12px;border-left:2px solid var(--exam-border);">';
+              html += '<div style="font-size:0.88rem;font-weight:600;color:var(--exam-text);margin-bottom:6px;">' + esc(sub.title) + '</div>';
+              if (sub.template) {
+                html += '<div class="template-hint">模板参考: ' + esc(sub.template) + '</div>';
+              }
+              html += '<textarea class="essay-textarea" data-qi="report-sub-' + si + '-' + sub.title + '" oninput="ExamApp.fillAnswer(this, \'report-sub-' + si + '\')" placeholder="请填写..." style="min-height:60px;"></textarea>';
+              html += '</div>';
+            });
+          }
+          html += '</div>';
+          html += '</div>';
+        });
+
+        html += '</div>';
+        return html;
+      }
+
+      function selectOption(el, qIdx, letter) {
+        if (examSubmitted) return;
+        var parent = el.closest('.question-block') || el.parentElement;
+        var options = parent.querySelectorAll('.option-item[data-qi="' + qIdx + '"]');
+        options.forEach(function(o) { o.classList.remove('selected'); });
+        el.classList.add('selected');
+        userAnswers[qIdx] = letter;
+      }
+
+      function fillAnswer(el, qIdx) {
+        if (examSubmitted) return;
+        userAnswers[qIdx] = el.value;
+      }
+
+      function toggleStep(stepId) {
+        var el = document.getElementById(stepId);
+        if (!el) return;
+        el.classList.toggle('visible');
+        var btn = event.target;
+        if (btn.textContent.includes('显示')) {
+          btn.textContent = btn.textContent.replace('显示', '隐藏');
+        } else {
+          btn.textContent = btn.textContent.replace('隐藏', '显示');
+        }
+      }
+
+      async function submitExam() {
+        if (!currentExam || examSubmitted) return;
+        if (timerInterval) clearInterval(timerInterval);
+        examSubmitted = true;
+
+        var questions = currentExam.questions || [];
+        var answers = [];
+        questions.forEach(function(q, idx) {
+          var ans = userAnswers[idx];
+          if (ans === undefined || ans === null) ans = '';
+          if (q.type === 'choice') {
+            var letterIdx = typeof ans === 'string' ? ans.charCodeAt(0) - 65 : -1;
+            answers.push(letterIdx >= 0 ? letterIdx : -1);
+          } else {
+            answers.push(String(ans));
+          }
+        });
+
+        var reportKeys = Object.keys(userAnswers).filter(function(k) { return typeof k === 'string' && k.startsWith('report'); });
+        reportKeys.forEach(function(k) {
+          answers.push({ section: k, content: userAnswers[k] });
+        });
+
+        var timeSpent = (currentExam.time_limit_min || 60) * 60 - timeRemaining;
+
+        var btn = document.getElementById('btnSubmitExam');
+        if (btn) { btn.disabled = true; btn.textContent = '⏳ 提交中...'; }
+
+        try {
+          var resp = await fetch(getApiUrl('/api/exam/' + currentExam.id + '/submit'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              answers: answers,
+              time_spent_sec: timeSpent
+            })
+          });
+          var json = await resp.json();
+          if (json.success) {
+            renderResult(json.data);
+            showToast('提交成功！', 'success');
+            loadHistory();
+          } else {
+            showToast('提交失败: ' + (json.detail || '未知错误'), 'error');
+          }
+        } catch(e) {
+          console.error('Submit error:', e);
+          showToast('提交失败: ' + e.message, 'error');
+        }
+
+        if (btn) { btn.textContent = '✅ 已提交'; }
+      }
+
+      function renderResult(data) {
+        var area = document.getElementById('examArea');
+        var score = data.score || 0;
+        var total = data.total_score || 100;
+        var pct = total > 0 ? Math.round((score / total) * 100) : 0;
+        var grade, gradeCls, gradeIcon;
+        if (pct >= 90) { grade = '优秀 A'; gradeCls = 'grade-a'; gradeIcon = '🏆'; }
+        else if (pct >= 80) { grade = '良好 B'; gradeCls = 'grade-b'; gradeIcon = '🌟'; }
+        else if (pct >= 60) { grade = '及格 C'; gradeCls = 'grade-c'; gradeIcon = '📖'; }
+        else { grade = '需加强 D'; gradeCls = 'grade-d'; gradeIcon = '💪'; }
+
+        var html = '<div class="result-card">';
+        html += '<div class="result-icon">' + gradeIcon + '</div>';
+        html += '<div class="result-score">' + score + '</div>';
+        html += '<div class="result-total">/ ' + total + ' 分 (' + pct + '%)</div>';
+        html += '<div class="result-grade ' + gradeCls + '">' + grade + '</div>';
+
+        if (data.grading && data.grading.length > 0) {
+          html += '<div class="grading-detail">';
+          html += '<div style="font-size:0.9rem;font-weight:600;color:var(--exam-text);margin-bottom:12px;">📊 逐题得分</div>';
+          data.grading.forEach(function(g, gi) {
+            var resultText, resultCls;
+            if (g.correct) { resultText = '正确'; resultCls = 'gq-correct'; }
+            else if (g.earned > 0 && g.earned < g.total) { resultText = '部分正确'; resultCls = 'gq-partial'; }
+            else { resultText = '错误'; resultCls = 'gq-wrong'; }
+            html += '<div class="grading-row">';
+            html += '<span class="gq-num">' + (g.question_index + 1) + '</span>';
+            html += '<span class="gq-result ' + resultCls + '">' + resultText + '</span>';
+            html += '<span class="gq-score">' + g.earned + ' / ' + g.total + '</span>';
+            html += '</div>';
+          });
+          html += '</div>';
+        }
+
+        html += '<button class="btn-new-exam" onclick="ExamApp.resetExam()">📝 再来一次</button>';
+        html += '</div>';
+
+        area.innerHTML = html;
+      }
+
+      async function viewExam(examId) {
+        try {
+          var resp = await fetch(getApiUrl('/api/exam/' + examId));
+          var json = await resp.json();
+          if (json.success) {
+            currentExam = json.data;
+            userAnswers = {};
+            examSubmitted = json.data.status === 'completed';
+            renderExam(json.data);
+            if (examSubmitted) {
+              if (timerInterval) clearInterval(timerInterval);
+              var timerEl = document.getElementById('examTimer');
+              if (timerEl) timerEl.textContent = '已结束';
+              var btn = document.getElementById('btnSubmitExam');
+              if (btn) { btn.disabled = true; btn.textContent = '✅ 已提交'; }
+              if (json.data.score != null) {
+                renderResult({
+                  score: json.data.score,
+                  total_score: json.data.total_score,
+                  grading: []
+                });
+              }
+            } else {
+              startTimer(json.data.time_limit_min);
+            }
+            area.scrollIntoView({ behavior: 'smooth' });
+          }
+        } catch(e) {
+          showToast('加载失败: ' + e.message, 'error');
+        }
+      }
+
+      function resetExam() {
+        currentExam = null;
+        userAnswers = {};
+        examSubmitted = false;
+        if (timerInterval) clearInterval(timerInterval);
+        document.getElementById('examArea').innerHTML = '<div class="empty-exam"><div class="empty-icon">🎯</div><h3>选择模式和章节后生成试卷</h3><p>系统将根据你的学习画像智能出题，针对性强化薄弱环节</p></div>';
+      }
+
+      function showToast(msg, type) {
+        var t = document.createElement('div');
+        t.className = 'toast toast-' + type;
+        t.textContent = msg;
+        document.body.appendChild(t);
+        setTimeout(function() { t.remove(); }, 3500);
+      }
+
+      function esc(s) {
+        if (!s) return '';
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
+
+      return {
+        init: init,
+        selectMode: selectMode,
+        toggleChapter: toggleChapter,
+        quickSelect: quickSelect,
+        generateExam: generateExam,
+        selectOption: selectOption,
+        fillAnswer: fillAnswer,
+        toggleStep: toggleStep,
+        submitExam: submitExam,
+        viewExam: viewExam,
+        resetExam: resetExam
+      };
+    })();
+
+    ExamApp.init();
+  </script>
+</body>
+</html>

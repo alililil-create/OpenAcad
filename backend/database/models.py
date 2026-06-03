@@ -232,3 +232,94 @@ class ChatSession(Base):
     last_message_at = Column(DateTime, server_default=func.now())
 
     user = relationship("User", back_populates="chat_sessions")
+
+
+class LearningMaterial(Base):
+    __tablename__ = "learning_materials"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    chapter_id = Column(String(50), nullable=False, index=True)
+    stage = Column(String(20), nullable=False, comment="seedling/sprout/practice/advanced/master")
+    mastery_at_creation = Column(Float, default=0.0)
+    content = Column(JSON, nullable=True, comment="{document: {title, content, sections}, questions: [...], doc_sections: [{id, title, content}]}")
+    profile_snapshot = Column(JSON, nullable=True)
+    weak_points = Column(JSON, nullable=True, comment="[knowledge_point, ...]")
+    is_current = Column(Boolean, default=True)
+    review_count = Column(Integer, default=0)
+    last_reviewed_at = Column(DateTime, nullable=True)
+    next_review_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+class MasteryHistory(Base):
+    __tablename__ = "mastery_history"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    chapter_id = Column(String(50), nullable=False, index=True)
+    mastery = Column(Float, nullable=False)
+    source = Column(String(30), nullable=False, comment="quiz/doc/review/initial/generation")
+    detail = Column(JSON, nullable=True, comment="{old_mastery, new_mastery, delta, question_id, ...}")
+    created_at = Column(DateTime, server_default=func.now())
+
+class WeakPoint(Base):
+    __tablename__ = "weak_points"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    chapter_id = Column(String(50), nullable=False, index=True)
+    knowledge_point = Column(String(200), nullable=False)
+    doc_section_id = Column(String(50), nullable=True)
+    status = Column(String(20), default="active", comment="active/resolved")
+    occurrence_count = Column(Integer, default=1)
+    first_seen_at = Column(DateTime, server_default=func.now())
+    resolved_at = Column(DateTime, nullable=True)
+
+
+class LearningPlan(Base):
+    __tablename__ = "learning_plans"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    goal_type = Column(String(30), nullable=False, comment="exam/project/paper/intro/remedial/extend/custom")
+    goal_detail = Column(String(300), nullable=True, comment="目标描述，如'2周内掌握Transformer'")
+    deadline = Column(DateTime, nullable=True)
+    weekly_hours = Column(Float, default=10.0)
+    chapter_ids = Column(JSON, nullable=False, comment="[chapter_id, ...]")
+    schedule = Column(JSON, nullable=True, comment="[{date, chapter_id, task_type, duration_min, status}]")
+    status = Column(String(20), default="active", comment="active/completed/abandoned")
+    profile_snapshot = Column(JSON, nullable=True)
+    progress_pct = Column(Float, default=0.0)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+
+class PlanTask(Base):
+    __tablename__ = "plan_tasks"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    plan_id = Column(Integer, ForeignKey("learning_plans.id"), nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    chapter_id = Column(String(50), nullable=False, index=True)
+    task_type = Column(String(30), nullable=False, comment="new_learn/review/quiz/derivation/code_lab/exam/compare/report")
+    task_date = Column(DateTime, nullable=True)
+    duration_min = Column(Integer, default=60)
+    status = Column(String(20), default="pending", comment="pending/in_progress/completed/skipped")
+    result = Column(JSON, nullable=True, comment="{score, correct_rate, time_spent, ...}")
+    order_index = Column(Integer, default=0)
+    created_at = Column(DateTime, server_default=func.now())
+    completed_at = Column(DateTime, nullable=True)
+
+
+class ExamPaper(Base):
+    __tablename__ = "exam_papers"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    exam_type = Column(String(30), nullable=False, comment="mock/derivation/compare/code_lab/report")
+    chapter_ids = Column(JSON, nullable=False)
+    questions = Column(JSON, nullable=False, comment="[{type, content, answer, options, steps, ...}]")
+    answers = Column(JSON, nullable=True, comment="用户提交的答案")
+    score = Column(Float, nullable=True)
+    total_score = Column(Float, default=100.0)
+    time_limit_min = Column(Integer, default=120)
+    time_spent_sec = Column(Integer, default=0)
+    status = Column(String(20), default="draft", comment="draft/in_progress/completed")
+    profile_snapshot = Column(JSON, nullable=True)
+    created_at = Column(DateTime, server_default=func.now())
+    completed_at = Column(DateTime, nullable=True)

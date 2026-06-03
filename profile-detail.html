@@ -4,9 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>学习画像详情 - 机器学习个性化智能学习平台</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/variables.css">
   <link rel="stylesheet" href="styles/base.css">
   <link rel="stylesheet" href="styles/components.css">
@@ -581,6 +578,7 @@
   <!-- Toast容器 -->
   <div id="toastContainer"></div>
 
+  <script src="scripts/localStorage.js"></script>
   <script>
     (function () {
       'use strict';
@@ -588,10 +586,9 @@
       // ==================== 工具函数 ====================
       function getUserId() {
         try {
-          const raw = localStorage.getItem('ml_user');
+          const raw = Storage.getUserID();
           if (!raw) return null;
-          const user = JSON.parse(raw);
-          return user.user_id || user.id || null;
+          return raw;
         } catch (e) {
           return null;
         }
@@ -754,7 +751,7 @@
 
         // Draw labels
         ctx.fillStyle = '#1E293B';
-        ctx.font = '600 13px "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif';
+        ctx.font = '600 13px "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
 
@@ -773,7 +770,7 @@
           var sx = cx + r * Math.cos(angle) - 22;
           var sy = cy + r * Math.sin(angle);
           ctx.fillStyle = '#94A3B8';
-          ctx.font = '10px "Poppins", sans-serif';
+          ctx.font = '10px "Segoe UI", "Helvetica Neue", sans-serif';
           ctx.textAlign = 'right';
           ctx.fillText(level, sx, sy);
         }
@@ -1289,7 +1286,7 @@
               overall_score: calculateOverallScore(currentMatrix),
               confirmedAt: new Date().toISOString()
             };
-            localStorage.setItem('ml_profile', JSON.stringify(profileToSave));
+            Storage.setProfile(profileToSave);
           } catch (e) { /* ignore */ }
 
           showToast('✅ 画像已保存确认！', 'success');

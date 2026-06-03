@@ -152,6 +152,7 @@ class AgentState(TypedDict):
     messages: List[dict]
     user_query: str
     user_intent: str              # learn/practice/ask_tutor/view_path
+    user_id: Optional[int]        # 透传到所有 Agent，保证 LLM 缓存按用户隔离
 
     # === 学生画像层（6大类）===
     student_profile: Optional[StudentProfile]

@@ -53,8 +53,8 @@
   --transition-slow: 0.5s ease;
 
   /* 字体 */
-  --font-sans: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  --font-display: 'Poppins', 'Noto Sans SC', sans-serif;
+  --font-sans: 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', 'STHeiti', sans-serif;
+  --font-display: 'Segoe UI', 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 
   /* 导航栏高度 */
   --navbar-height: 72px;

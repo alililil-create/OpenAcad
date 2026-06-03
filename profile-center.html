@@ -4,9 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>个人中心 - 机器学习个性化智能学习平台</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/variables.css">
   <link rel="stylesheet" href="styles/base.css">
   <link rel="stylesheet" href="styles/components.css">
@@ -406,35 +403,28 @@
 
     // ===== 加载用户信息 =====
     function loadUserInfo() {
-      let user = null;
-      try {
-        user = JSON.parse(localStorage.getItem('ml_user') || 'null');
-      } catch(e) { user = null; }
+      var user = Storage.getUser();
 
       if (!user || !user.user_id) {
-        // 未登录
         document.getElementById('noLoginSection').style.display = 'block';
         document.getElementById('loggedInSection').style.display = 'none';
         return null;
       }
 
-      // 已登录
       document.getElementById('noLoginSection').style.display = 'none';
       document.getElementById('loggedInSection').style.display = 'block';
 
-      const username = user.username || '用户';
-      const firstChar = username.charAt(0);
+      var username = user.username || '用户';
+      var firstChar = username.charAt(0);
 
       document.getElementById('largeAvatar').textContent = firstChar;
       document.getElementById('displayUsername').textContent = username;
       document.getElementById('displayUserId').textContent = 'ID: ' + (user.user_id || '--');
 
-      // 注册时间 - 优先从 localStorage ml_user 中读取，否则从 API 获取
-      const registeredAt = user.registered_at || user.registeredAt || null;
+      var registeredAt = user.registered_at || user.registeredAt || null;
       document.getElementById('displayRegTime').textContent = formatDateTime(registeredAt);
 
-      // 更新导航栏头像
-      const navAvatar = document.getElementById('userAvatar');
+      var navAvatar = document.getElementById('userAvatar');
       if (navAvatar) navAvatar.textContent = firstChar;
 
       return user;
@@ -449,18 +439,18 @@
       }
 
       // 先从缓存加载
-      let profileData = null;
+      var profileData = null;
       try {
-        const cached = JSON.parse(localStorage.getItem('ml_profile_cache') || 'null');
-        if (cached && cached.capability_matrix) profileData = cached;
+        var cached = JSON.parse(localStorage.getItem('ml_profile_cache') || 'null');
+        if (cached && cached.capability_matrix && cached._uid === userId) profileData = cached;
       } catch(e) {}
 
-      // 从 API 获取最新数据
       try {
-        const resp = await fetch(`${getApiBase()}/api/wizard/full-profile/${userId}`);
-        const json = await resp.json();
+        var resp = await fetch(getApiBase() + '/api/wizard/full-profile/' + userId);
+        var json = await resp.json();
         if (json.success && json.data) {
           profileData = json.data;
+          profileData._uid = userId;
           localStorage.setItem('ml_profile_cache', JSON.stringify(profileData));
         }
       } catch(e) {

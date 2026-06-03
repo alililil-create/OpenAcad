@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse, HTMLResponse
+from fastapi.responses import StreamingResponse, HTMLResponse, FileResponse
 from pydantic import BaseModel
 from typing import List, Optional
 from pathlib import Path
@@ -26,6 +26,10 @@ from services.cache_service import CacheService
 from services.vector_service import init_milvus, close_milvus, insert_resource, search_resources, rebuild_vocabulary
 from services.oss_service import init_minio, close_minio, upload_file, upload_text, get_file, get_presigned_url
 from routers.wizard import router as wizard_router
+from routers.study import router as study_router
+from routers.materials import router as materials_router
+from routers.plans import router as plans_router
+from routers.exam import router as exam_router
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -110,8 +114,12 @@ app.add_middleware(
 )
 
 app.include_router(wizard_router)
+app.include_router(study_router)
+app.include_router(materials_router)
+app.include_router(plans_router)
+app.include_router(exam_router)
 
-FRONTEND_DIR = Path(__file__).resolve().parent.parent / "bei"
+FRONTEND_DIR = Path(__file__).resolve().parent.parent
 
 
 # ===== 工具函数 =====
@@ -214,6 +222,12 @@ async def serve_exercises():
     return path.read_text(encoding="utf-8") if path.exists() else HTMLResponse("404", status_code=404)
 
 
+@app.get("/wizard", response_class=HTMLResponse)
+async def serve_wizard_redirect():
+    path = FRONTEND_DIR / "wizard.html"
+    return path.read_text(encoding="utf-8") if path.exists() else HTMLResponse("404", status_code=404)
+
+
 @app.get("/wizard.html", response_class=HTMLResponse)
 async def serve_wizard():
     path = FRONTEND_DIR / "wizard.html"
@@ -244,6 +258,54 @@ async def serve_profile_center():
     return path.read_text(encoding="utf-8") if path.exists() else HTMLResponse("404", status_code=404)
 
 
+@app.get("/knowledge-center.html", response_class=HTMLResponse)
+async def serve_knowledge_center():
+    path = FRONTEND_DIR / "knowledge-center.html"
+    return path.read_text(encoding="utf-8") if path.exists() else HTMLResponse("404", status_code=404)
+
+
+@app.get("/knowledge-center", response_class=HTMLResponse)
+async def serve_knowledge_center_short():
+    path = FRONTEND_DIR / "knowledge-center.html"
+    return path.read_text(encoding="utf-8") if path.exists() else HTMLResponse("404", status_code=404)
+
+
+@app.get("/study.html", response_class=HTMLResponse)
+async def serve_study():
+    path = FRONTEND_DIR / "study.html"
+    return path.read_text(encoding="utf-8") if path.exists() else HTMLResponse("404", status_code=404)
+
+
+@app.get("/study", response_class=HTMLResponse)
+async def serve_study_short():
+    path = FRONTEND_DIR / "study.html"
+    return path.read_text(encoding="utf-8") if path.exists() else HTMLResponse("404", status_code=404)
+
+
+@app.get("/materials.html", response_class=HTMLResponse)
+async def serve_materials():
+    path = FRONTEND_DIR / "materials.html"
+    return path.read_text(encoding="utf-8") if path.exists() else HTMLResponse("404", status_code=404)
+
+
+@app.get("/materials", response_class=HTMLResponse)
+async def serve_materials_short():
+    path = FRONTEND_DIR / "materials.html"
+    return path.read_text(encoding="utf-8") if path.exists() else HTMLResponse("404", status_code=404)
+
+
+@app.get("/exam.html", response_class=HTMLResponse)
+async def serve_exam():
+    path = FRONTEND_DIR / "exam.html"
+    return path.read_text(encoding="utf-8") if path.exists() else HTMLResponse("404", status_code=404)
+
+
+@app.get("/exam", response_class=HTMLResponse)
+async def serve_exam_short():
+    path = FRONTEND_DIR / "exam.html"
+    return path.read_text(encoding="utf-8") if path.exists() else HTMLResponse("404", status_code=404)
+
+
 @app.get("/styles/{filename}")
 async def serve_styles(filename: str):
     path = FRONTEND_DIR / "styles" / filename
@@ -263,6 +325,18 @@ async def serve_scripts(filename: str):
 @app.get("/@vite/client")
 async def ignore_vite():
     return HTMLResponse("// empty", media_type="application/javascript")
+
+
+# ===== 本地文件服务 =====
+LOCAL_STORAGE_PATH = Path(__file__).resolve().parent / "local_storage"
+
+@app.get("/local-files/{bucket}/{file_path:path}")
+async def serve_local_file(bucket: str, file_path: str):
+    """提供本地存储文件的访问"""
+    file_full_path = LOCAL_STORAGE_PATH / bucket / file_path
+    if file_full_path.exists() and file_full_path.is_file():
+        return FileResponse(file_full_path)
+    raise HTTPException(status_code=404, detail="File not found")
 
 
 # ===== 认证 API =====
@@ -672,7 +746,8 @@ async def chat_stream(request: ChatRequest):
                     user_query=request.message,
                     chat_history=merged_history,
                     thread_id=request.thread_id,
-                    existing_profile=existing_profile
+                    existing_profile=existing_profile,
+                    user_id=request.user_id or 0
                 ):
                     if not event:
                         continue
@@ -940,7 +1015,8 @@ async def analyze_profile_pipeline(user_id: int):
                     user_query=synthesis,
                     chat_history=[],
                     thread_id=f"profile_analyze_{user_id}_{int(datetime.utcnow().timestamp())}",
-                    existing_profile=existing_profile
+                    existing_profile=existing_profile,
+                    user_id=user_id
                 ):
                     if not event:
                         continue
@@ -1041,6 +1117,31 @@ async def api_oss_list(bucket: str = "mindmaps", prefix: str = ""):
     from services.oss_service import list_files
     files = await list_files(bucket, prefix)
     return {"success": True, "bucket": bucket, "files": files}
+
+
+# ===== 用户列表（用于前端用户切换器）=====
+
+@app.get("/api/users/list")
+async def list_users():
+    """列出所有可用用户（用于前端切换演示）"""
+    if not db_conn._async_session_factory:
+        raise HTTPException(500, "数据库未初始化")
+    async with db_conn._async_session_factory() as db:
+        result = await db.execute(
+            select(User.id, User.username, User.email, User.is_active, User.created_at)
+            .order_by(User.id)
+        )
+        rows = result.all()
+        users = []
+        for r in rows:
+            users.append({
+                "id": r.id,
+                "username": r.username,
+                "email": r.email,
+                "is_active": bool(r.is_active),
+                "created_at": r.created_at.isoformat() if r.created_at else None,
+            })
+        return {"success": True, "data": users}
 
 
 # ===== 健康检查 =====

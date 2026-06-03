@@ -1,4 +1,5 @@
 from typing import Dict, Any
+import json
 from graph.state import AgentState
 from services.llm_service import get_llm_service
 import time
@@ -106,22 +107,32 @@ class QuestionAgent:
 4. 编程题要有完整可运行代码
 """
 
-        result = await llm.structured_output(
+        uid = int(input_data.get("user_id") or 0)
+        result = await llm.chat(
             messages=[{"role": "user", "content": prompt}],
-            output_schema={
-                "questions": [
-                    {
-                        "id": "", "type": "", "question": "",
-                        "options": [], "answer": "",
-                        "explanation": "", "difficulty": 3,
-                        "knowledge_point": "", "hints": []
-                    }
-                ]
-            },
-            system_prompt="你擅长设计有针对性的练习题，能根据学生水平调整难度。"
+            system_prompt="你擅长设计有针对性的练习题，能根据学生水平调整难度。请严格返回JSON格式的题目列表。",
+            cache_agent="quiz",
+            cache_chapter=str(input_data.get("topic", ""))[:32],
+            cache_stage="agent",
+            cache_profile_hash=str(uid),
+            cache_user_id=uid,
+            use_cache=False,
+            write_cache=False,
         )
 
-        return {"questions": result.get("questions", [])}
+        questions = []
+        try:
+            raw = result.get("content", "[]")
+            if "```json" in raw:
+                raw = raw.split("```json")[1].split("```")[0].strip()
+            elif "```" in raw:
+                raw = raw.split("```")[1].split("```")[0].strip()
+            questions = json.loads(raw)
+        except Exception as parse_err:
+            logger.warning(f"[{self.AGENT_NAME}] JSON解析失败: {parse_err}, 使用原始文本")
+            questions = [{"id": "q1", "type": "text", "question": result.get("content", "")[:500]}]
+
+        return {"questions": questions if isinstance(questions, list) else [questions]}
 
     def _build_result(self, output_data: Dict[str, Any]) -> Dict[str, Any]:
         return {"questions": output_data["questions"]}

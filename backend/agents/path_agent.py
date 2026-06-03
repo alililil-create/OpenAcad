@@ -64,7 +64,8 @@ class PathAgent:
                 "has_questions": bool(state.get("questions")),
                 "has_code": bool(state.get("code_examples")),
                 "has_mindmap": bool(state.get("mindmap"))
-            }
+            },
+            "user_id": int(state.get("user_id") or 0),
         }
 
     async def _process(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -111,6 +112,7 @@ class PathAgent:
 6. 总时长控制在8-12周
 """
 
+        uid = int(input_data.get("user_id") or 0)
         result = await llm.structured_output(
             messages=[{"role": "user", "content": prompt}],
             output_schema={
@@ -122,7 +124,8 @@ class PathAgent:
                     }
                 ]
             },
-            system_prompt="你是教育规划专家，擅长根据学生特点制定科学的学习路径。"
+            system_prompt="你是教育规划专家，擅长根据学生特点制定科学的学习路径。",
+            cache_user_id=uid,
         )
 
         return {"path": result.get("learning_path", [])}
