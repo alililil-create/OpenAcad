@@ -88,7 +88,8 @@ class ProfileAgent:
         return {
             "messages": state.get("messages", []),
             "user_query": state.get("user_query", ""),
-            "existing_profile": state.get("student_profile")
+            "existing_profile": state.get("student_profile"),
+            "user_id": int(state.get("user_id") or 0),
         }
 
     async def _process(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -273,10 +274,12 @@ class ProfileAgent:
             "confidence_score": 0.5, "profile_version": 1
         }
 
+        uid = int(input_data.get("user_id") or 0)
         result = await llm.structured_output(
             messages=[{"role": "user", "content": prompt}],
             output_schema=output_schema,
-            system_prompt="你是机器学习教育画像分析专家。从对话中精确提取学生特征，不编造不确定的信息。skill_matrix 评分需要分布在 1-5 范围内，不要全部给中间值。"
+            system_prompt="你是机器学习教育画像分析专家。从对话中精确提取学生特征，不编造不确定的信息。skill_matrix 评分需要分布在 1-5 范围内，不要全部给中间值。",
+            cache_user_id=uid,
         )
 
         # 深度合并已有画像

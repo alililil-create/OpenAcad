@@ -59,7 +59,8 @@ class MindmapAgent:
         return {
             "topic": state.get("user_query", ""),
             "profile": state.get("student_profile"),
-            "document_content": state.get("document", {}).get("content", "") if state.get("document") else ""
+            "document_content": state.get("document", {}).get("content", "") if state.get("document") else "",
+            "user_id": int(state.get("user_id") or 0),
         }
 
     async def _process(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -70,6 +71,7 @@ class MindmapAgent:
 
 学生年级：{profile.get('grade_level', '未知')}
 已有文档内容摘要：{input_data['document_content'][:500] if input_data['document_content'] else '无'}
+[uid={input_data.get('user_id', 0)}]
 
 请以Markdown格式生成思维导图（使用缩进表示层级关系）：
 
@@ -103,9 +105,13 @@ class MindmapAgent:
 4. 适合用Markmap等工具渲染
 """
 
+        uid = int(input_data.get("user_id") or 0)
         result = await llm.chat(
             messages=[{"role": "user", "content": prompt}],
-            system_prompt="你擅长将复杂知识体系整理成清晰的思维导图结构。"
+            system_prompt="你擅长将复杂知识体系整理成清晰的思维导图结构。",
+            cache_user_id=uid,
+            use_cache=False,
+            write_cache=False,
         )
 
         return {"mindmap_content": result["content"]}

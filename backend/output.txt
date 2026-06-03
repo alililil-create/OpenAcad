@@ -1,0 +1,20 @@
+﻿=== Material ID=3, chapter=ml_overview, stage=seedling ===
+题目总数: 5
+题型分布: {'choice': 3, 'judge': 2}
+
+=== Material ID=2, chapter=ml_overview, stage=seedling ===
+题目总数: 5
+题型分布: {'choice': 2, 'judge': 1, 'fill': 1, 'text': 1}
+
+  【简答题 q5】
+    id: q5
+    question: 请简要描述强化学习的基本原理，并说明它适用于哪类问题。
+    answer: 强化学习包含一个智能体在环境中采取行动，环境会返回奖励或惩罚。智能体通过不断试错，学习一套策略，以最大化长期累积奖励。它适用于需要连续决策的场景，如下棋、机器人行走等。
+    key_points: None
+    difficulty: 2
+    doc_section_id: SEC-02
+
+=== Material ID=1, chapter=supervised_learning, stage=seedling ===
+题目总数: 5
+题型分布: {'choice': 2, 'truefalse': 1, 'fill': 1, 'short_answer': 1}
+

@@ -18,11 +18,60 @@ class CacheService:
     PROFILE_PREFIX = "profile:"
     SESSION_PREFIX = "session:"
     RATE_LIMIT_PREFIX = "rate:"
+    LLM_PREFIX = "llm:"
 
     # 过期时间
     PROFILE_TTL = 3600    # 画像缓存1小时
     SESSION_TTL = 1800    # 会话缓存30分钟
     RATE_TTL = 60         # 限流窗口1分钟
+    LLM_DOC_TTL = 86400   # LLM 文档生成缓存24小时
+    LLM_QUIZ_TTL = 86400  # LLM 题目生成缓存24小时
+
+    @staticmethod
+    def _make_llm_key(agent: str, chapter_id: str, stage: str, profile_hash: str = "", user_id: int = 0) -> str:
+        safe_user = int(user_id) if user_id else 0
+        return f"{CacheService.LLM_PREFIX}u{safe_user}:{agent}:{chapter_id}:{stage}:{profile_hash}"
+
+    @staticmethod
+    async def get_llm_cache(agent: str, chapter_id: str, stage: str, profile_hash: str = "", user_id: int = 0) -> dict | None:
+        r = CacheService._get_redis()
+        if r is None:
+            return None
+        key = CacheService._make_llm_key(agent, chapter_id, stage, profile_hash, user_id)
+        try:
+            data = await r.get(key)
+            if data:
+                logger.info(f"[Cache] LLM cache hit: {key}")
+                return json.loads(data)
+        except Exception as e:
+            logger.warning(f"[Cache] LLM cache read failed: {e}")
+        return None
+
+    @staticmethod
+    async def set_llm_cache(agent: str, chapter_id: str, stage: str, content: str, profile_hash: str = "", user_id: int = 0) -> None:
+        r = CacheService._get_redis()
+        if r is None:
+            return
+        key = CacheService._make_llm_key(agent, chapter_id, stage, profile_hash, user_id)
+        ttl = CacheService.LLM_DOC_TTL if agent == "doc" else CacheService.LLM_QUIZ_TTL
+        try:
+            await r.setex(key, ttl, json.dumps({"content": content}, ensure_ascii=False))
+            logger.info(f"[Cache] LLM cache set: {key}, ttl={ttl}s, len={len(content)}")
+        except Exception as e:
+            logger.warning(f"[Cache] LLM cache write failed: {e}")
+
+    @staticmethod
+    async def invalidate_llm_cache(agent: str = None, chapter_id: str = None, user_id: int = 0) -> None:
+        r = CacheService._get_redis()
+        if r is None:
+            return
+        try:
+            user_part = f"u{user_id}" if user_id else "u*"
+            pattern = f"{CacheService.LLM_PREFIX}{user_part}:{agent or '*'}:{chapter_id or '*'}:*"
+            async for key in r.scan_iter(match=pattern, count=100):
+                await r.delete(key)
+        except Exception:
+            pass
 
     @staticmethod
     def _get_redis() -> Redis | None:

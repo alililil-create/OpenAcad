@@ -600,7 +600,14 @@ for i in range(5):
         messages: List[Dict[str, str]],
         system_prompt: Optional[str] = None,
         temperature: Optional[float] = None,
-        max_tokens: Optional[int] = None
+        max_tokens: Optional[int] = None,
+        cache_agent: Optional[str] = None,
+        cache_chapter: Optional[str] = None,
+        cache_stage: Optional[str] = None,
+        cache_profile_hash: Optional[str] = None,
+        cache_user_id: int = 0,
+        use_cache: bool = True,
+        write_cache: bool = True
     ) -> Dict[str, Any]:
         """模拟非流式对话"""
         start_time = time.time()
@@ -611,16 +618,73 @@ for i in range(5):
         user_msg = messages[-1]["content"] if messages else ""
         
         # 根据关键词返回不同的模拟回复
-        if "画像" in user_msg or "profile" in user_msg or "学习情况" in user_msg:
+        if "题目" in user_msg or "练习题" in user_msg or "出题" in user_msg or ("测试题" in user_msg) or ("题库" in user_msg and "生成" in user_msg):
+            mock_quiz = [
+                {"id": "q1", "type": "choice", "question": "以下哪个不属于机器学习的三大范式？", "options": ["A. 监督学习", "B. 无监督学习", "C. 半监督学习", "D. 强化学习"], "answer": "C", "explanation": "机器学习的三大范式是：监督学习、无监督学习、强化学习。'半监督学习'是监督与无监督的结合，不属于基本范式。", "difficulty": 2, "knowledge_point": "ML基本概念", "doc_section_id": "SEC-01", "hints": ["思考哪些是最常见的学习方式"], "key_points": ["监督学习", "无监督学习", "强化学习"]},
+                {"id": "q2", "type": "choice", "question": "关于梯度下降算法，学习率过大会导致什么问题？", "options": ["A. 收敛速度过慢", "B. 震荡或不收敛", "C. 过拟合", "D. 欠拟合"], "answer": "B", "explanation": "学习率过大会导致参数更新步长太大，可能在最小值附近来回震荡甚至发散。", "difficulty": 2, "knowledge_point": "优化算法", "doc_section_id": "SEC-02", "hints": ["想象下山时步子太大"], "key_points": ["震荡", "不收敛", "发散"]},
+                {"id": "q3", "type": "judge", "question": "机器学习就是深度学习。", "options": ["正确", "错误"], "answer": "B", "explanation": "机器学习是人工智能的子领域，深度学习是机器学习的子集。不是所有机器学习问题都需要深度学习。", "difficulty": 1, "knowledge_point": "ML基本概念", "doc_section_id": "SEC-01", "hints": ["考虑包含关系"], "key_points": ["子集", "包含关系"]},
+                {"id": "q4", "type": "judge", "question": "数据量越大，模型效果一定越好。", "options": ["正确", "错误"], "answer": "B", "explanation": "数据质量比数量更重要。脏数据、噪声数据反而会降低模型性能。", "difficulty": 1, "knowledge_point": "数据质量", "doc_section_id": "SEC-05", "hints": ["考虑数据质量"], "key_points": ["数据质量", "噪声", "脏数据"]},
+                {"id": "q5", "type": "text", "question": "请简述监督学习和无监督学习的区别，并各举一个应用场景。", "options": None, "answer": "监督学习使用有标签的数据进行训练，目标是学习输入到输出的映射关系，常用于分类和回归任务，例如垃圾邮件分类。无监督学习使用无标签数据，发现数据中的隐藏结构或模式，常用于聚类和降维，例如客户分群。", "explanation": "监督学习依赖于标注数据，每个样本都有明确的正确答案；无监督学习则试图在没有标签的情况下发现数据内在规律。", "difficulty": 3, "knowledge_point": "监督学习vs无监督学习", "doc_section_id": "SEC-01", "hints": ["一个有标签一个无标签", "想想分类和聚类的区别"], "key_points": ["有标签", "无标签", "分类", "回归", "聚类"]},
+            ]
+            content = json.dumps(mock_quiz, ensure_ascii=False)
+        elif "画像" in user_msg or "学习情况" in user_msg or "学习情况分析" in user_msg:
             content = f"已成功构建你的学习画像！\\n\\n基于你的对话，我提取了以下特征：\\n\\n📚 专业背景：{self.mock_profiles[0]['major']}\\n🎓 年级水平：{self.mock_profiles[0]['grade_level']}\\n🔢 数学基础：{self.mock_profiles[0]['math_foundation']}/5\\n💻 编程经验：{self.mock_profiles[0]['programming_exp']}/5\\n🤖 ML知识储备：{self.mock_profiles[0]['ml_knowledge']}/5\\n\\n接下来我将调用其他Agent为你生成个性化学习资源..."
-            
-        elif "文档" in user_msg or "讲解" in user_msg or "学习" in user_msg:
-            doc = list(self.mock_documents.values())[0]
-            content = f"✅ 已为你生成《{doc['title']}》\\n\\n📄 内容概要：\\n- 包含{len(doc['content'])}字详细讲解\\n- 涵盖概念、数学、代码、应用\\n- 预计阅读时间：{doc['estimated_time']}分钟\\n\\n💡 文档特点：\\n- 适合{doc['difficulty']}级别学习者\\n- 包含可运行的Python代码示例\\n- 提供实际应用案例分析"
-            
-        elif "题目" in user_msg or "练习" in user_msg or "测试" in user_msg:
-            content = f"✅ 已生成{len(self.mock_questions)}道练习题\\n\\n📝 题目类型覆盖：\\n- 选择题：{sum(1 for q in self.mock_questions if q['type']=='choice')}道\\n- 填空题：{sum(1 for q in self.mock_questions if q['type']=='fill_blank')}道\\n- 编程题：{sum(1 for q in self.mock_questions if q['type']=='coding')}道\\n- 案例分析：{sum(1 for q in self.mock_questions if q['type']=='case_study')}道\\n\\n🎯 难度分布：从基础({min(q['difficulty'] for q in self.mock_questions)})到进阶({max(q['difficulty'] for q in self.mock_questions)})"
-            
+        elif "文档" in user_msg or "讲解" in user_msg or ("教学" in user_msg and "生成" in user_msg):
+            content = """# 机器学习基础 - 🌱 启蒙
+
+## [SEC-01] 核心概念
+
+**机器学习 (Machine Learning)** 是人工智能的一个子领域，它使计算机能够从数据中自动学习和改进，而无需进行明确的编程。
+
+简单来说：不是我们教计算机怎么做，而是让计算机自己学会怎么做。
+
+核心三要素：
+1. **数据 (Data)**: 学习的原料
+2. **模型 (Model)**: 学习的方法
+3. **算法 (Algorithm)**: 学习的规则
+
+## [SEC-02] 原理详解
+
+机器学习的基本流程是：收集数据 → 选择模型 → 训练模型 → 评估模型 → 预测。
+
+就像学骑自行车一样：你不需要记住每块肌肉该怎么动（编程），而是通过不断练习（数据+反馈），身体自然学会了平衡（模型）。
+
+关键概念：
+- **训练集**: 用来学习的数据
+- **测试集**: 用来检验学习效果的数据
+- **特征**: 数据中用来做判断的属性
+
+## [SEC-03] 代码示例
+
+```python
+from sklearn.linear_model import LinearRegression
+import numpy as np
+
+X = np.array([[1], [2], [3], [4], [5]])
+y = np.array([2, 4, 6, 8, 10])
+
+model = LinearRegression()
+model.fit(X, y)
+
+predictions = model.predict([[6]])
+print(f"预测值: {predictions}")
+```
+
+## [SEC-04] 应用场景
+
+1. **房价预测**: 根据面积、位置等特征预测房价
+2. **垃圾邮件分类**: 根据邮件内容判断是否为垃圾邮件
+3. **图像识别**: 识别手写数字（MNIST数据集）
+4. **推荐系统**: 根据用户行为推荐商品
+
+## [SEC-05] 常见误区与总结
+
+常见误区：
+1. 机器学习≠深度学习，深度学习是机器学习的子集
+2. 数据质量比数量更重要，脏数据会降低模型性能
+3. 复杂模型不一定更好，Occam's Razor原则
+
+总结：机器学习让计算机从数据中学习规律，三大要素是数据、模型和算法。"""
         else:
             content = f"[Mock回复] 你说的是：{user_msg}\\n\\n这是一个模拟的AI回复。在真实模式下，这里会调用大模型API生成个性化的回答。\\n\\n当前系统状态：\\n- ✅ 后端服务正常运行\\n- ✅ 7个Agent已就绪\\n- ⏳ 等待接入真实AI模型"
 
@@ -654,7 +718,8 @@ for i in range(5):
         self,
         messages: List[Dict[str, str]],
         output_schema: Dict[str, Any],
-        system_prompt: Optional[str] = None
+        system_prompt: Optional[str] = None,
+        cache_user_id: int = 0
     ) -> Dict[str, Any]:
         """模拟结构化输出"""
         await asyncio.sleep(1.5)  # 模拟处理时间

@@ -25,8 +25,14 @@ class Settings(BaseSettings):
     XUNFEI_API_SECRET: str = ""
     XUNFEI_API_PASSWORD: str = ""
 
-    # 模型选择
-    LLM_MODEL: str = "X2"
+    # LLM 提供商
+    LLM_PROVIDER: str = "spark"  # spark / deepseek / qwen
+    LLM_MODEL: str = "spark-x"
+
+    # DeepSeek 配置 (支持火山方舟等第三方平台)
+    DEEPSEEK_API_KEY: str = ""
+    DEEPSEEK_MODEL: str = "deepseek-chat"
+    DEEPSEEK_BASE_URL: str = "https://ark.cn-beijing.volces.com/api/v3"
 
     # 阿里云通义千问配置
     QWEN_API_KEY: str = ""

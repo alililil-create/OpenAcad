@@ -40,11 +40,7 @@ async function triggerProfileAnalysis() {
   if (isProcessing) return;
 
   // 获取用户ID
-  let userId = null;
-  try {
-    const user = JSON.parse(localStorage.getItem('ml_user') || 'null');
-    userId = user?.user_id;
-  } catch(e) {}
+  var userId = Storage.getUserID();
 
   if (!userId) {
     appendAIMessage('⚠️ 请先登录后再使用此功能。<a href="register.html">去登录</a>');

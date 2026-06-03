@@ -18,12 +18,7 @@ class MLApiClient {
     }
 
     _getUserId() {
-        try {
-            const user = JSON.parse(localStorage.getItem('ml_user') || '{}');
-            return user.user_id || null;
-        } catch {
-            return null;
-        }
+        return Storage.getUserID();
     }
 
     // 非流式对话

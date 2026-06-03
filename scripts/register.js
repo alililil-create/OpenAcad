@@ -55,11 +55,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const passwordError = document.getElementById('passwordError');
   const confirmPasswordError = document.getElementById('confirmPasswordError');
 
-  // 初始化：检查登录状态
-  const savedUser = Storage.getUser();
-  if (savedUser && savedUser.token && savedUser.user_id) {
-    navigateTo('index.html');
-    return;
+  // 初始化：清除旧数据，检查登录状态
+  checkAndRedirectIfLoggedIn();
+
+  function checkAndRedirectIfLoggedIn() {
+    var savedUser = Storage.getUser();
+    if (savedUser && savedUser.token && savedUser.user_id) {
+      navigateTo('index.html');
+    }
   }
 
   function validateUsername() {
@@ -134,7 +137,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const result = await response.json();
 
       if (result.success) {
-        // 保存用户信息到 localStorage
+        // 先清除所有旧数据，再写入新数据
+        Storage.clearAll();
+
         Storage.setUser({
           user_id: result.data.user_id,
           username: result.data.username,

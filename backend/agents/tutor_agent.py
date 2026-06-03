@@ -59,7 +59,8 @@ class TutorAgent:
         return {
             "question": state.get("user_query", ""),
             "context": state.get("messages", []),
-            "profile": state.get("student_profile")
+            "profile": state.get("student_profile"),
+            "user_id": int(state.get("user_id") or 0),
         }
 
     async def _process(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -94,9 +95,17 @@ class TutorAgent:
 - 字数500-800字
 """
 
+        uid = int(input_data.get("user_id") or 0)
         result = await llm.chat(
             messages=[{"role": "user", "content": prompt}],
-            system_prompt="你是一位经验丰富的机器学习导师，善于因材施教，能用最简单的语言解释复杂的概念。"
+            system_prompt="你是一位经验丰富的机器学习导师，善于因材施教，能用最简单的语言解释复杂的概念。",
+            cache_agent="tutor",
+            cache_chapter="tutor",
+            cache_stage="agent",
+            cache_profile_hash=str(uid),
+            cache_user_id=uid,
+            use_cache=False,
+            write_cache=False,
         )
 
         return {"response": result["content"]}

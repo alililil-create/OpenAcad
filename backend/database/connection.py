@@ -66,6 +66,11 @@ async def get_db_session() -> AsyncSession:
             await session.close()
 
 
+def get_session_factory():
+    """获取session工厂（路由层直接使用）"""
+    return _async_session_factory
+
+
 # 直接获取 session 实例（非依赖注入场景）
 AsyncSessionLocal = get_db_session
 

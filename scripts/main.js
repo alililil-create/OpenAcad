@@ -139,7 +139,6 @@ function requireAuth(redirectTo = 'register.html') {
 // 初始化页面公共元素
 function initCommonPage() {
   initNavbarScroll();
-  initMockData();
 }
 
 // 导出函数

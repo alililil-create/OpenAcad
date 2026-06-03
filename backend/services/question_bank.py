@@ -1,5 +1,5 @@
 """
-机器学习题库 — 15 道单选题，覆盖 7 个章节，28 个知识点
+机器学习题库 — 覆盖 9 个章节，45 个知识点
 支持自适应跳题逻辑
 """
 
@@ -7,6 +7,38 @@
 # 每道题包含: id, chapter, knowledge_points[], difficulty(1-5), question, options, answer(0-based), explanation
 
 QUESTIONS = [
+    # ===== 机器学习概述 (2题) =====
+    {
+        "id": "overview_1",
+        "chapter": "ml_overview",
+        "knowledge_points": ["ml_definition", "supervised_unsupervised"],
+        "difficulty": 1,
+        "question": "以下哪项最准确地描述了\"机器学习\"？",
+        "options": [
+            "计算机通过明确的规则编程来执行任务",
+            "计算机从数据中自动学习模式和规律",
+            "计算机模拟人类大脑的所有功能",
+            "计算机执行预先定义的逻辑推理"
+        ],
+        "answer": 1,
+        "explanation": "机器学习的核心是从数据中自动学习规律，而无需显式编程。"
+    },
+    {
+        "id": "overview_2",
+        "chapter": "ml_overview",
+        "knowledge_points": ["bias_variance"],
+        "difficulty": 2,
+        "question": "当模型复杂度增加时，偏差和方差分别如何变化？",
+        "options": [
+            "偏差增大，方差减小",
+            "偏差减小，方差增大",
+            "偏差和方差都增大",
+            "偏差和方差都减小"
+        ],
+        "answer": 1,
+        "explanation": "模型复杂度增加时，偏差减小（拟合能力更强），但方差增大（对训练数据更敏感），这就是偏差-方差权衡。"
+    },
+
     # ===== 数学基础 (3题) =====
     {
         "id": "math_1",
@@ -54,7 +86,7 @@ QUESTIONS = [
         "explanation": "梯度指向函数值上升最快的方向，因此梯度下降中参数更新方向为负梯度方向，即下降最快的方向。"
     },
 
-    # ===== 编程基础 (2题) =====
+    # ===== 编程与数据处理 (2题) =====
     {
         "id": "code_1",
         "chapter": "programming",
@@ -68,20 +100,20 @@ QUESTIONS = [
     {
         "id": "code_2",
         "chapter": "programming",
-        "knowledge_points": ["numpy", "pandas"],
+        "knowledge_points": ["data_preprocessing", "sklearn"],
         "difficulty": 2,
-        "question": "使用 Pandas 读取 CSV 文件并查看前5行的正确方法是？",
+        "question": "在scikit-learn中，对特征进行标准化（均值为0，标准差为1）应使用哪个类？",
         "options": [
-            "pd.read_csv('file.csv').top(5)",
-            "pd.read('file.csv').head(5)",
-            "pd.read_csv('file.csv').head(5)",
-            "pd.open_csv('file.csv').preview(5)"
+            "sklearn.preprocessing.MinMaxScaler",
+            "sklearn.preprocessing.StandardScaler",
+            "sklearn.preprocessing.Normalizer",
+            "sklearn.decomposition.PCA"
         ],
-        "answer": 2,
-        "explanation": "Pandas 读取 CSV 用 pd.read_csv()，查看前几行用 .head(n) 方法。"
+        "answer": 1,
+        "explanation": "StandardScaler 对每个特征减去均值再除以标准差，实现Z-score标准化。MinMaxScaler做归一化到[0,1]，Normalizer按样本归一化。"
     },
 
-    # ===== 监督学习 (4题) =====
+    # ===== 监督学习 (5题) =====
     {
         "id": "sup_1",
         "chapter": "supervised_learning",
@@ -100,20 +132,35 @@ QUESTIONS = [
     {
         "id": "sup_2",
         "chapter": "supervised_learning",
-        "knowledge_points": ["decision_tree"],
-        "difficulty": 3,
-        "question": "决策树节点划分时，ID3算法使用的准则是什么？",
+        "knowledge_points": ["naive_bayes"],
+        "difficulty": 2,
+        "question": "朴素贝叶斯分类器在文本分类中表现优秀的主要原因是什么？",
         "options": [
-            "基尼系数 (Gini Index)",
-            "信息增益 (Information Gain)",
-            "均方误差 (MSE)",
-            "F1分数"
+            "它能捕捉特征之间的复杂交互",
+            "特征独立假设在文本场景下近似成立且计算高效",
+            "它使用了深度神经网络",
+            "它不需要任何训练数据"
         ],
         "answer": 1,
-        "explanation": "ID3 使用信息增益作为划分准则，选择使信息增益最大的特征进行分裂。C4.5 用信息增益率，CART 可用基尼系数。"
+        "explanation": "文本分类中词的特征近似独立，朴素贝叶斯的条件独立假设恰好适用，且计算复杂度低，适合高维稀疏数据。"
     },
     {
         "id": "sup_3",
+        "chapter": "supervised_learning",
+        "knowledge_points": ["knn"],
+        "difficulty": 2,
+        "question": "KNN算法中，K值过小会导致什么问题？",
+        "options": [
+            "欠拟合",
+            "过拟合，对噪声敏感",
+            "计算速度变慢",
+            "模型无法收敛"
+        ],
+        "answer": 1,
+        "explanation": "K值过小时，模型只关注最近的少数样本，容易受噪声影响，导致过拟合。K值过大则可能导致欠拟合。"
+    },
+    {
+        "id": "sup_4",
         "chapter": "supervised_learning",
         "knowledge_points": ["svm"],
         "difficulty": 4,
@@ -128,7 +175,7 @@ QUESTIONS = [
         "explanation": "核函数通过隐式映射将低维不可分数据投影到高维空间，在高维空间寻找最优分离超平面。"
     },
     {
-        "id": "sup_4",
+        "id": "sup_5",
         "chapter": "supervised_learning",
         "knowledge_points": ["ensemble"],
         "difficulty": 3,
@@ -143,7 +190,7 @@ QUESTIONS = [
         "explanation": "随机森林用 Bagging 并行训练多棵决策树后投票/平均；GBDT 用 Boosting 串行训练，每棵树拟合前一棵的残差。"
     },
 
-    # ===== 无监督学习 (1题) =====
+    # ===== 无监督学习 (2题) =====
     {
         "id": "unsup_1",
         "chapter": "unsupervised_learning",
@@ -159,8 +206,23 @@ QUESTIONS = [
         "answer": 1,
         "explanation": "K-means 是无监督聚类算法，PCA 是无监督降维方法，两者都不需要标签数据。"
     },
+    {
+        "id": "unsup_2",
+        "chapter": "unsupervised_learning",
+        "knowledge_points": ["dbscan"],
+        "difficulty": 3,
+        "question": "相比K-Means，DBSCAN的主要优势是什么？",
+        "options": [
+            "计算速度更快",
+            "能发现任意形状的簇且不需要预设簇数",
+            "总是产生更好的聚类结果",
+            "适用于所有类型的数据"
+        ],
+        "answer": 1,
+        "explanation": "DBSCAN基于密度聚类，能发现任意形状的簇，且自动确定簇的数量，不需要像K-Means那样预设K值。"
+    },
 
-    # ===== 神经网络与深度学习 (2题) =====
+    # ===== 神经网络基础 (2题) =====
     {
         "id": "nn_1",
         "chapter": "neural_networks",
@@ -179,6 +241,23 @@ QUESTIONS = [
     {
         "id": "nn_2",
         "chapter": "neural_networks",
+        "knowledge_points": ["activation_optimizer"],
+        "difficulty": 3,
+        "question": "Adam优化器相比SGD的主要改进是什么？",
+        "options": [
+            "不需要学习率",
+            "自适应调整每个参数的学习率，结合动量和RMSprop",
+            "只使用一阶梯度信息",
+            "训练速度一定更快"
+        ],
+        "answer": 1,
+        "explanation": "Adam结合了动量法（Momentum）和RMSprop，为每个参数自适应地调整学习率，通常收敛更快更稳定。"
+    },
+
+    # ===== 深度学习 (3题) =====
+    {
+        "id": "dl_1",
+        "chapter": "deep_learning",
         "knowledge_points": ["cnn"],
         "difficulty": 3,
         "question": "CNN中卷积层的主要作用是提取哪种特征？",
@@ -190,6 +269,36 @@ QUESTIONS = [
         ],
         "answer": 1,
         "explanation": "卷积核在图像上滑动，提取局部空间特征（边缘、角点、纹理），深层卷积可提取更抽象的高级特征。"
+    },
+    {
+        "id": "dl_2",
+        "chapter": "deep_learning",
+        "knowledge_points": ["transformer"],
+        "difficulty": 4,
+        "question": "Transformer中的自注意力（Self-Attention）机制的核心思想是什么？",
+        "options": [
+            "只关注相邻的词",
+            "通过Query-Key-Value计算序列中每个位置对所有位置的注意力权重",
+            "使用卷积提取局部特征",
+            "通过递归方式处理序列"
+        ],
+        "answer": 1,
+        "explanation": "自注意力通过Q-K-V机制计算序列中每个位置对其他所有位置的关联度（注意力权重），实现全局依赖建模，是Transformer的核心。"
+    },
+    {
+        "id": "dl_3",
+        "chapter": "deep_learning",
+        "knowledge_points": ["transfer_learning"],
+        "difficulty": 3,
+        "question": "迁移学习中'微调（Fine-tuning）'的含义是什么？",
+        "options": [
+            "从头开始训练模型",
+            "在预训练模型基础上，用新数据继续训练部分或全部层",
+            "只使用模型最后一层",
+            "减小模型参数量"
+        ],
+        "answer": 1,
+        "explanation": "微调是在预训练模型的基础上，用目标领域的数据继续训练，调整部分或全部层的参数，使模型适应新任务。"
     },
 
     # ===== 模型评估与调优 (2题) =====
@@ -211,33 +320,33 @@ QUESTIONS = [
     {
         "id": "eval_2",
         "chapter": "model_evaluation",
-        "knowledge_points": ["cross_validation", "metrics"],
+        "knowledge_points": ["feature_engineering", "cross_validation"],
         "difficulty": 2,
-        "question": "K 折交叉验证的主要目的是什么？",
+        "question": "特征工程的核心目标是什么？",
         "options": [
-            "增加训练样本数量",
-            "更可靠地评估模型泛化能力",
-            "减少模型参数量",
-            "加速模型训练"
+            "增加特征数量",
+            "从原始数据中提取更有信息量的特征以提升模型性能",
+            "删除所有缺失值",
+            "只使用数值型特征"
         ],
         "answer": 1,
-        "explanation": "K折交叉验证将数据分为K份轮换验证，每个样本都参与训练和验证，得到更稳定可靠的模型性能估计。"
+        "explanation": "特征工程是从原始数据中构建更有表达力的特征，包括特征构造、选择、变换等，是提升模型性能的关键步骤。"
     },
 
     # ===== 进阶方向兴趣探测 (1题) =====
     {
         "id": "adv_1",
         "chapter": "advanced_interest",
-        "knowledge_points": ["nlp", "cv", "reinforcement_learning", "mlops"],
+        "knowledge_points": ["nlp", "cv", "llm", "reinforcement_learning", "recommendation", "mlops"],
         "difficulty": 1,
         "question": "以下哪个机器学习子方向你最感兴趣或有过接触？",
         "options": [
             "自然语言处理 (NLP) — 文本分类、GPT等",
             "计算机视觉 (CV) — 图像识别、目标检测等",
-            "强化学习 — 游戏AI、机器人控制等",
-            "MLOps — 模型部署、监控、CI/CD"
+            "大语言模型 (LLM) — ChatGPT、微调、Prompt工程",
+            "推荐系统 / MLOps — 个性化推荐、模型部署"
         ],
-        "answer": -1,  # 无正确/错误之分，兴趣探测题
+        "answer": -1,
         "explanation": "此题不计分，用于探测学习兴趣方向，帮助后续推荐学习内容。"
     }
 ]
@@ -245,13 +354,15 @@ QUESTIONS = [
 
 # ===== 章节分配规则 =====
 CHAPTER_ALLOCATION = {
-    "math_foundation": {"total": 3, "required": 1},        # 第一题对则跳过剩余
+    "ml_overview": {"total": 2, "required": 1},
+    "math_foundation": {"total": 3, "required": 1},
     "programming": {"total": 2, "required": 1},
-    "supervised_learning": {"total": 4, "required": 2},
-    "unsupervised_learning": {"total": 1, "required": 1},
+    "supervised_learning": {"total": 5, "required": 2},
+    "unsupervised_learning": {"total": 2, "required": 1},
     "neural_networks": {"total": 2, "required": 1},
+    "deep_learning": {"total": 3, "required": 2},
     "model_evaluation": {"total": 2, "required": 1},
-    "advanced_interest": {"total": 1, "required": 1}       # 兴趣探测，必答
+    "advanced_interest": {"total": 1, "required": 1}
 }
 
 # 知识点→章节映射（用于score计算）
@@ -260,15 +371,17 @@ for q in QUESTIONS:
     for kp in q["knowledge_points"]:
         KNOWLEDGE_POINT_TO_CHAPTER[kp] = q["chapter"]
 
-# 所有28个知识点列表
+# 所有45个知识点列表
 ALL_KNOWLEDGE_POINTS = {
-    "math_foundation": ["linear_algebra", "probability_stats", "calculus", "optimization"],
-    "programming": ["python", "numpy", "pandas"],
-    "supervised_learning": ["linear_regression", "logistic_regression", "decision_tree", "svm", "ensemble"],
-    "unsupervised_learning": ["kmeans", "pca"],
-    "neural_networks": ["perceptron", "backpropagation", "cnn", "rnn"],
-    "model_evaluation": ["overfitting", "cross_validation", "metrics", "regularization"],
-    "advanced_interest": ["nlp", "cv", "reinforcement_learning", "mlops"]
+    "ml_overview": ["ml_definition", "supervised_unsupervised", "data_split", "bias_variance"],
+    "math_foundation": ["linear_algebra", "probability_stats", "calculus", "optimization", "information_theory"],
+    "programming": ["python", "numpy", "pandas", "data_preprocessing", "sklearn"],
+    "supervised_learning": ["linear_regression", "logistic_regression", "naive_bayes", "knn", "decision_tree", "svm", "ensemble"],
+    "unsupervised_learning": ["kmeans", "hierarchical_clustering", "dbscan", "pca", "tsne"],
+    "neural_networks": ["perceptron", "backpropagation", "activation_optimizer", "dl_framework"],
+    "deep_learning": ["cnn", "rnn_lstm", "transformer", "gan", "transfer_learning"],
+    "model_evaluation": ["overfitting", "cross_validation", "metrics", "regularization", "feature_engineering", "hyperparameter_tuning"],
+    "advanced_interest": ["nlp", "cv", "llm", "reinforcement_learning", "recommendation", "mlops"]
 }
 
 
@@ -291,13 +404,14 @@ def get_all_chapters() -> list:
 
 
 def get_chapter_names() -> dict:
-    """章节英文→中文映射"""
     return {
+        "ml_overview": "机器学习概述",
         "math_foundation": "数学基础",
-        "programming": "编程基础",
+        "programming": "编程与数据处理",
         "supervised_learning": "监督学习",
         "unsupervised_learning": "无监督学习",
-        "neural_networks": "神经网络与深度学习",
+        "neural_networks": "神经网络基础",
+        "deep_learning": "深度学习",
         "model_evaluation": "模型评估与调优",
-        "advanced_interest": "进阶方向（兴趣探测）"
+        "advanced_interest": "进阶方向"
     }
